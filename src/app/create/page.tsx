@@ -34,12 +34,9 @@ function CreatePageContent() {
   const [personB, setPersonB] = useState<File | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
-  const [deleteImmediately, setDeleteImmediately] = useState(false);
-
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingMessage, setGeneratingMessage] = useState("");
   const [resultImage, setResultImage] = useState<string | null>(null);
-  const [variationsUsed, setVariationsUsed] = useState(0);
 
   const [showTipModal, setShowTipModal] = useState(false);
   const [hasShownTipModal, setHasShownTipModal] = useState(false);
@@ -112,7 +109,6 @@ function CreatePageContent() {
           personB: personBBase64,
           style: selectedStyle,
           prompt,
-          deleteImmediately,
         }),
       });
 
@@ -132,7 +128,7 @@ function CreatePageContent() {
       clearInterval(messageInterval);
       setIsGenerating(false);
     }
-  }, [personA, personB, selectedStyle, prompt, deleteImmediately, showToast]);
+  }, [personA, personB, selectedStyle, prompt, showToast]);
 
   const handleDownload = useCallback(() => {
     if (!resultImage) return;
@@ -154,17 +150,6 @@ function CreatePageContent() {
     document.body.removeChild(link);
   }, [resultImage, hasShownTipModal]);
 
-  const handleVariation = useCallback(() => {
-    if (variationsUsed >= 1) {
-      showToast(copy.create.result.variationLimit, "info");
-      setShowTipModal(true);
-      return;
-    }
-
-    setVariationsUsed((prev) => prev + 1);
-    handleGenerate();
-  }, [variationsUsed, handleGenerate, showToast]);
-
   const handleReset = useCallback(() => {
     setPersonA(null);
     setPersonB(null);
@@ -172,7 +157,6 @@ function CreatePageContent() {
     setPrompt("");
     setResultImage(null);
     setCurrentStep(0);
-    setVariationsUsed(0);
     setHasShownTipModal(false);
   }, []);
 
@@ -204,12 +188,6 @@ function CreatePageContent() {
             className="px-8 py-3 bg-stone-800 text-white rounded-xl font-medium hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500"
           >
             {copy.create.result.downloadButton}
-          </button>
-          <button
-            onClick={handleVariation}
-            className="px-8 py-3 bg-white text-stone-800 border border-stone-300 rounded-xl font-medium hover:bg-stone-50 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500"
-          >
-            {copy.create.result.variationsButton}
           </button>
         </div>
 
@@ -365,26 +343,6 @@ function CreatePageContent() {
                 rows={4}
                 className="w-full px-4 py-3 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent resize-none"
               />
-            </div>
-
-            {/* Delete Option */}
-            <div className="mb-8 p-4 bg-stone-50 rounded-xl border border-stone-200">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={deleteImmediately}
-                  onChange={(e) => setDeleteImmediately(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-stone-800 border-stone-300 rounded focus:ring-stone-500"
-                />
-                <div>
-                  <span className="font-medium text-stone-800">
-                    {copy.create.deleteOption.label}
-                  </span>
-                  <p className="text-sm text-stone-600 mt-1">
-                    {copy.create.deleteOption.description}
-                  </p>
-                </div>
-              </label>
             </div>
 
             {/* Generate Button */}
