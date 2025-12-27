@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.BACKEND_URL || "https://memoryframe-backend.onrender.com";
+const BACKEND_URL = process.env.BACKEND_URL || "https://memoryframe.onrender.com";
 
 interface GenerateRequest {
   personA: string; // base64
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
 
     // Handle other errors
     if (!backendResponse.ok) {
-      console.error("Backend error:", backendResponse.status, data);
+      console.error("Backend error:", data);
       return NextResponse.json(
         { error: data.message || "Generation failed. Please try again." },
         { status: backendResponse.status }
