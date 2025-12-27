@@ -1,0 +1,44 @@
+# Render.com Blueprint
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: memoryframe-backend
+    runtime: node
+    region: frankfurt
+    plan: starter
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-image-1
+      - key: REDIS_URL
+        fromService:
+          name: memoryframe-redis
+          type: redis
+          property: connectionString
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: GLOBAL_LIMIT_PER_HOUR
+        value: 10
+      - key: GLOBAL_WINDOW_SECONDS
+        value: 3600
+      - key: IP_LIMIT_PER_HOUR
+        value: 20
+      - key: MAX_UPLOAD_MB
+        value: 10
+
+  - type: redis
+    name: memoryframe-redis
+    region: frankfurt
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+
