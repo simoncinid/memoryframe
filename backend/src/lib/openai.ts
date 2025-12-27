@@ -17,44 +17,58 @@ function getOpenAI(): OpenAI {
   return openaiClient;
 }
 
+// Style instructions - ONLY about visual style, NOT about background or composition
 const STYLE_INSTRUCTIONS: Record<ImageStyle, string> = {
-  classic: 'Timeless studio portrait style with soft, flattering lighting and elegant composition.',
-  painterly: 'Artistic painterly style with visible brushstroke textures and rich colors, but maintaining photorealistic facial details.',
-  cinematic: 'Cinematic look with dramatic lighting and film-like color grading, keeping faces sharp and detailed.',
-  vintage: 'Vintage aesthetic with warm, slightly faded colors and nostalgic mood, but crystal clear facial features.',
-  blackwhite: 'Elegant black and white with strong contrast and rich tonal range, preserving all facial details.',
-  watercolor: 'Soft watercolor painting style with gentle color bleeds, but photorealistic faces.',
-  'pop-art': 'Bold Pop Art style with vibrant colors and graphic elements, keeping faces recognizable and detailed.',
-  renaissance: 'Renaissance masters style with classical painting techniques, but highly detailed realistic faces.',
-  photorealistic: 'Professional photograph with natural lighting and lifelike details.',
+  classic: 'Apply a timeless, elegant aesthetic with soft lighting and balanced colors.',
+  painterly: 'Apply an artistic painterly look with subtle brushstroke textures and rich colors, while keeping faces photorealistic.',
+  cinematic: 'Apply cinematic color grading with dramatic lighting contrast, keeping all details sharp.',
+  vintage: 'Apply a vintage film aesthetic with warm, slightly faded colors and subtle grain.',
+  blackwhite: 'Convert to elegant black and white with strong contrast and rich tonal range.',
+  watercolor: 'Apply a soft watercolor effect to the environment while keeping faces sharp and realistic.',
+  'pop-art': 'Apply bold Pop Art colors and graphic contrast while preserving facial recognition.',
+  renaissance: 'Apply Renaissance painting tones and lighting while keeping faces highly detailed and realistic.',
+  photorealistic: 'Enhance with professional photography quality - natural lighting and crisp details.',
 };
 
 function buildEditPrompt(style: string, userPrompt: string): string {
   const styleInstruction = STYLE_INSTRUCTIONS[style as ImageStyle] || STYLE_INSTRUCTIONS.classic;
   
   return `
-TASK: Transform this side-by-side photo collage into a single unified portrait where both people appear together naturally in the same scene.
+TASK: This is a side-by-side collage of two photos (LEFT and RIGHT). Transform it into a SINGLE unified photograph where ALL people from BOTH sides appear together naturally.
 
 USER REQUEST: ${userPrompt}
 
-STYLE: ${styleInstruction}
+VISUAL STYLE TO APPLY: ${styleInstruction}
 
-CRITICAL REQUIREMENTS:
-1. UNIFY the two people into ONE cohesive photograph - they should look like they're in the same physical space
-2. Make them appear connected - standing together, embracing, or interacting naturally as specified by the user
-3. Create a seamless, realistic background that fits both subjects
-4. Match lighting, shadows, and perspective perfectly between both people
-5. PRESERVE exact facial features of BOTH people - faces must remain highly detailed and recognizable
-6. Skin textures must be natural and photorealistic regardless of artistic style
-7. Hands and body proportions must be anatomically correct
-8. No visible seams, borders, or signs this was originally two separate photos
+MERGING RULES:
+1. PRESERVE ALL PEOPLE from the LEFT side - do not remove anyone
+2. ADD the person(s) from the RIGHT side into the scene with the others
+3. Everyone must appear together in ONE cohesive photo, as if they were all present in the same moment
+4. Arrange people naturally - they can be standing together, interacting, or posed as a group
+
+BACKGROUND RULES:
+- If the user specified a background/scene in their request, use that
+- If NOT specified: choose the more interesting/detailed background between LEFT and RIGHT side
+- If one side has a plain/white background and the other has a real scene, USE the real scene
+- The final background must look natural and fit all subjects
+
+FACE REQUIREMENTS (CRITICAL):
+- PRESERVE exact facial features of EVERY person - all faces must remain highly detailed and 100% recognizable
+- Faces must be HYPER-REALISTIC regardless of artistic style applied
+- Do NOT alter, blur, distort, or stylize any face
+- Natural skin textures on all faces
+
+TECHNICAL REQUIREMENTS:
+- Match lighting and shadows consistently across all people
+- Correct perspective so everyone appears at natural scale
+- Anatomically correct hands and body proportions
+- No visible seams, borders, or collage artifacts
 
 ABSOLUTE CONSTRAINTS:
-- Faces must be HYPER-REALISTIC and HIGHLY DETAILED even if using artistic styles
-- Do NOT alter, distort, or stylize facial features beyond recognition
-- Do NOT add extra people
-- Do NOT add text or watermarks
-- Do NOT create unrealistic proportions or mutations
+- Do NOT remove or ignore any person from either side
+- Do NOT add people who are not in the original images
+- Do NOT add text, watermarks, or logos
+- Do NOT create mutations or unrealistic body parts
 `.trim();
 }
 
@@ -148,7 +162,7 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
 
   const openai = getOpenAI();
 
-  // Step 1: Create collage of the two people
+  // Step 1: Create collage of the two images
   console.log('[OpenAI] Creating collage of two images...');
   const collageBuffer = await createCollage(personABase64, personBBase64);
   console.log('[OpenAI] Collage created, size:', collageBuffer.length, 'bytes');
