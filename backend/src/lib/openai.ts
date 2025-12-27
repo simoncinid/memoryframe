@@ -34,41 +34,46 @@ function buildEditPrompt(style: string, userPrompt: string): string {
   const styleInstruction = STYLE_INSTRUCTIONS[style as ImageStyle] || STYLE_INSTRUCTIONS.classic;
   
   return `
-TASK: This is a side-by-side collage of two photos (LEFT and RIGHT). Transform it into a SINGLE unified photograph where ALL people from BOTH sides appear together naturally.
+TASK: This is a side-by-side collage of two photos (LEFT and RIGHT). Merge them into ONE unified photo by placing all people together.
 
 USER REQUEST: ${userPrompt}
 
-VISUAL STYLE TO APPLY: ${styleInstruction}
+VISUAL STYLE: ${styleInstruction}
 
-MERGING RULES:
-1. PRESERVE ALL PEOPLE from the LEFT side - do not remove anyone
-2. ADD the person(s) from the RIGHT side into the scene with the others
-3. Everyone must appear together in ONE cohesive photo, as if they were all present in the same moment
-4. Arrange people naturally - they can be standing together, interacting, or posed as a group
+=== CRITICAL: MINIMAL AI GENERATION ===
+This is a PHOTO COMPOSITING task, NOT an image generation task.
+Your job is to MERGE existing photos with MINIMAL changes - like Photoshop compositing.
+DO NOT regenerate or reimagine anything. PRESERVE as much as possible from the originals.
 
-BACKGROUND RULES:
-- If the user specified a background/scene in their request, use that
-- If NOT specified: choose the more interesting/detailed background between LEFT and RIGHT side
-- If one side has a plain/white background and the other has a real scene, USE the real scene
-- The final background must look natural and fit all subjects
+=== BACKGROUND PRESERVATION (VERY IMPORTANT) ===
+1. Choose the background from LEFT or RIGHT side - whichever has the real scene (not plain/white)
+2. COPY that background EXACTLY as it appears in the original - same colors, same details, same everything
+3. Do NOT generate a new background. Do NOT add AI-generated elements to the background
+4. The background should look IDENTICAL to the source photo - as if copied pixel by pixel
+5. Only extend/blend the background minimally where needed to fit everyone
 
-FACE REQUIREMENTS (CRITICAL):
-- PRESERVE exact facial features of EVERY person - all faces must remain highly detailed and 100% recognizable
-- Faces must be HYPER-REALISTIC regardless of artistic style applied
-- Do NOT alter, blur, distort, or stylize any face
-- Natural skin textures on all faces
+=== PEOPLE PRESERVATION (VERY IMPORTANT) ===
+1. KEEP every person EXACTLY as they appear in their original photo
+2. Do NOT modify faces, hair, clothes, poses, or body proportions
+3. Do NOT regenerate or redraw any person - just PLACE them in the scene
+4. The only acceptable change is adjusting scale/position to fit everyone together
+5. Each person should look like they were cut out and pasted - preserving 100% of original details
 
-TECHNICAL REQUIREMENTS:
-- Match lighting and shadows consistently across all people
-- Correct perspective so everyone appears at natural scale
-- Anatomically correct hands and body proportions
-- No visible seams, borders, or collage artifacts
+=== MERGING RULES ===
+- Include ALL people from BOTH sides - do not remove anyone
+- Position people naturally together (standing, grouped, etc.)
+- Match lighting between people and background
+- Remove the visible border/seam between the two original photos
+- Create smooth transitions where photos meet
 
-ABSOLUTE CONSTRAINTS:
-- Do NOT remove or ignore any person from either side
-- Do NOT add people who are not in the original images
-- Do NOT add text, watermarks, or logos
-- Do NOT create mutations or unrealistic body parts
+=== ABSOLUTE CONSTRAINTS ===
+- NEVER regenerate faces - they must be pixel-perfect copies from originals
+- NEVER add AI-generated background elements - use only what's in the source photos
+- NEVER add people not in the original images
+- NEVER add text, watermarks, or logos
+- NEVER create mutations or unrealistic body parts
+
+The final result should look like a real photograph where everyone was present, NOT like AI-generated art.
 `.trim();
 }
 
