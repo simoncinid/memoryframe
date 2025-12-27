@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit } from "@/lib/rate-limit";
 
-// TODO: Replace mock with actual image generation provider (e.g., Replicate, OpenAI DALL-E, Stability AI)
-// TODO: Implement persistent storage (e.g., S3, Cloudflare R2) for generated images
-// TODO: Add proper rate limiting with Redis for production scale
+const BACKEND_URL = process.env.BACKEND_URL || "https://memoryframe.onrender.com";
 
 interface GenerateRequest {
   personA: string; // base64
@@ -14,31 +11,28 @@ interface GenerateRequest {
   deleteImmediately?: boolean;
 }
 
+function base64ToBlob(base64: string, mimeType: string): Blob {
+  // Remove data URL prefix if present
+  const base64Data = base64.includes(",") ? base64.split(",")[1] : base64;
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], { type: mimeType });
+}
+
+function getMimeType(base64: string): string {
+  if (base64.startsWith("data:")) {
+    const match = base64.match(/data:([^;]+);/);
+    return match ? match[1] : "image/jpeg";
+  }
+  return "image/jpeg";
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // Get client IP for rate limiting
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || 
-               request.headers.get("x-real-ip") || 
-               "unknown";
-
-    // Check rate limit
-    const rateLimitResult = checkRateLimit(ip);
-    if (!rateLimitResult.allowed) {
-      return NextResponse.json(
-        { 
-          error: "Daily limit reached. Try again later.",
-          resetAt: rateLimitResult.resetAt 
-        },
-        { 
-          status: 429,
-          headers: {
-            "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
-            "X-RateLimit-Reset": rateLimitResult.resetAt.toString(),
-          }
-        }
-      );
-    }
-
     const body: GenerateRequest = await request.json();
 
     // Validate required fields
@@ -49,42 +43,69 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Simulate processing time (3-6 seconds)
-    const processingTime = Math.floor(Math.random() * 3000) + 3000;
-    await new Promise((resolve) => setTimeout(resolve, processingTime));
+    // Build multipart form data for backend
+    const formData = new FormData();
+    
+    // Convert base64 images to blobs and append
+    const personAMime = getMimeType(body.personA);
+    const personBMime = getMimeType(body.personB);
+    const backgroundMime = getMimeType(body.background);
+    
+    formData.append("personA", base64ToBlob(body.personA, personAMime), "personA.jpg");
+    formData.append("personB", base64ToBlob(body.personB, personBMime), "personB.jpg");
+    formData.append("background", base64ToBlob(body.background, backgroundMime), "background.jpg");
+    formData.append("style", body.style);
+    formData.append("scene", body.prompt);
+    formData.append("delete_policy", body.deleteImmediately ? "immediate" : "24h");
 
-    // Mock result - in production, this would call the actual AI service
-    // TODO: Replace with actual image generation API call
-    // Example with Replicate:
-    // const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
-    // const output = await replicate.run("model-id", { input: { ... } });
-    
-    // For now, return a placeholder gradient image URL
-    // In production, you would:
-    // 1. Call the AI generation API
-    // 2. Upload result to persistent storage
-    // 3. Return the storage URL
-    
-    const mockImageId = Math.random().toString(36).substring(2, 15);
-    
-    // Using a gradient placeholder since we can't generate real images
-    // This simulates what the response structure would look like
-    const result = {
+    // Forward client IP for rate limiting
+    const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0] || 
+                     request.headers.get("x-real-ip") || 
+                     "unknown";
+
+    // Call backend
+    const backendResponse = await fetch(`${BACKEND_URL}/api/generate`, {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-Forwarded-For": clientIp,
+      },
+    });
+
+    const data = await backendResponse.json();
+
+    // Handle rate limit errors
+    if (backendResponse.status === 429) {
+      return NextResponse.json(
+        { 
+          error: data.message || "System is busy. Try again soon.",
+          retry_after_seconds: data.retry_after_seconds,
+        },
+        { status: 429 }
+      );
+    }
+
+    // Handle other errors
+    if (!backendResponse.ok) {
+      console.error("Backend error:", data);
+      return NextResponse.json(
+        { error: data.message || "Generation failed. Please try again." },
+        { status: backendResponse.status }
+      );
+    }
+
+    // Success - convert base64 to data URL for frontend display
+    const resultImageUrl = `data:${data.mime_type};base64,${data.image_base64}`;
+
+    return NextResponse.json({
       success: true,
-      resultImageUrl: `/api/placeholder/${mockImageId}`,
-      generationId: mockImageId,
+      resultImageUrl,
+      generationId: data.request_id,
       style: body.style,
       prompt: body.prompt,
       createdAt: new Date().toISOString(),
-      // If deleteImmediately is true, we would delete the source images here
       deletedSources: body.deleteImmediately || false,
-    };
-
-    return NextResponse.json(result, {
-      headers: {
-        "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
-        "X-RateLimit-Reset": rateLimitResult.resetAt.toString(),
-      }
+      generation_time_ms: data.generation_time_ms,
     });
 
   } catch (error) {
