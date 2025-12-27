@@ -16,7 +16,6 @@ import { trackEvent } from "@/lib/analytics";
 const steps = [
   { id: "personA", title: copy.create.steps.personA.title },
   { id: "personB", title: copy.create.steps.personB.title },
-  { id: "background", title: copy.create.steps.background.title },
   { id: "style", title: copy.create.steps.style.title },
   { id: "prompt", title: copy.create.steps.prompt.title },
 ];
@@ -33,7 +32,6 @@ function CreatePageContent() {
   const [currentStep, setCurrentStep] = useState(0);
   const [personA, setPersonA] = useState<File | null>(null);
   const [personB, setPersonB] = useState<File | null>(null);
-  const [background, setBackground] = useState<File | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
   const [deleteImmediately, setDeleteImmediately] = useState(false);
@@ -52,11 +50,11 @@ function CreatePageContent() {
     if (styleParam && copy.styles.find((s) => s.id === styleParam)) {
       setSelectedStyle(styleParam);
       // Jump to style step if style is pre-selected
-      if (personA && personB && background) {
-        setCurrentStep(3);
+      if (personA && personB) {
+        setCurrentStep(2);
       }
     }
-  }, [searchParams, personA, personB, background]);
+  }, [searchParams, personA, personB]);
 
   // Auto-advance steps
   useEffect(() => {
@@ -68,11 +66,7 @@ function CreatePageContent() {
   }, [personB, currentStep]);
 
   useEffect(() => {
-    if (background && currentStep === 2) setCurrentStep(3);
-  }, [background, currentStep]);
-
-  useEffect(() => {
-    if (selectedStyle && currentStep === 3) setCurrentStep(4);
+    if (selectedStyle && currentStep === 2) setCurrentStep(3);
   }, [selectedStyle, currentStep]);
 
   // Show tip modal after result
@@ -87,7 +81,7 @@ function CreatePageContent() {
   }, [resultImage, hasShownTipModal]);
 
   const handleGenerate = useCallback(async () => {
-    if (!personA || !personB || !background || !selectedStyle || !prompt) {
+    if (!personA || !personB || !selectedStyle || !prompt) {
       showToast("Please complete all steps before generating", "error");
       return;
     }
@@ -105,10 +99,9 @@ function CreatePageContent() {
     }, 1500);
 
     try {
-      const [personABase64, personBBase64, backgroundBase64] = await Promise.all([
+      const [personABase64, personBBase64] = await Promise.all([
         fileToBase64(personA),
         fileToBase64(personB),
-        fileToBase64(background),
       ]);
 
       const response = await fetch("/api/generate", {
@@ -117,7 +110,6 @@ function CreatePageContent() {
         body: JSON.stringify({
           personA: personABase64,
           personB: personBBase64,
-          background: backgroundBase64,
           style: selectedStyle,
           prompt,
           deleteImmediately,
@@ -140,7 +132,7 @@ function CreatePageContent() {
       clearInterval(messageInterval);
       setIsGenerating(false);
     }
-  }, [personA, personB, background, selectedStyle, prompt, deleteImmediately, showToast]);
+  }, [personA, personB, selectedStyle, prompt, deleteImmediately, showToast]);
 
   const handleDownload = useCallback(() => {
     if (!resultImage) return;
@@ -176,7 +168,6 @@ function CreatePageContent() {
   const handleReset = useCallback(() => {
     setPersonA(null);
     setPersonB(null);
-    setBackground(null);
     setSelectedStyle(null);
     setPrompt("");
     setResultImage(null);
@@ -311,27 +302,8 @@ function CreatePageContent() {
           </div>
         )}
 
-        {/* Step 3: Background */}
+        {/* Step 3: Style */}
         {currentStep === 2 && (
-          <div className="max-w-md mx-auto">
-            <h2 className="text-xl font-semibold text-stone-800 mb-2">
-              {copy.create.steps.background.title}
-            </h2>
-            <p className="text-stone-600 mb-6">
-              {copy.create.steps.background.description}
-            </p>
-            <UploadDropzone
-              onFileSelect={setBackground}
-              value={background}
-              onClear={() => setBackground(null)}
-              label="Upload background image"
-              guidelines={[]}
-            />
-          </div>
-        )}
-
-        {/* Step 4: Style */}
-        {currentStep === 3 && (
           <div>
             <h2 className="text-xl font-semibold text-stone-800 mb-2">
               {copy.create.steps.style.title}
@@ -357,8 +329,8 @@ function CreatePageContent() {
           </div>
         )}
 
-        {/* Step 5: Prompt */}
-        {currentStep === 4 && (
+        {/* Step 4: Prompt */}
+        {currentStep === 3 && (
           <div className="max-w-2xl mx-auto">
             <h2 className="text-xl font-semibold text-stone-800 mb-2">
               {copy.create.steps.prompt.title}
@@ -436,14 +408,13 @@ function CreatePageContent() {
         >
           ← Back
         </button>
-        {currentStep < 4 && (
+        {currentStep < 3 && (
           <button
-            onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
+            onClick={() => setCurrentStep(Math.min(3, currentStep + 1))}
             disabled={
               (currentStep === 0 && !personA) ||
               (currentStep === 1 && !personB) ||
-              (currentStep === 2 && !background) ||
-              (currentStep === 3 && !selectedStyle)
+              (currentStep === 2 && !selectedStyle)
             }
             className="px-6 py-2 text-stone-800 font-medium hover:text-stone-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -468,4 +439,3 @@ export default function CreatePage() {
     </Suspense>
   );
 }
-

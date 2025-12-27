@@ -58,15 +58,13 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
       // Generate or use client request ID
       requestId = fields.get('client_request_id') || generateRequestId();
 
-      // Extract files
+      // Extract files (only personA and personB needed now)
       const personA = files.get('personA');
       const personB = files.get('personB');
-      const background = files.get('background');
 
       // Validate required files
       validateFile(personA, 'personA');
       validateFile(personB, 'personB');
-      validateFile(background, 'background');
 
       // Validate required fields
       const style = validateStyle(fields.get('style'));
@@ -104,13 +102,12 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
       // Convert images to base64
       const personABase64 = personA!.buffer.toString('base64');
       const personBBase64 = personB!.buffer.toString('base64');
-      const backgroundBase64 = background!.buffer.toString('base64');
 
       // Call OpenAI
       const result = await generateImage({
         personABase64,
         personBBase64,
-        backgroundBase64,
+        backgroundBase64: '', // Not used anymore
         style,
         scene,
         size,
@@ -178,4 +175,3 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
 };
 
 export default generateRoutes;
-

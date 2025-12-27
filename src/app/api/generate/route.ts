@@ -5,7 +5,6 @@ const BACKEND_URL = process.env.BACKEND_URL || "https://memoryframe.onrender.com
 interface GenerateRequest {
   personA: string; // base64
   personB: string; // base64
-  background: string; // base64
   style: string;
   prompt: string;
   deleteImmediately?: boolean;
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest) {
     const body: GenerateRequest = await request.json();
 
     // Validate required fields
-    if (!body.personA || !body.personB || !body.background || !body.style || !body.prompt) {
+    if (!body.personA || !body.personB || !body.style || !body.prompt) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -49,11 +48,9 @@ export async function POST(request: NextRequest) {
     // Convert base64 images to blobs and append
     const personAMime = getMimeType(body.personA);
     const personBMime = getMimeType(body.personB);
-    const backgroundMime = getMimeType(body.background);
     
     formData.append("personA", base64ToBlob(body.personA, personAMime), "personA.jpg");
     formData.append("personB", base64ToBlob(body.personB, personBMime), "personB.jpg");
-    formData.append("background", base64ToBlob(body.background, backgroundMime), "background.jpg");
     formData.append("style", body.style);
     formData.append("scene", body.prompt);
     formData.append("delete_policy", body.deleteImmediately ? "immediate" : "24h");
@@ -144,4 +141,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
