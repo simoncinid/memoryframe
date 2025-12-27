@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/Toast";
 import { copy } from "@/content/copy";
+import { Analytics } from "@vercel/analytics/next";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -96,6 +97,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={dmSans.variable}>
       <head>
+        {/* CookieYes Banner */}
+        <script
+          id="cookieyes"
+          type="text/javascript"
+          src="https://cdn-cookieyes.com/client_data/aa7f58b0c622fb45e5c2fd3a91841679/script.js"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
@@ -107,6 +114,7 @@ export default function RootLayout({
           <main className="min-h-screen pt-20">{children}</main>
           <Footer />
         </ToastProvider>
+        <Analytics />
       </body>
     </html>
   );
