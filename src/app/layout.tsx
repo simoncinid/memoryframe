@@ -104,7 +104,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-white text-stone-900">
         <ToastProvider>
           <Navbar />
-          <main className="min-h-screen pt-16">{children}</main>
+          <main className="min-h-screen pt-20">{children}</main>
           <Footer />
         </ToastProvider>
       </body>

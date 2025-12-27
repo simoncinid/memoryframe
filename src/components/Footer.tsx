@@ -13,9 +13,9 @@ export function Footer() {
               <Image
                 src="/logo.png"
                 alt={copy.brand.name}
-                width={32}
-                height={32}
-                className="w-8 h-8"
+                width={64}
+                height={64}
+                className="w-16 h-16"
               />
               <span className="font-semibold text-stone-800 text-lg">
                 {copy.brand.name}
