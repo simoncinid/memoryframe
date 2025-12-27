@@ -464,7 +464,7 @@ export const copy = {
     owner: {
       name: "SIMONCINI DIEGO",
       address: "Italy",
-      email: "diego@memoryframe.com",
+      email: "reservationwebbitz@gmail.com",
     },
     privacy: {
       title: "Privacy Policy",
@@ -472,7 +472,7 @@ export const copy = {
       sections: [
         {
           title: "1. Data Controller",
-          content: "The Data Controller is SIMONCINI DIEGO, contactable at diego@memoryframe.com. This Privacy Policy explains how we handle your data when you use MemoryFrame.",
+          content: "The Data Controller is SIMONCINI DIEGO, contactable at reservationwebbitz@gmail.com. This Privacy Policy explains how we handle your data when you use MemoryFrame.",
         },
         {
           title: "2. Data We Collect",
@@ -496,7 +496,7 @@ export const copy = {
         },
         {
           title: "7. Your Rights Under GDPR",
-          content: "As an EU resident, you have rights including: access to your data, rectification, erasure, restriction of processing, data portability, and objection to processing. Since we do not store personal data, most of these rights are automatically satisfied. For any privacy-related inquiries, contact diego@memoryframe.com.",
+          content: "As an EU resident, you have rights including: access to your data, rectification, erasure, restriction of processing, data portability, and objection to processing. Since we do not store personal data, most of these rights are automatically satisfied. For any privacy-related inquiries, contact reservationwebbitz@gmail.com.",
         },
         {
           title: "8. Children's Privacy",
@@ -512,7 +512,7 @@ export const copy = {
         },
         {
           title: "11. Contact",
-          content: "For privacy-related questions or requests, contact: SIMONCINI DIEGO at diego@memoryframe.com.",
+          content: "For privacy-related questions or requests, contact: SIMONCINI DIEGO at reservationwebbitz@gmail.com.",
         },
       ],
     },
@@ -578,15 +578,15 @@ export const copy = {
         },
         {
           title: "15. Contact",
-          content: "For questions about these Terms of Service, contact: SIMONCINI DIEGO at diego@memoryframe.com.",
+          content: "For questions about these Terms of Service, contact: SIMONCINI DIEGO at reservationwebbitz@gmail.com.",
         },
       ],
     },
     contact: {
       title: "Contact Us",
       intro: "We'd love to hear from you. Whether you have questions, feedback, or need support, reach out through the channel below.",
-      email: "diego@memoryframe.com",
-      privacyEmail: "diego@memoryframe.com",
+      email: "reservationwebbitz@gmail.com",
+      privacyEmail: "reservationwebbitz@gmail.com",
       responseTime: "We typically respond within 24-48 hours.",
     },
   },
@@ -595,7 +595,7 @@ export const copy = {
     tagline: "Create meaningful family portraits with AI",
     copyright: "© 2024 MemoryFrame. All rights reserved.",
     legalEntity: "SIMONCINI DIEGO",
-    legalAddress: "Italy • diego@memoryframe.com",
+    legalAddress: "Italy • reservationwebbitz@gmail.com",
     links: {
       product: [
         { label: "Create Portrait", href: "/create" },
