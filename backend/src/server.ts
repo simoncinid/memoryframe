@@ -3,7 +3,6 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import { config, validateConfig } from './lib/config.js';
-import { connectRedis, disconnectRedis } from './lib/redis.js';
 import healthRoutes from './routes/health.js';
 import generateRoutes from './routes/generate.js';
 
@@ -45,10 +44,8 @@ async function start() {
       },
     });
 
-    // Connect to Redis for rate limiting and caching
-    fastify.log.info('Connecting to Redis...');
-    await connectRedis();
-    fastify.log.info('Redis connected successfully');
+    // Rate limiting mode info
+    fastify.log.info(`Rate limiting: in-memory (single instance)`);
 
     // Register routes
     await fastify.register(healthRoutes);
@@ -113,10 +110,6 @@ async function shutdown(signal: string) {
   try {
     await fastify.close();
     fastify.log.info('HTTP server closed');
-    
-    await disconnectRedis();
-    fastify.log.info('Redis disconnected');
-    
     process.exit(0);
   } catch (err) {
     fastify.log.error({ err }, 'Error during shutdown');

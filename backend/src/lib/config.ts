@@ -24,8 +24,11 @@ export const config = {
   openaiApiKey: process.env.OPENAI_API_KEY ?? '',
   openaiModel: getEnvOrDefault('OPENAI_MODEL', 'gpt-image-1'),
 
-  // Redis
-  redisUrl: getEnvOrDefault('REDIS_URL', 'redis://localhost:6379'),
+  // Redis (optional - falls back to in-memory rate limiting)
+  redisUrl: process.env.REDIS_URL || '',
+  get useRedis() {
+    return !!this.redisUrl;
+  },
 
   // CORS
   frontendOrigin: getEnvOrDefault('FRONTEND_ORIGIN', 'http://localhost:3000'),
@@ -54,9 +57,9 @@ export const config = {
 } as const;
 
 export function validateConfig(): void {
-  // Redis URL is required for production
-  if (config.nodeEnv === 'production' && !config.redisUrl) {
-    throw new Error('REDIS_URL is required in production for global rate limiting');
+  // Warn if Redis is not configured in production
+  if (config.nodeEnv === 'production' && !config.useRedis) {
+    console.warn('[Config] REDIS_URL not set - using in-memory rate limiting (not suitable for multiple instances)');
   }
 }
 
