@@ -44,9 +44,28 @@ export interface FileInfo {
   mimetype: string;
 }
 
-export type ImageStyle = 'photorealistic' | 'vintage' | 'cinematic' | 'painterly';
+export type ImageStyle = 
+  | 'classic'
+  | 'painterly' 
+  | 'cinematic' 
+  | 'vintage'
+  | 'blackwhite'
+  | 'watercolor'
+  | 'pop-art'
+  | 'renaissance'
+  | 'photorealistic';
 
-export const VALID_STYLES: ImageStyle[] = ['photorealistic', 'vintage', 'cinematic', 'painterly'];
+export const VALID_STYLES: ImageStyle[] = [
+  'classic',
+  'painterly',
+  'cinematic',
+  'vintage',
+  'blackwhite',
+  'watercolor',
+  'pop-art',
+  'renaissance',
+  'photorealistic',
+];
 
 export const VALID_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 

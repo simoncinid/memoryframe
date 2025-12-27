@@ -17,14 +17,19 @@ function getOpenAI(): OpenAI {
 }
 
 const STYLE_INSTRUCTIONS: Record<ImageStyle, string> = {
-  photorealistic: 'Create a photorealistic image with natural lighting, accurate skin tones, and lifelike details. The result should look like a professional photograph.',
-  vintage: 'Apply a vintage aesthetic with warm, slightly faded colors, soft film grain, and nostalgic mood reminiscent of 1970s-1980s photography.',
-  cinematic: 'Create a cinematic look with dramatic lighting, film-like color grading, shallow depth of field, and a movie-poster quality composition.',
+  classic: 'Create a timeless studio portrait style with soft, flattering lighting, neutral backgrounds, and elegant composition. Professional photography aesthetic.',
   painterly: 'Render in an artistic, painterly style with visible brushstroke textures, rich colors, and an impressionistic or classical painting aesthetic.',
+  cinematic: 'Create a cinematic look with dramatic lighting, film-like color grading, shallow depth of field, and a movie-poster quality composition.',
+  vintage: 'Apply a vintage aesthetic with warm, slightly faded colors, soft film grain, and nostalgic mood reminiscent of 1970s-1980s photography.',
+  blackwhite: 'Create an elegant black and white portrait with strong contrast, rich tonal range, and timeless monochrome aesthetic. Focus on shadows and highlights.',
+  watercolor: 'Render in a soft watercolor painting style with gentle color bleeds, flowing transitions, and delicate artistic texture.',
+  'pop-art': 'Create a bold Pop Art style inspired by Andy Warhol with vibrant colors, graphic elements, halftone patterns, and high contrast.',
+  renaissance: 'Render in the style of Renaissance masters with classical painting techniques, dramatic chiaroscuro lighting, rich oil paint textures, and noble composition.',
+  photorealistic: 'Create a photorealistic image with natural lighting, accurate skin tones, and lifelike details. The result should look like a professional photograph.',
 };
 
 function buildPrompt(style: string, scene: string): string {
-  const styleInstruction = STYLE_INSTRUCTIONS[style as ImageStyle] || STYLE_INSTRUCTIONS.photorealistic;
+  const styleInstruction = STYLE_INSTRUCTIONS[style as ImageStyle] || STYLE_INSTRUCTIONS.classic;
   
   return `
 COMPOSITING TASK: Create a single cohesive image combining two people with a new background.
