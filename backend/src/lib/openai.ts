@@ -1,4 +1,5 @@
-import OpenAI from 'openai';
+import OpenAI, { toFile } from 'openai';
+import sharp from 'sharp';
 import { config } from './config.js';
 import { UpstreamError } from './errors.js';
 import type { ImageStyle } from '../types.js';
@@ -9,7 +10,7 @@ function getOpenAI(): OpenAI {
   if (!openaiClient) {
     openaiClient = new OpenAI({
       apiKey: config.openaiApiKey,
-      timeout: 60000, // 60s timeout
+      timeout: 120000, // 2 min timeout for edit operations
       maxRetries: 0, // We handle retries ourselves
     });
   }
@@ -17,46 +18,43 @@ function getOpenAI(): OpenAI {
 }
 
 const STYLE_INSTRUCTIONS: Record<ImageStyle, string> = {
-  classic: 'Create a timeless studio portrait style with soft, flattering lighting, neutral backgrounds, and elegant composition. Professional photography aesthetic.',
-  painterly: 'Render in an artistic, painterly style with visible brushstroke textures, rich colors, and an impressionistic or classical painting aesthetic.',
-  cinematic: 'Create a cinematic look with dramatic lighting, film-like color grading, shallow depth of field, and a movie-poster quality composition.',
-  vintage: 'Apply a vintage aesthetic with warm, slightly faded colors, soft film grain, and nostalgic mood reminiscent of 1970s-1980s photography.',
-  blackwhite: 'Create an elegant black and white portrait with strong contrast, rich tonal range, and timeless monochrome aesthetic. Focus on shadows and highlights.',
-  watercolor: 'Render in a soft watercolor painting style with gentle color bleeds, flowing transitions, and delicate artistic texture.',
-  'pop-art': 'Create a bold Pop Art style inspired by Andy Warhol with vibrant colors, graphic elements, halftone patterns, and high contrast.',
-  renaissance: 'Render in the style of Renaissance masters with classical painting techniques, dramatic chiaroscuro lighting, rich oil paint textures, and noble composition.',
-  photorealistic: 'Create a photorealistic image with natural lighting, accurate skin tones, and lifelike details. The result should look like a professional photograph.',
+  classic: 'Timeless studio portrait style with soft, flattering lighting and elegant composition.',
+  painterly: 'Artistic painterly style with visible brushstroke textures and rich colors, but maintaining photorealistic facial details.',
+  cinematic: 'Cinematic look with dramatic lighting and film-like color grading, keeping faces sharp and detailed.',
+  vintage: 'Vintage aesthetic with warm, slightly faded colors and nostalgic mood, but crystal clear facial features.',
+  blackwhite: 'Elegant black and white with strong contrast and rich tonal range, preserving all facial details.',
+  watercolor: 'Soft watercolor painting style with gentle color bleeds, but photorealistic faces.',
+  'pop-art': 'Bold Pop Art style with vibrant colors and graphic elements, keeping faces recognizable and detailed.',
+  renaissance: 'Renaissance masters style with classical painting techniques, but highly detailed realistic faces.',
+  photorealistic: 'Professional photograph with natural lighting and lifelike details.',
 };
 
-function buildPrompt(style: string, scene: string): string {
+function buildEditPrompt(style: string, userPrompt: string): string {
   const styleInstruction = STYLE_INSTRUCTIONS[style as ImageStyle] || STYLE_INSTRUCTIONS.classic;
   
   return `
-COMPOSITING TASK: Create a single cohesive image combining two people with a new background.
+TASK: Transform this side-by-side photo collage into a single unified portrait where both people appear together naturally in the same scene.
 
-SCENE DESCRIPTION: ${scene}
+USER REQUEST: ${userPrompt}
 
 STYLE: ${styleInstruction}
 
-COMPOSITING REQUIREMENTS:
-- Place both subjects naturally in the scene with coherent spatial relationship
-- Match lighting direction and intensity between subjects and background
-- Ensure consistent perspective and scale
-- Blend subjects seamlessly into the environment
+CRITICAL REQUIREMENTS:
+1. UNIFY the two people into ONE cohesive photograph - they should look like they're in the same physical space
+2. Make them appear connected - standing together, embracing, or interacting naturally as specified by the user
+3. Create a seamless, realistic background that fits both subjects
+4. Match lighting, shadows, and perspective perfectly between both people
+5. PRESERVE exact facial features of BOTH people - faces must remain highly detailed and recognizable
+6. Skin textures must be natural and photorealistic regardless of artistic style
+7. Hands and body proportions must be anatomically correct
+8. No visible seams, borders, or signs this was originally two separate photos
 
-QUALITY REQUIREMENTS:
-- Sharp, high-quality rendering throughout
-- Natural skin textures without artificial smoothing
-- Anatomically correct hands with proper finger count and proportions
-- Natural, symmetrical facial features
-- No visible artifacts, halos, or blending seams
-
-STRICT CONSTRAINTS:
-- PRESERVE exact facial identity of both subjects - no modifications to face structure
-- NO unnatural aging or de-aging effects
-- NO additional people beyond the two subjects
-- NO text, watermarks, or logos in the image
-- NO distortions or mutations of body parts
+ABSOLUTE CONSTRAINTS:
+- Faces must be HYPER-REALISTIC and HIGHLY DETAILED even if using artistic styles
+- Do NOT alter, distort, or stylize facial features beyond recognition
+- Do NOT add extra people
+- Do NOT add text or watermarks
+- Do NOT create unrealistic proportions or mutations
 `.trim();
 }
 
@@ -81,16 +79,66 @@ async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Create a side-by-side collage of two images using sharp
+ */
+async function createCollage(imageABase64: string, imageBBase64: string): Promise<Buffer> {
+  // Convert base64 to buffers
+  const bufferA = Buffer.from(imageABase64, 'base64');
+  const bufferB = Buffer.from(imageBBase64, 'base64');
+
+  // Get metadata for both images
+  const metaA = await sharp(bufferA).metadata();
+  const metaB = await sharp(bufferB).metadata();
+
+  // Target height for both images (use the smaller one to avoid upscaling)
+  const targetHeight = Math.min(metaA.height || 1024, metaB.height || 1024, 1024);
+
+  // Resize both images to same height while maintaining aspect ratio
+  const resizedA = await sharp(bufferA)
+    .resize({ height: targetHeight, fit: 'inside' })
+    .png()
+    .toBuffer();
+
+  const resizedB = await sharp(bufferB)
+    .resize({ height: targetHeight, fit: 'inside' })
+    .png()
+    .toBuffer();
+
+  // Get new dimensions after resize
+  const newMetaA = await sharp(resizedA).metadata();
+  const newMetaB = await sharp(resizedB).metadata();
+
+  const widthA = newMetaA.width || 512;
+  const widthB = newMetaB.width || 512;
+  const totalWidth = widthA + widthB;
+
+  // Create the collage - side by side
+  const collage = await sharp({
+    create: {
+      width: totalWidth,
+      height: targetHeight,
+      channels: 4,
+      background: { r: 255, g: 255, b: 255, alpha: 1 }
+    }
+  })
+    .composite([
+      { input: resizedA, left: 0, top: 0 },
+      { input: resizedB, left: widthA, top: 0 }
+    ])
+    .png()
+    .toBuffer();
+
+  return collage;
+}
+
 export async function generateImage(options: GenerateImageOptions): Promise<GenerateImageResult> {
   const {
-    personABase64: _personABase64,
-    personBBase64: _personBBase64,
-    backgroundBase64: _backgroundBase64,
+    personABase64,
+    personBBase64,
     style,
     scene,
     size = config.defaultSize,
-    quality = config.defaultQuality,
-    outputFormat = config.defaultOutputFormat,
   } = options;
 
   // Mock mode for development without API key
@@ -99,27 +147,38 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
   }
 
   const openai = getOpenAI();
-  const prompt = buildPrompt(style, scene);
 
-  // Note: Image inputs would be used with gpt-image-1 edit API
-  // Currently using generate API which only takes prompt
+  // Step 1: Create collage of the two people
+  console.log('[OpenAI] Creating collage of two images...');
+  const collageBuffer = await createCollage(personABase64, personBBase64);
+  console.log('[OpenAI] Collage created, size:', collageBuffer.length, 'bytes');
 
+  // Step 2: Build the prompt
+  const prompt = buildEditPrompt(style, scene);
+
+  // Step 3: Call OpenAI images/edit API
   const maxRetries = 2;
-  const backoffMs = [1000, 2000];
+  const backoffMs = [2000, 4000];
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const response = await openai.images.generate({
+      console.log(`[OpenAI] Calling images.edit API (attempt ${attempt + 1})...`);
+      
+      // Convert buffer to File object for the SDK
+      const imageFile = await toFile(collageBuffer, 'collage.png', { type: 'image/png' });
+
+      const response = await openai.images.edit({
         model: config.openaiModel,
+        image: imageFile,
         prompt,
         n: 1,
-        size: size as '1024x1024' | '1536x1024' | '1024x1536' | 'auto',
-        quality: quality as 'low' | 'medium' | 'high',
-        moderation: 'auto',
+        size: size as '1024x1024' | '1536x1024' | '1024x1536',
       });
 
-      // Check for b64_json response
+      console.log('[OpenAI] API response received');
+
+      // Check for response data
       const imageData = response.data?.[0];
       
       if (!imageData) {
@@ -129,36 +188,38 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
       if (imageData.b64_json) {
         return {
           imageBase64: imageData.b64_json,
-          mimeType: `image/${outputFormat}`,
+          mimeType: 'image/png',
         };
       } else if (imageData.url) {
         // If URL returned, fetch and convert to base64
+        console.log('[OpenAI] Fetching image from URL...');
         const imageResponse = await fetch(imageData.url);
         const arrayBuffer = await imageResponse.arrayBuffer();
         const base64 = Buffer.from(arrayBuffer).toString('base64');
         return {
           imageBase64: base64,
-          mimeType: `image/${outputFormat}`,
+          mimeType: 'image/png',
         };
       }
 
       throw new Error('No image data in response');
     } catch (error) {
       lastError = error as Error;
+      console.error(`[OpenAI] Error on attempt ${attempt + 1}:`, (error as Error).message);
       
       // Check if error is retryable
       const isRetryable = isRetryableError(error);
       const is400Error = is400LevelError(error);
 
-      // Don't retry on 400-level errors
+      // Don't retry on 400-level errors (except 429)
       if (is400Error) {
-        console.error('[OpenAI] Non-retryable error:', (error as Error).message);
+        console.error('[OpenAI] Non-retryable 4xx error');
         break;
       }
 
       // Retry on 429 and 5xx errors
       if (isRetryable && attempt < maxRetries) {
-        console.warn(`[OpenAI] Retrying after error (attempt ${attempt + 1}/${maxRetries}):`, (error as Error).message);
+        console.warn(`[OpenAI] Retrying in ${backoffMs[attempt]}ms...`);
         await sleep(backoffMs[attempt]);
         continue;
       }
@@ -193,7 +254,6 @@ function is400LevelError(error: unknown): boolean {
  */
 function generateMockImage(): GenerateImageResult {
   // Create a simple 100x100 placeholder PNG
-  // This is a minimal valid PNG with solid color
   const mockBase64 = 
     'iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz' +
     'AAALEwAACxMBAJqcGAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEUSURB' +
@@ -201,11 +261,10 @@ function generateMockImage(): GenerateImageResult {
     'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEh' +
     'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEh' +
     'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEh' +
-    'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhIaEPg8AByvE6V9MAAAAASUVORK5CYII=';
+    'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhIaEPg8AByvE6V9MAAAAASUVORK5CYII=';
 
   return {
     imageBase64: mockBase64,
     mimeType: 'image/png',
   };
 }
-
