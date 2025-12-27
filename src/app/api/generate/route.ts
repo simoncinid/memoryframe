@@ -63,16 +63,44 @@ export async function POST(request: NextRequest) {
                      request.headers.get("x-real-ip") || 
                      "unknown";
 
-    // Call backend
-    const backendResponse = await fetch(`${BACKEND_URL}/api/generate`, {
-      method: "POST",
-      body: formData,
-      headers: {
-        "X-Forwarded-For": clientIp,
-      },
-    });
+    // Call backend with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
-    const data = await backendResponse.json();
+    let backendResponse: Response;
+    try {
+      backendResponse = await fetch(`${BACKEND_URL}/api/generate`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Forwarded-For": clientIp,
+        },
+        signal: controller.signal,
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      console.error("Backend fetch error:", fetchError);
+      return NextResponse.json(
+        { error: "Backend service unavailable. Please try again in a moment." },
+        { status: 503 }
+      );
+    }
+    clearTimeout(timeoutId);
+
+    // Get response text first to handle non-JSON responses
+    const responseText = await backendResponse.text();
+    
+    // Try to parse as JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error("Backend returned non-JSON response:", responseText.substring(0, 500));
+      return NextResponse.json(
+        { error: "Backend service error. Please try again." },
+        { status: 502 }
+      );
+    }
 
     // Handle rate limit errors
     if (backendResponse.status === 429) {
@@ -87,7 +115,7 @@ export async function POST(request: NextRequest) {
 
     // Handle other errors
     if (!backendResponse.ok) {
-      console.error("Backend error:", data);
+      console.error("Backend error:", backendResponse.status, data);
       return NextResponse.json(
         { error: data.message || "Generation failed. Please try again." },
         { status: backendResponse.status }
