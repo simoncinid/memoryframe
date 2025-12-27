@@ -2,7 +2,7 @@ export const copy = {
   brand: {
     name: "MemoryFrame",
     tagline: "Create meaningful family portraits with AI",
-    domain: "memoryframe.com",
+    domain: "memoryframe.art",
   },
 
   home: {

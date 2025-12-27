@@ -13,7 +13,7 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://memoryframe.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://memoryframe.art";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

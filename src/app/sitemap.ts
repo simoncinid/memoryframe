@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://memoryframe.com";
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://memoryframe.art";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
