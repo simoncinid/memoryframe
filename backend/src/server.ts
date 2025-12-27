@@ -7,7 +7,7 @@ import { connectRedis, disconnectRedis } from './lib/redis.js';
 import healthRoutes from './routes/health.js';
 import generateRoutes from './routes/generate.js';
 
-// Validate configuration on startup
+// Validate configuration on startup before initializing server
 validateConfig();
 
 const fastify = Fastify({
@@ -18,12 +18,12 @@ const fastify = Fastify({
       : undefined,
   },
   trustProxy: true,
-  requestTimeout: 120000, // 2 minutes for long generation requests
+  requestTimeout: 120000, // 2 minutes timeout for long AI generation requests
 });
 
 async function start() {
   try {
-    // Register plugins
+    // Register security and middleware plugins
     await fastify.register(helmet, {
       contentSecurityPolicy: false, // Disabled for API
     });
@@ -45,10 +45,10 @@ async function start() {
       },
     });
 
-    // Connect to Redis
+    // Connect to Redis for rate limiting and caching
     fastify.log.info('Connecting to Redis...');
     await connectRedis();
-    fastify.log.info('Redis connected');
+    fastify.log.info('Redis connected successfully');
 
     // Register routes
     await fastify.register(healthRoutes);
