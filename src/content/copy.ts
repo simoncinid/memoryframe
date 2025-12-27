@@ -72,7 +72,7 @@ export const copy = {
       items: [
         {
           question: "Is MemoryFrame really free?",
-          answer: "Yes, the basic service is completely free. You can optionally leave a tip if the tool helped you.",
+          answer: "Yes, 100% free! There's no catch, no hidden fees, no watermarks. Running AI costs real money, but we keep it free through optional tips from users who love their portraits and want to help others enjoy the same experience.",
         },
         {
           question: "What photo formats are supported?",
@@ -161,14 +161,17 @@ export const copy = {
   },
 
   tipModal: {
-    title: "Support This Free Tool",
-    subtitle: "If it helped you, leave what feels right",
-    amounts: [3, 7, 15, 29],
-    otherLabel: "Other",
-    checkoutButton: "Checkout",
+    title: "Love Your Portrait? 💜",
+    subtitle: "MemoryFrame is 100% free, but each generation costs us real money",
+    costMessage: "This portrait cost us approximately",
+    empatheticMessage: "Tips from kind users like you are the only way we can keep this tool free for everyone. No pressure at all — but if you can, even a small tip helps us cover the AI costs and keep creating magic for families everywhere.",
+    amounts: [2, 5, 10, 20],
+    otherLabel: "Custom",
+    checkoutButton: "Leave a Tip 💜",
+    skipText: "No worries, enjoy your portrait!",
     thankYou: {
-      title: "Thank You!",
-      message: "Your support helps keep MemoryFrame free for everyone.",
+      title: "You're Amazing! 🎉",
+      message: "Your generosity helps keep MemoryFrame free for families everywhere. Thank you for being part of our community!",
       closeButton: "Close",
     },
   },
@@ -458,83 +461,132 @@ export const copy = {
   },
 
   legal: {
+    owner: {
+      name: "SIMONCINI DIEGO",
+      address: "Italy",
+      email: "diego@memoryframe.com",
+    },
     privacy: {
       title: "Privacy Policy",
-      lastUpdated: "December 2024",
+      lastUpdated: "December 27, 2024",
       sections: [
         {
-          title: "What We Collect",
-          content: "We collect only what's necessary to provide the service: the photos you upload, your style and prompt choices, and basic usage data (page views, feature usage). We do not require account creation or personal information.",
+          title: "1. Data Controller",
+          content: "The Data Controller is SIMONCINI DIEGO, contactable at diego@memoryframe.com. This Privacy Policy explains how we handle your data when you use MemoryFrame.",
         },
         {
-          title: "How We Use Your Data",
-          content: "Photos are used solely to generate your portrait. We do not use your photos to train AI models. Usage data helps us improve the service and fix issues.",
+          title: "2. Data We Collect",
+          content: "MemoryFrame is designed with privacy-first principles. We DO NOT store or retain any user photos or personal data. Photos you upload are transmitted directly to OpenAI's API for processing and are immediately discarded after generation. We do not have access to your photos, we do not save them on our servers, and we do not use them for any purpose other than generating your requested portrait.",
         },
         {
-          title: "Data Retention",
-          content: "Uploaded photos are automatically deleted within 24 hours by default. You can choose to delete them immediately after generation. Generated portraits are available for download but not stored permanently on our servers.",
+          title: "3. How Your Photos Are Processed",
+          content: "When you upload photos, they are sent directly via API to OpenAI for image generation. We act as a simple intermediary - your photos pass through our service but are never stored, logged, or retained. OpenAI processes the images according to their own privacy policy and data handling practices. We recommend reviewing OpenAI's privacy policy for details on their data processing.",
         },
         {
-          title: "Data Security",
-          content: "All data is encrypted in transit using TLS. Photos are processed in isolated environments and not accessible to our team.",
+          title: "4. No Data Retention",
+          content: "We explicitly confirm: (a) No photos are stored on our servers; (b) No user accounts or personal information are collected; (c) No cookies are used to track individual users; (d) No databases of user content exist; (e) Generated images are provided for immediate download and are not stored.",
         },
         {
-          title: "Third Parties",
-          content: "We use cloud infrastructure providers to process and store data temporarily. We do not sell or share your data with advertisers or data brokers.",
+          title: "5. Third-Party Services",
+          content: "We use OpenAI's API for image generation. Your photos are transmitted to OpenAI for processing. We use Vercel for hosting and Stripe for tip processing. We do not sell, share, or transfer your data to advertisers or data brokers.",
         },
         {
-          title: "Your Rights",
-          content: "You can request deletion of any data associated with your session. Contact us at privacy@memoryframe.com.",
+          title: "6. Analytics",
+          content: "We may collect anonymous, aggregate usage statistics (such as page views and feature usage) to improve the service. This data cannot be used to identify individual users.",
         },
         {
-          title: "Cookies",
-          content: "We use essential cookies for site functionality and anonymous analytics to understand usage patterns. No advertising cookies.",
+          title: "7. Your Rights Under GDPR",
+          content: "As an EU resident, you have rights including: access to your data, rectification, erasure, restriction of processing, data portability, and objection to processing. Since we do not store personal data, most of these rights are automatically satisfied. For any privacy-related inquiries, contact diego@memoryframe.com.",
+        },
+        {
+          title: "8. Children's Privacy",
+          content: "Our service is not directed to children under 16. If you upload photos of minors, you must be their parent or legal guardian, or have explicit consent from their parent or legal guardian.",
+        },
+        {
+          title: "9. Security Measures",
+          content: "All data transmissions are encrypted using TLS/SSL. We use industry-standard security practices. Since we don't store data, risks associated with data breaches are minimized.",
+        },
+        {
+          title: "10. Changes to This Policy",
+          content: "We may update this Privacy Policy from time to time. The 'Last Updated' date at the top indicates when changes were made. Continued use of the service after changes constitutes acceptance.",
+        },
+        {
+          title: "11. Contact",
+          content: "For privacy-related questions or requests, contact: SIMONCINI DIEGO at diego@memoryframe.com.",
         },
       ],
     },
     terms: {
       title: "Terms of Service",
-      lastUpdated: "December 2024",
+      lastUpdated: "December 27, 2024",
       sections: [
         {
-          title: "Service Description",
-          content: "MemoryFrame provides an AI-powered tool to generate family portraits from uploaded photos. The service is provided free of charge, with optional tipping.",
+          title: "1. Service Provider",
+          content: "MemoryFrame is operated by SIMONCINI DIEGO (hereinafter 'Provider', 'we', 'us'). By using this service, you agree to these Terms of Service.",
         },
         {
-          title: "Acceptable Use",
-          content: "You may use MemoryFrame for personal and commercial purposes. You must have the right to use any photos you upload. You must not upload illegal content, deepfakes intended to deceive, or content that violates others' rights.",
+          title: "2. Service Description",
+          content: "MemoryFrame is a free AI-powered tool that generates family portraits from uploaded photos. The service uses OpenAI's image generation technology via API calls. We do not store any photos or user data - all processing is done in real-time through API calls.",
         },
         {
-          title: "Photos of Minors",
-          content: "You may only upload photos of minors if you are their parent or legal guardian, or have explicit permission from their parent or legal guardian.",
+          title: "3. Free Service & Voluntary Tips",
+          content: "The service is provided completely free of charge. Users may optionally leave a tip to support the ongoing costs of maintaining the service (API costs, hosting, development). Tips are entirely voluntary, non-refundable, and do not provide any additional features or guarantees.",
         },
         {
-          title: "Content Ownership",
-          content: "You retain ownership of photos you upload. You own the generated portraits and may use them freely. By uploading, you grant us a temporary license to process the images.",
+          title: "4. Acceptable Use",
+          content: "You agree to: (a) Only upload photos you have the right to use; (b) Not upload illegal, harmful, or offensive content; (c) Not use the service to create deepfakes or misleading content; (d) Not attempt to circumvent rate limits or abuse the service; (e) Comply with all applicable laws and regulations.",
         },
         {
-          title: "Service Limitations",
-          content: "We limit generations to 5 per hour per user to prevent abuse. We reserve the right to refuse service for violations of these terms.",
+          title: "5. Photos of Minors",
+          content: "You may only upload photos of minors if you are their parent or legal guardian, or have explicit written consent from their parent or legal guardian. You assume full responsibility for compliance with this requirement.",
         },
         {
-          title: "No Warranty",
-          content: "The service is provided 'as is' without warranties. Results may vary based on input quality and complexity.",
+          title: "6. Intellectual Property",
+          content: "You retain all rights to the photos you upload. The generated portraits are yours to use for personal or commercial purposes without restriction. The MemoryFrame name, logo, and website design remain the property of the Provider.",
         },
         {
-          title: "Tips and Payments",
-          content: "Tips are voluntary and non-refundable. They help support continued development of the free service.",
+          title: "7. No Data Storage",
+          content: "We explicitly do not store, retain, or archive any photos you upload. Photos are processed via real-time API calls and immediately discarded. We have no ability to recover, view, or access your photos after processing.",
         },
         {
-          title: "Changes to Terms",
-          content: "We may update these terms. Continued use after changes constitutes acceptance.",
+          title: "8. Service Limitations",
+          content: "We impose rate limits (5 generations per hour) to prevent abuse and ensure fair access. We reserve the right to modify, suspend, or terminate the service at any time without notice. Service availability is not guaranteed.",
+        },
+        {
+          title: "9. Disclaimer of Warranties",
+          content: "THE SERVICE IS PROVIDED 'AS IS' WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. We do not guarantee: (a) Uninterrupted or error-free operation; (b) Specific quality or accuracy of generated images; (c) Availability at any particular time; (d) Results meeting your expectations.",
+        },
+        {
+          title: "10. Limitation of Liability",
+          content: "TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE PROVIDER SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, DATA, OR GOODWILL, ARISING FROM YOUR USE OF THE SERVICE.",
+        },
+        {
+          title: "11. Indemnification",
+          content: "You agree to indemnify and hold harmless the Provider from any claims, damages, or expenses arising from your use of the service or violation of these terms.",
+        },
+        {
+          title: "12. Governing Law",
+          content: "These Terms shall be governed by and construed in accordance with the laws of Italy. Any disputes shall be subject to the exclusive jurisdiction of the courts of Italy.",
+        },
+        {
+          title: "13. Severability",
+          content: "If any provision of these Terms is found to be unenforceable, the remaining provisions shall continue in full force and effect.",
+        },
+        {
+          title: "14. Changes to Terms",
+          content: "We reserve the right to modify these Terms at any time. Changes will be effective upon posting. Continued use of the service constitutes acceptance of modified Terms.",
+        },
+        {
+          title: "15. Contact",
+          content: "For questions about these Terms of Service, contact: SIMONCINI DIEGO at diego@memoryframe.com.",
         },
       ],
     },
     contact: {
       title: "Contact Us",
-      intro: "We'd love to hear from you. Whether you have questions, feedback, or need support, reach out through any of the channels below.",
-      email: "hello@memoryframe.com",
-      privacyEmail: "privacy@memoryframe.com",
+      intro: "We'd love to hear from you. Whether you have questions, feedback, or need support, reach out through the channel below.",
+      email: "diego@memoryframe.com",
+      privacyEmail: "diego@memoryframe.com",
       responseTime: "We typically respond within 24-48 hours.",
     },
   },
@@ -542,6 +594,8 @@ export const copy = {
   footer: {
     tagline: "Create meaningful family portraits with AI",
     copyright: "© 2024 MemoryFrame. All rights reserved.",
+    legalEntity: "SIMONCINI DIEGO",
+    legalAddress: "Italy • diego@memoryframe.com",
     links: {
       product: [
         { label: "Create Portrait", href: "/create" },
@@ -552,6 +606,8 @@ export const copy = {
         { label: "AI Family Portrait", href: "/ai-family-portrait" },
         { label: "Combine Two Photos", href: "/combine-two-photos" },
         { label: "Add Person to Photo", href: "/add-person-to-photo" },
+        { label: "Merge Photos AI", href: "/merge-photos-ai" },
+        { label: "Portrait AI Generator", href: "/portrait-ai-generator" },
       ],
       legal: [
         { label: "Privacy Policy", href: "/privacy" },
@@ -559,7 +615,7 @@ export const copy = {
         { label: "Contact", href: "/contact" },
       ],
     },
-    privacyNote: "Your photos are never used for AI training and are deleted within 24 hours.",
+    privacyNote: "We never store your photos. All processing happens via real-time API calls - your privacy is guaranteed.",
   },
 
   navbar: {

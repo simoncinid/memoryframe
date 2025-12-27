@@ -1,142 +1,86 @@
-import Link from "next/link";
 import { Metadata } from "next";
+import { HowToPageLayout } from "@/components/HowToPageLayout";
 import { copy } from "@/content/copy";
-import { FAQ, FAQJsonLd } from "@/components/FAQ";
 
 const pageData = copy.seoPages.photoBackgroundReplacement;
 
 export const metadata: Metadata = {
   title: pageData.title,
   description: pageData.metaDescription,
+  keywords: [
+    "photo background replacement",
+    "change photo background",
+    "AI background remover",
+    "background changer",
+    "replace photo background",
+    "photo background editor",
+    "remove background AI",
+  ],
   alternates: {
     canonical: "/photo-background-replacement",
+  },
+  openGraph: {
+    title: "AI Photo Background Replacement | Change Background Free",
+    description: "Replace photo backgrounds instantly with AI. Transform any portrait with beautiful new backgrounds. Free online tool.",
+    type: "website",
   },
 };
 
 const faqItems = [
   {
     question: "How does AI background replacement work?",
-    answer: "Our AI identifies the subjects in your photo, separates them from the background, and seamlessly composites them onto your chosen new background.",
+    answer: "Our AI intelligently separates the subjects from the original background and seamlessly places them into your chosen new background, adjusting lighting and shadows for a natural result.",
   },
   {
     question: "What backgrounds can I use?",
-    answer: "You can upload any image as a background, or describe a scene and let our AI generate an appropriate setting.",
+    answer: "You can upload any background image, or describe the scene you want and let our AI generate an appropriate setting.",
   },
   {
-    question: "Will the edges look natural?",
-    answer: "Our AI handles edge blending automatically, adjusting for lighting and color to create a natural transition between subject and background.",
+    question: "Will the edges look clean?",
+    answer: "Yes! Our AI handles complex edges like hair and detailed clothing well. The result is professional-quality compositing.",
   },
+  {
+    question: "Can I use this for professional headshots?",
+    answer: "Absolutely! Many users transform casual photos into professional headshots by adding clean studio backgrounds.",
+  },
+  {
+    question: "Do I need Photoshop skills?",
+    answer: "Not at all. Our AI does all the complex work. Just upload your photos, choose a style, and get professional results in seconds.",
+  },
+];
+
+const prompts = [
+  {
+    name: "Professional Studio",
+    prompt: "Clean professional studio background, soft gradient, business appropriate lighting",
+  },
+  {
+    name: "Beach Paradise",
+    prompt: "Tropical beach sunset, palm trees, crystal clear water, vacation vibes",
+  },
+  {
+    name: "Mountain Vista",
+    prompt: "Majestic mountain landscape, dramatic clouds, golden hour lighting",
+  },
+];
+
+const relatedPages = [
+  { label: "Portrait AI Generator", href: "/portrait-ai-generator" },
+  { label: "Add Person to Photo", href: "/add-person-to-photo" },
+  { label: "AI Family Portrait", href: "/ai-family-portrait" },
+  { label: "Browse Styles", href: "/styles" },
 ];
 
 export default function PhotoBackgroundReplacementPage() {
   return (
-    <>
-      <FAQJsonLd items={faqItems} />
-      
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-stone-800 mb-4">
-            {pageData.h1}
-          </h1>
-          <p className="text-lg text-stone-600">{pageData.intro}</p>
-        </div>
-
-        {/* Use Cases */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-stone-800 mb-6">
-            What You Can Do
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {pageData.useCases.map((useCase, index) => (
-              <div
-                key={index}
-                className="p-6 bg-stone-50 rounded-xl border border-stone-200"
-              >
-                <h3 className="font-semibold text-stone-800 mb-2">
-                  {useCase.title}
-                </h3>
-                <p className="text-stone-600 text-sm">{useCase.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Example Prompts */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-stone-800 mb-6">
-            Background Ideas
-          </h2>
-          <div className="space-y-4">
-            {copy.prompts.categories.slice(3, 6).map((cat) => (
-              <div key={cat.id} className="p-4 bg-white border border-stone-200 rounded-xl">
-                <p className="text-stone-800 font-medium mb-2">{cat.name}</p>
-                <p className="text-stone-600 text-sm">{cat.prompts[0]}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Common Mistakes */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-stone-800 mb-6">
-            Avoid These Issues
-          </h2>
-          <ul className="space-y-3">
-            {pageData.commonMistakes.map((mistake, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <span className="shrink-0 w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-sm">
-                  ✕
-                </span>
-                <span className="text-stone-600">{mistake}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* FAQ */}
-        <section className="mb-12">
-          <FAQ items={faqItems} title="Frequently Asked Questions" />
-        </section>
-
-        {/* CTA */}
-        <section className="text-center py-12 bg-stone-800 rounded-2xl">
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Replace Your Background Now
-          </h2>
-          <p className="text-stone-300 mb-6">
-            Transform any photo in seconds.
-          </p>
-          <Link
-            href="/create"
-            className="inline-block px-8 py-3 bg-white text-stone-800 rounded-xl font-medium hover:bg-stone-100 transition-colors"
-          >
-            Start Creating
-          </Link>
-        </section>
-
-        {/* Related Pages */}
-        <div className="mt-12 pt-8 border-t border-stone-200">
-          <h3 className="text-lg font-semibold text-stone-800 mb-4">
-            Related Pages
-          </h3>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/add-person-to-photo"
-              className="text-stone-600 hover:text-stone-800 underline underline-offset-4"
-            >
-              Add Person to Photo
-            </Link>
-            <Link
-              href="/prompts"
-              className="text-stone-600 hover:text-stone-800 underline underline-offset-4"
-            >
-              Browse Prompts
-            </Link>
-          </div>
-        </div>
-      </div>
-    </>
+    <HowToPageLayout
+      h1={pageData.h1}
+      intro={pageData.intro}
+      useCases={pageData.useCases}
+      commonMistakes={pageData.commonMistakes}
+      faqItems={faqItems}
+      relatedPages={relatedPages}
+      prompts={prompts}
+    />
   );
 }
-

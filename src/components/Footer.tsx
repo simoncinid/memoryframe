@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { copy } from "@/content/copy";
 
 export function Footer() {
@@ -9,9 +10,13 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-stone-800 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">M</span>
-              </div>
+              <Image
+                src="/logo.png"
+                alt={copy.brand.name}
+                width={32}
+                height={32}
+                className="w-8 h-8"
+              />
               <span className="font-semibold text-stone-800 text-lg">
                 {copy.brand.name}
               </span>
@@ -76,9 +81,15 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-stone-200">
-          <p className="text-stone-500 text-sm text-center">
-            {copy.footer.copyright}
-          </p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-stone-500 text-xs text-center md:text-left">
+              <p className="font-medium">{copy.footer.legalEntity}</p>
+              <p>{copy.footer.legalAddress}</p>
+            </div>
+            <p className="text-stone-500 text-sm text-center">
+              {copy.footer.copyright}
+            </p>
+          </div>
         </div>
       </div>
     </footer>

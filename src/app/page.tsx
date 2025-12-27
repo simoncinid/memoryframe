@@ -16,6 +16,14 @@ export default function HomePage() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
           <div className="max-w-3xl mx-auto text-center">
+            {/* Free Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-full mb-6 animate-in fade-in slide-in-from-bottom-2">
+              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-sm font-medium text-green-800">100% Free — No signup required</span>
+            </div>
+            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-stone-800 mb-6 animate-in fade-in slide-in-from-bottom-2">
               {copy.home.hero.headline}
             </h1>
@@ -35,6 +43,25 @@ export default function HomePage() {
               >
                 {copy.home.hero.ctaSecondary}
               </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Free Service Banner */}
+      <section className="py-6 bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 border-y border-pink-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center md:text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </div>
+              <div>
+                <p className="font-semibold text-stone-800">Free forever, powered by your support</p>
+                <p className="text-sm text-stone-600">Running AI costs real money — tips from kind users keep this free for everyone 💜</p>
+              </div>
             </div>
           </div>
         </div>
@@ -188,13 +215,22 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-stone-800">
+      <section className="py-20 bg-gradient-to-br from-stone-800 to-stone-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full mb-6">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-sm font-medium text-white/90">100% Free • No Signup • No Watermarks</span>
+          </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Create Your Portrait?
           </h2>
-          <p className="text-lg text-stone-300 mb-8">
-            It only takes a minute. Free, no signup required.
+          <p className="text-lg text-stone-300 mb-2">
+            It only takes a minute. Upload two photos, pick a style, done.
+          </p>
+          <p className="text-sm text-stone-400 mb-8">
+            Love your result? Optional tips help keep this free for families everywhere 💜
           </p>
           <Link
             href="/create"

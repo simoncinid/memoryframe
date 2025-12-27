@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { copy } from "@/content/copy";
 
@@ -13,9 +14,13 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-stone-800 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">M</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt={copy.brand.name}
+              width={36}
+              height={36}
+              className="w-9 h-9"
+            />
             <span className="font-semibold text-stone-800 text-lg">
               {copy.brand.name}
             </span>
