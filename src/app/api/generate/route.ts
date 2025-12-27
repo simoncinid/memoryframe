@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.BACKEND_URL || "https://memoryframe.onrender.com";
+const BACKEND_URL = process.env.BACKEND_URL || "https://memoryframe-backend.onrender.com";
 
 interface GenerateRequest {
   personA: string; // base64
