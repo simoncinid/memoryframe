@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { copy } from "@/content/copy";
 import { FAQ, FAQJsonLd } from "@/components/FAQ";
 
@@ -14,16 +15,8 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,113,108,0.08),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(168,162,158,0.08),transparent_50%)]" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-3xl mx-auto text-center">
-            {/* Free Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-full mb-6 animate-in fade-in slide-in-from-bottom-2">
-              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-sm font-medium text-green-800">100% Free — No signup required</span>
-            </div>
-            
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-stone-800 mb-6 animate-in fade-in slide-in-from-bottom-2">
               {copy.home.hero.headline}
             </h1>
@@ -80,20 +73,128 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {copy.home.howItWorks.steps.map((step, index) => (
-              <div
-                key={index}
-                className="relative p-8 bg-stone-50 rounded-2xl border border-stone-200"
-              >
-                <div className="w-12 h-12 bg-stone-800 text-white rounded-xl flex items-center justify-center text-xl font-bold mb-6">
-                  {step.number}
-                </div>
-                <h3 className="text-xl font-semibold text-stone-800 mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-stone-600">{step.description}</p>
+            {/* Step 1 - Upload Photos */}
+            <div className="p-6 bg-stone-50 rounded-2xl border border-stone-200">
+              <div className="w-12 h-12 bg-stone-800 text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                1
               </div>
-            ))}
+              <h3 className="text-xl font-semibold text-stone-800 mb-3">
+                Upload Photos
+              </h3>
+              <p className="text-stone-600 text-sm mb-4">Add photos of two people and choose a background scene.</p>
+              
+              {/* Visual Example */}
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <p className="text-xs text-stone-500 mb-1 font-medium">Person 1</p>
+                    <div className="aspect-square rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
+                      <Image 
+                        src="/examplephoto1.png" 
+                        alt="Example person 1" 
+                        width={120} 
+                        height={120}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-stone-500 mb-1 font-medium">Person 2</p>
+                    <div className="aspect-square rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
+                      <Image 
+                        src="/examplephoto2.png" 
+                        alt="Example person 2" 
+                        width={120} 
+                        height={120}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-stone-500 mb-1 font-medium">Background</p>
+                  <div className="aspect-video rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
+                    <Image 
+                      src="/examplebackground.png" 
+                      alt="Example background" 
+                      width={280} 
+                      height={160}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 - Pick a Style */}
+            <div className="p-6 bg-stone-50 rounded-2xl border border-stone-200">
+              <div className="w-12 h-12 bg-stone-800 text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                2
+              </div>
+              <h3 className="text-xl font-semibold text-stone-800 mb-3">
+                Pick a Style
+              </h3>
+              <p className="text-stone-600 text-sm mb-4">Select from classic, painterly, cinematic, and more artistic styles.</p>
+              
+              {/* Visual Example - Style Cards */}
+              <div className="grid grid-cols-2 gap-2">
+                {/* Selected Style */}
+                <div className="p-3 bg-stone-800 rounded-lg border-2 border-stone-800 relative">
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div className="w-full aspect-square rounded bg-gradient-to-br from-stone-600 to-stone-800 mb-2" />
+                  <p className="text-xs text-white font-medium text-center">Classic</p>
+                </div>
+                
+                {/* Other Styles */}
+                <div className="p-3 bg-white rounded-lg border border-stone-200 opacity-60">
+                  <div className="w-full aspect-square rounded bg-gradient-to-br from-amber-500 to-orange-700 mb-2" />
+                  <p className="text-xs text-stone-600 font-medium text-center">Painterly</p>
+                </div>
+                <div className="p-3 bg-white rounded-lg border border-stone-200 opacity-60">
+                  <div className="w-full aspect-square rounded bg-gradient-to-br from-slate-700 to-slate-900 mb-2" />
+                  <p className="text-xs text-stone-600 font-medium text-center">Cinematic</p>
+                </div>
+                <div className="p-3 bg-white rounded-lg border border-stone-200 opacity-60">
+                  <div className="w-full aspect-square rounded bg-gradient-to-br from-amber-600 to-amber-800 mb-2" />
+                  <p className="text-xs text-stone-600 font-medium text-center">Vintage</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 - Generate & Download */}
+            <div className="p-6 bg-stone-50 rounded-2xl border border-stone-200">
+              <div className="w-12 h-12 bg-stone-800 text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                3
+              </div>
+              <h3 className="text-xl font-semibold text-stone-800 mb-3">
+                Generate & Download
+              </h3>
+              <p className="text-stone-600 text-sm mb-4">Get your portrait in seconds. Download in high quality.</p>
+              
+              {/* Visual Example - Result */}
+              <div className="relative">
+                <div className="aspect-[4/5] rounded-xl overflow-hidden border-2 border-stone-200 bg-stone-100 shadow-lg">
+                  <Image 
+                    src="/examplemerged.png" 
+                    alt="Example merged portrait result" 
+                    width={280} 
+                    height={350}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Download Badge */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 bg-green-500 text-white rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-lg">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Ready to Download
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

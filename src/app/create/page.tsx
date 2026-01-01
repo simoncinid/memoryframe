@@ -245,31 +245,57 @@ function CreatePageContent() {
       <div className="mb-12">
         {/* Step 1: Person A */}
         {currentStep === 0 && (
-          <div className="max-w-md mx-auto">
-            <h2 className="text-lg font-semibold text-stone-800 mb-3">
-              {copy.create.steps.personA.title} — <span className="font-normal text-stone-500">{copy.create.steps.personA.description}</span>
-            </h2>
-            <UploadDropzone
-              onFileSelect={setPersonA}
-              value={personA}
-              onClear={() => setPersonA(null)}
-              label="Upload Person A photo"
-            />
+          <div>
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+              {copy.create.uploadGuidelines.map((guideline, index) => (
+                <span
+                  key={index}
+                  className="text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded-full whitespace-nowrap"
+                >
+                  {guideline}
+                </span>
+              ))}
+            </div>
+            <div className="max-w-md mx-auto">
+              <h2 className="text-lg font-semibold text-stone-800 mb-3 text-center">
+                {copy.create.steps.personA.title} — <span className="font-normal text-stone-500">{copy.create.steps.personA.description}</span>
+              </h2>
+              <UploadDropzone
+                onFileSelect={setPersonA}
+                value={personA}
+                onClear={() => setPersonA(null)}
+                label="Upload Person A photo"
+                guidelines={[]}
+              />
+            </div>
           </div>
         )}
 
         {/* Step 2: Person B */}
         {currentStep === 1 && (
-          <div className="max-w-md mx-auto">
-            <h2 className="text-lg font-semibold text-stone-800 mb-3">
-              {copy.create.steps.personB.title} — <span className="font-normal text-stone-500">{copy.create.steps.personB.description}</span>
-            </h2>
-            <UploadDropzone
-              onFileSelect={setPersonB}
-              value={personB}
-              onClear={() => setPersonB(null)}
-              label="Upload Person B photo"
-            />
+          <div>
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+              {copy.create.uploadGuidelines.map((guideline, index) => (
+                <span
+                  key={index}
+                  className="text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded-full whitespace-nowrap"
+                >
+                  {guideline}
+                </span>
+              ))}
+            </div>
+            <div className="max-w-md mx-auto">
+              <h2 className="text-lg font-semibold text-stone-800 mb-3 text-center">
+                {copy.create.steps.personB.title} — <span className="font-normal text-stone-500">{copy.create.steps.personB.description}</span>
+              </h2>
+              <UploadDropzone
+                onFileSelect={setPersonB}
+                value={personB}
+                onClear={() => setPersonB(null)}
+                label="Upload Person B photo"
+                guidelines={[]}
+              />
+            </div>
           </div>
         )}
 
