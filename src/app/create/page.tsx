@@ -227,10 +227,9 @@ function CreatePageContent() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-stone-800 mb-2">
+        <h1 className="text-3xl font-bold text-stone-800">
           {copy.create.title}
         </h1>
-        <p className="text-stone-600">{copy.create.subtitle}</p>
       </div>
 
       {/* Stepper */}
@@ -247,12 +246,9 @@ function CreatePageContent() {
         {/* Step 1: Person A */}
         {currentStep === 0 && (
           <div className="max-w-md mx-auto">
-            <h2 className="text-xl font-semibold text-stone-800 mb-2">
-              {copy.create.steps.personA.title}
+            <h2 className="text-lg font-semibold text-stone-800 mb-3">
+              {copy.create.steps.personA.title} — <span className="font-normal text-stone-500">{copy.create.steps.personA.description}</span>
             </h2>
-            <p className="text-stone-600 mb-6">
-              {copy.create.steps.personA.description}
-            </p>
             <UploadDropzone
               onFileSelect={setPersonA}
               value={personA}
@@ -265,12 +261,9 @@ function CreatePageContent() {
         {/* Step 2: Person B */}
         {currentStep === 1 && (
           <div className="max-w-md mx-auto">
-            <h2 className="text-xl font-semibold text-stone-800 mb-2">
-              {copy.create.steps.personB.title}
+            <h2 className="text-lg font-semibold text-stone-800 mb-3">
+              {copy.create.steps.personB.title} — <span className="font-normal text-stone-500">{copy.create.steps.personB.description}</span>
             </h2>
-            <p className="text-stone-600 mb-6">
-              {copy.create.steps.personB.description}
-            </p>
             <UploadDropzone
               onFileSelect={setPersonB}
               value={personB}
