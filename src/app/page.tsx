@@ -92,44 +92,30 @@ export default function HomePage() {
               <h3 className="text-xl font-semibold text-stone-800 mb-3">
                 Upload Photos
               </h3>
-              <p className="text-stone-600 text-sm mb-4">Add photos of two people and choose a background scene.</p>
+              <p className="text-stone-600 text-sm mb-4">Upload clear photos of two people you want to combine.</p>
               
               {/* Visual Example */}
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <p className="text-xs text-stone-500 mb-1 font-medium">Person 1</p>
-                    <div className="aspect-square rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
-                      <Image 
-                        src="/examplephoto1.png" 
-                        alt="Example person 1" 
-                        width={120} 
-                        height={120}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-stone-500 mb-1 font-medium">Person 2</p>
-                    <div className="aspect-square rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
-                      <Image 
-                        src="/examplephoto2.png" 
-                        alt="Example person 2" 
-                        width={120} 
-                        height={120}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <p className="text-xs text-stone-500 mb-1 font-medium">Person 1</p>
+                  <div className="aspect-square rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
+                    <Image 
+                      src="/examplephoto1.png" 
+                      alt="Example person 1" 
+                      width={150} 
+                      height={150}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
-                <div>
-                  <p className="text-xs text-stone-500 mb-1 font-medium">Background</p>
-                  <div className="aspect-video rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
+                <div className="flex-1">
+                  <p className="text-xs text-stone-500 mb-1 font-medium">Person 2</p>
+                  <div className="aspect-square rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
                     <Image 
-                      src="/examplebackground.png" 
-                      alt="Example background" 
-                      width={280} 
-                      height={160}
+                      src="/examplephoto2.png" 
+                      alt="Example person 2" 
+                      width={150} 
+                      height={150}
                       className="w-full h-full object-cover"
                     />
                   </div>
