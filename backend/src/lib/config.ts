@@ -20,9 +20,8 @@ export const config = {
   nodeEnv: getEnvOrDefault('NODE_ENV', 'development'),
   logLevel: getEnvOrDefault('LOG_LEVEL', 'info'),
 
-  // OpenAI
-  openaiApiKey: process.env.OPENAI_API_KEY ?? '',
-  openaiModel: getEnvOrDefault('OPENAI_MODEL', 'gpt-image-1'),
+  // SeedDream (WaveSpeed AI)
+  seedreamApiKey: process.env.SEEDREAM_API_KEY ?? '',
 
   // Redis (optional - falls back to in-memory rate limiting)
   redisUrl: process.env.REDIS_URL || '',
@@ -52,7 +51,7 @@ export const config = {
 
   // Feature flags
   get isMockMode() {
-    return !this.openaiApiKey;
+    return !this.seedreamApiKey;
   },
 } as const;
 

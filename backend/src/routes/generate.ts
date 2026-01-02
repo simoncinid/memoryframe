@@ -103,7 +103,7 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
       const personABase64 = personA!.buffer.toString('base64');
       const personBBase64 = personB!.buffer.toString('base64');
 
-      // Call OpenAI
+      // Call SeedDream v4
       const result = await generateImage({
         personABase64,
         personBBase64,

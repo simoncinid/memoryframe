@@ -1,21 +1,8 @@
-import OpenAI, { toFile } from 'openai';
-import sharp from 'sharp';
 import { config } from './config.js';
 import { UpstreamError } from './errors.js';
 import type { ImageStyle } from '../types.js';
 
-let openaiClient: OpenAI | null = null;
-
-function getOpenAI(): OpenAI {
-  if (!openaiClient) {
-    openaiClient = new OpenAI({
-      apiKey: config.openaiApiKey,
-      timeout: 120000, // 2 min timeout for edit operations
-      maxRetries: 0, // We handle retries ourselves
-    });
-  }
-  return openaiClient;
-}
+const WAVESPEED_API_BASE = 'https://api.wavespeed.ai/api/v3';
 
 // Style instructions - ONLY about visual style, NOT about background or composition
 const STYLE_INSTRUCTIONS: Record<ImageStyle, string> = {
@@ -34,22 +21,22 @@ function buildEditPrompt(style: string, userPrompt: string): string {
   const styleInstruction = STYLE_INSTRUCTIONS[style as ImageStyle] || STYLE_INSTRUCTIONS.classic;
   
   return `
-TASK: This is a side-by-side collage of two photos (LEFT and RIGHT). Transform it into a SINGLE unified photograph where ALL people from BOTH sides appear together naturally.
+TASK: Create a SINGLE unified photograph where ALL people from BOTH input images appear together naturally.
 
 USER REQUEST: ${userPrompt}
 
 VISUAL STYLE TO APPLY: ${styleInstruction}
 
 MERGING RULES:
-1. PRESERVE ALL PEOPLE from the LEFT side - do not remove anyone
-2. ADD the person(s) from the RIGHT side into the scene with the others
+1. PRESERVE ALL PEOPLE from the FIRST image - do not remove anyone
+2. ADD the person(s) from the SECOND image into the scene with the others
 3. Everyone must appear together in ONE cohesive photo, as if they were all present in the same moment
 4. Arrange people naturally - they can be standing together, interacting, or posed as a group
 
 BACKGROUND RULES:
 - If the user specified a background/scene in their request, use that
-- If NOT specified: choose the more interesting/detailed background between LEFT and RIGHT side
-- If one side has a plain/white background and the other has a real scene, USE the real scene
+- If NOT specified: choose the more interesting/detailed background between the two images
+- If one image has a plain/white background and the other has a real scene, USE the real scene
 - The final background must look natural and fit all subjects
 
 FACE REQUIREMENTS (CRITICAL):
@@ -62,10 +49,10 @@ TECHNICAL REQUIREMENTS:
 - Match lighting and shadows consistently across all people
 - Correct perspective so everyone appears at natural scale
 - Anatomically correct hands and body proportions
-- No visible seams, borders, or collage artifacts
+- No visible seams, borders, or artifacts
 
 ABSOLUTE CONSTRAINTS:
-- Do NOT remove or ignore any person from either side
+- Do NOT remove or ignore any person from either image
 - Do NOT add people who are not in the original images
 - Do NOT add text, watermarks, or logos
 - Do NOT create mutations or unrealistic body parts
@@ -89,61 +76,107 @@ interface GenerateImageResult {
   mimeType: string;
 }
 
+interface WaveSpeedSubmitResponse {
+  data: {
+    id: string;
+  };
+}
+
+interface WaveSpeedResultResponse {
+  data: {
+    id: string;
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    outputs?: string[];
+    error?: string;
+  };
+}
+
 async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
- * Create a side-by-side collage of two images using sharp
+ * Submit task to WaveSpeed SeedDream v4 API
  */
-async function createCollage(imageABase64: string, imageBBase64: string): Promise<Buffer> {
-  // Convert base64 to buffers
-  const bufferA = Buffer.from(imageABase64, 'base64');
-  const bufferB = Buffer.from(imageBBase64, 'base64');
+async function submitSeedreamTask(images: string[], prompt: string): Promise<string> {
+  const url = `${WAVESPEED_API_BASE}/bytedance/seedream-v4/edit`;
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${config.seedreamApiKey}`,
+    },
+    body: JSON.stringify({
+      enable_base64_output: false,
+      enable_sync_mode: false,
+      images: images,
+      prompt: prompt,
+    }),
+  });
 
-  // Get metadata for both images
-  const metaA = await sharp(bufferA).metadata();
-  const metaB = await sharp(bufferB).metadata();
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[SeedDream] Submit error:', response.status, errorText);
+    throw new UpstreamError(`SeedDream API error: ${response.status} - ${errorText}`);
+  }
 
-  // Target height for both images (use the smaller one to avoid upscaling)
-  const targetHeight = Math.min(metaA.height || 1024, metaB.height || 1024, 1024);
+  const result = await response.json() as WaveSpeedSubmitResponse;
+  return result.data.id;
+}
 
-  // Resize both images to same height while maintaining aspect ratio
-  const resizedA = await sharp(bufferA)
-    .resize({ height: targetHeight, fit: 'inside' })
-    .png()
-    .toBuffer();
+/**
+ * Poll for task result
+ */
+async function pollForResult(requestId: string, timeoutMs: number = 120000): Promise<string> {
+  const url = `${WAVESPEED_API_BASE}/predictions/${requestId}/result`;
+  const startTime = Date.now();
+  const pollInterval = 500; // 500ms between polls
+  
+  while (Date.now() - startTime < timeoutMs) {
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${config.seedreamApiKey}`,
+      },
+    });
 
-  const resizedB = await sharp(bufferB)
-    .resize({ height: targetHeight, fit: 'inside' })
-    .png()
-    .toBuffer();
-
-  // Get new dimensions after resize
-  const newMetaA = await sharp(resizedA).metadata();
-  const newMetaB = await sharp(resizedB).metadata();
-
-  const widthA = newMetaA.width || 512;
-  const widthB = newMetaB.width || 512;
-  const totalWidth = widthA + widthB;
-
-  // Create the collage - side by side
-  const collage = await sharp({
-    create: {
-      width: totalWidth,
-      height: targetHeight,
-      channels: 4,
-      background: { r: 255, g: 255, b: 255, alpha: 1 }
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[SeedDream] Poll error:', response.status, errorText);
+      throw new UpstreamError(`SeedDream poll error: ${response.status}`);
     }
-  })
-    .composite([
-      { input: resizedA, left: 0, top: 0 },
-      { input: resizedB, left: widthA, top: 0 }
-    ])
-    .png()
-    .toBuffer();
 
-  return collage;
+    const result = await response.json() as WaveSpeedResultResponse;
+    const status = result.data.status;
+
+    if (status === 'completed') {
+      if (!result.data.outputs || result.data.outputs.length === 0) {
+        throw new UpstreamError('SeedDream returned no output images');
+      }
+      console.log(`[SeedDream] Task completed in ${Date.now() - startTime}ms`);
+      return result.data.outputs[0];
+    } else if (status === 'failed') {
+      throw new UpstreamError(`SeedDream task failed: ${result.data.error || 'Unknown error'}`);
+    }
+
+    // Still processing, wait and poll again
+    console.log(`[SeedDream] Status: ${status}, waiting...`);
+    await sleep(pollInterval);
+  }
+
+  throw new UpstreamError('SeedDream task timed out');
+}
+
+/**
+ * Download image from URL and convert to base64
+ */
+async function downloadImageAsBase64(imageUrl: string): Promise<string> {
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new UpstreamError(`Failed to download generated image: ${response.status}`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  return Buffer.from(arrayBuffer).toString('base64');
 }
 
 export async function generateImage(options: GenerateImageOptions): Promise<GenerateImageResult> {
@@ -152,7 +185,6 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
     personBBase64,
     style,
     scene,
-    size = config.defaultSize,
   } = options;
 
   // Mock mode for development without API key
@@ -160,111 +192,39 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
     return generateMockImage();
   }
 
-  const openai = getOpenAI();
+  console.log('[SeedDream] Starting image generation...');
 
-  // Step 1: Create collage of the two images
-  console.log('[OpenAI] Creating collage of two images...');
-  const collageBuffer = await createCollage(personABase64, personBBase64);
-  console.log('[OpenAI] Collage created, size:', collageBuffer.length, 'bytes');
+  // SeedDream v4 accepts multiple images directly - no need for collage!
+  // Convert base64 to data URLs for the API
+  const imageA = `data:image/png;base64,${personABase64}`;
+  const imageB = `data:image/png;base64,${personBBase64}`;
 
-  // Step 2: Build the prompt
+  // Build the prompt
   const prompt = buildEditPrompt(style, scene);
+  console.log('[SeedDream] Prompt:', prompt.substring(0, 200) + '...');
 
-  // Step 3: Call OpenAI images/edit API
-  const maxRetries = 2;
-  const backoffMs = [2000, 4000];
-  let lastError: Error | null = null;
+  // Submit the task
+  console.log('[SeedDream] Submitting task...');
+  const requestId = await submitSeedreamTask([imageA, imageB], prompt);
+  console.log(`[SeedDream] Task submitted, request ID: ${requestId}`);
 
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      console.log(`[OpenAI] Calling images.edit API (attempt ${attempt + 1})...`);
-      
-      // Convert buffer to File object for the SDK
-      const imageFile = await toFile(collageBuffer, 'collage.png', { type: 'image/png' });
+  // Poll for result
+  console.log('[SeedDream] Polling for result...');
+  const outputUrl = await pollForResult(requestId);
+  console.log(`[SeedDream] Output URL: ${outputUrl}`);
 
-      const response = await openai.images.edit({
-        model: config.openaiModel,
-        image: imageFile,
-        prompt,
-        n: 1,
-        size: size as '1024x1024' | '1536x1024' | '1024x1536',
-      });
+  // Download the result image
+  console.log('[SeedDream] Downloading result image...');
+  const imageBase64 = await downloadImageAsBase64(outputUrl);
 
-      console.log('[OpenAI] API response received');
-
-      // Check for response data
-      const imageData = response.data?.[0];
-      
-      if (!imageData) {
-        throw new Error('No image data in response');
-      }
-      
-      if (imageData.b64_json) {
-        return {
-          imageBase64: imageData.b64_json,
-          mimeType: 'image/png',
-        };
-      } else if (imageData.url) {
-        // If URL returned, fetch and convert to base64
-        console.log('[OpenAI] Fetching image from URL...');
-        const imageResponse = await fetch(imageData.url);
-        const arrayBuffer = await imageResponse.arrayBuffer();
-        const base64 = Buffer.from(arrayBuffer).toString('base64');
-        return {
-          imageBase64: base64,
-          mimeType: 'image/png',
-        };
-      }
-
-      throw new Error('No image data in response');
-    } catch (error) {
-      lastError = error as Error;
-      console.error(`[OpenAI] Error on attempt ${attempt + 1}:`, (error as Error).message);
-      
-      // Check if error is retryable
-      const isRetryable = isRetryableError(error);
-      const is400Error = is400LevelError(error);
-
-      // Don't retry on 400-level errors (except 429)
-      if (is400Error) {
-        console.error('[OpenAI] Non-retryable 4xx error');
-        break;
-      }
-
-      // Retry on 429 and 5xx errors
-      if (isRetryable && attempt < maxRetries) {
-        console.warn(`[OpenAI] Retrying in ${backoffMs[attempt]}ms...`);
-        await sleep(backoffMs[attempt]);
-        continue;
-      }
-
-      break;
-    }
-  }
-
-  throw new UpstreamError(`OpenAI generation failed: ${lastError?.message ?? 'Unknown error'}`);
-}
-
-function isRetryableError(error: unknown): boolean {
-  if (error instanceof OpenAI.APIError) {
-    return error.status === 429 || (error.status >= 500 && error.status < 600);
-  }
-  // Network errors are retryable
-  if (error instanceof Error && error.message.includes('fetch')) {
-    return true;
-  }
-  return false;
-}
-
-function is400LevelError(error: unknown): boolean {
-  if (error instanceof OpenAI.APIError) {
-    return error.status >= 400 && error.status < 500 && error.status !== 429;
-  }
-  return false;
+  return {
+    imageBase64,
+    mimeType: 'image/png',
+  };
 }
 
 /**
- * Generate a mock image for development/testing without OpenAI key.
+ * Generate a mock image for development/testing without API key.
  */
 function generateMockImage(): GenerateImageResult {
   // Create a simple 100x100 placeholder PNG
@@ -275,7 +235,8 @@ function generateMockImage(): GenerateImageResult {
     'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEh' +
     'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEh' +
     'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEh' +
-    'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhIaEPg8AByvE6V9MAAAAASUVORK5CYII=';
+    'ISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEh' +
+    'ISEhISEhIaEPg8AByvE6V9MAAAAASUVORK5CYII=';
 
   return {
     imageBase64: mockBase64,
