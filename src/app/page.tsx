@@ -30,12 +30,14 @@ export default function HomePage() {
               >
                 {copy.home.hero.ctaPrimary}
               </Link>
+              {/* Gallery link - commented out
               <a
                 href="#gallery"
                 className="px-8 py-4 bg-white text-stone-800 border border-stone-300 rounded-xl font-medium text-lg hover:bg-stone-50 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2"
               >
                 {copy.home.hero.ctaSecondary}
               </a>
+              */}
             </div>
           </div>
         </div>
@@ -196,7 +198,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Gallery */}
+      {/* Gallery - commented out (can be uncommented later if needed)
       <section id="gallery" className="py-20 bg-stone-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -222,6 +224,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      */}
 
       {/* Styles Preview */}
       <section className="py-20 bg-white">
