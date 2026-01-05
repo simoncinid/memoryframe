@@ -10,7 +10,11 @@ type AnalyticsEvent =
   | "download_click"
   | "style_selected"
   | "prompt_copied"
-  | "page_view";
+  | "page_view"
+  | "meme_generate_started"
+  | "meme_generate_success"
+  | "meme_generate_error"
+  | "meme_download_click";
 
 interface EventProperties {
   [key: string]: string | number | boolean | undefined;

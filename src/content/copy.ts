@@ -608,6 +608,7 @@ export const copy = {
         { label: "Add Person to Photo", href: "/add-person-to-photo" },
         { label: "Merge Photos AI", href: "/merge-photos-ai" },
         { label: "Portrait AI Generator", href: "/portrait-ai-generator" },
+        { label: "Meme Face Swap", href: "/meme" },
       ],
       legal: [
         { label: "Privacy Policy", href: "/privacy" },
@@ -621,6 +622,7 @@ export const copy = {
   navbar: {
     links: [
       { label: "Home", href: "/" },
+      { label: "Meme Face Swap", href: "/meme" },
       { label: "Styles", href: "/styles" },
       { label: "Prompts", href: "/prompts" },
     ],
