@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
     
     // Build the scene/prompt for face swap
     const memePrompts: Record<string, string> = {
-      kirk: "FACE SWAP ONLY: Replace the face in the first image with the facial features of Charlie Kirk from the second image. Keep the EXACT same body, clothing, pose, and background from the first image. Only blend the facial features (eyes, nose, mouth proportions) from the second image onto the face position in the first image. The result should look like the person in photo 1 but with facial characteristics of person in photo 2.",
-      maduro: "FACE SWAP ONLY: Replace the face in the first image with the facial features of Nicolás Maduro from the second image. Keep the EXACT same body, clothing, pose, and background from the first image. Only blend the facial features (eyes, nose, mouth, mustache) from the second image onto the face position in the first image. The result should look like the person in photo 1 but with facial characteristics of person in photo 2.",
+      kirk: "FACE SWAP ONLY: Replace the face in the first image with the facial features of Charlie Kirk from the second image. Keep the EXACT same body, clothing, pose, and background from the first image. Only blend the facial features from the second image onto the face position in the first image. The result should almostlook like the person in photo 2 (charlie kirk or maduro) but keeping little facial characteristics of person in photo 1.",
+      maduro: "FACE SWAP ONLY: Replace the face in the first image with the facial features of Nicolás Maduro from the second image. Keep the EXACT same body, clothing, pose, and background from the first image. Only blend the facial features from the second image onto the face position in the first image. The result should look like the person in photo 1 but with facial characteristics of person in photo 2.",
     };
     
     formData.append("scene", memePrompts[body.memeType]);
