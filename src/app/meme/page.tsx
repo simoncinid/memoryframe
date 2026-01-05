@@ -254,22 +254,13 @@ function MemePageContent() {
               }`}
             >
               {/* Meme Image */}
-              <div className="aspect-video relative bg-gradient-to-br from-stone-100 to-stone-200">
+              <div className="aspect-video relative overflow-hidden">
                 <Image
                   src={meme.image}
                   alt={meme.name}
                   fill
-                  className="object-contain p-4"
-                  onError={(e) => {
-                    // Fallback if image doesn't exist
-                    e.currentTarget.style.display = 'none';
-                  }}
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-6xl opacity-20">
-                    {meme.id === "kirk" ? "🧔" : "🇻🇪"}
-                  </span>
-                </div>
               </div>
               
               {/* Meme Info */}
