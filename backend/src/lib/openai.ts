@@ -27,15 +27,24 @@ USER REQUEST: ${userPrompt}
 
 VISUAL STYLE TO APPLY: ${styleInstruction}
 
+CRITICAL - DOCUMENT/ID CARD DETECTION:
+- If ANY input image contains an ID card, passport, driver's license, or any official document with a photo:
+  * EXTRACT ONLY THE PERSON'S FACE from the document photo
+  * COMPLETELY IGNORE the document itself (card, borders, text, etc.)
+  * Recreate the person's FULL BODY based on their face
+  * DO NOT include the physical card/document in the final image
+- Treat the person from the document as if you received a normal portrait photo of them
+
 MERGING RULES:
 1. PRESERVE ALL PEOPLE from the FIRST image - do not remove anyone
 2. ADD the person(s) from the SECOND image into the scene with the others
 3. Everyone must appear together in ONE cohesive photo, as if they were all present in the same moment
-4. Arrange people naturally - they can be standing together, interacting, or posed as a group
+4. Arrange people naturally - standing close together, arms around shoulders, embracing, or in a warm family pose
+5. People should appear PHYSICALLY CONNECTED (touching, hugging, holding hands) not just standing apart
 
 BACKGROUND RULES:
 - If the user specified a background/scene in their request, use that
-- If NOT specified: choose the more interesting/detailed background between the two images
+- If NOT specified: USE the background from the group/family photo, not from individual portraits or documents
 - If one image has a plain/white background and the other has a real scene, USE the real scene
 - The final background must look natural and fit all subjects
 
@@ -45,6 +54,12 @@ FACE REQUIREMENTS (CRITICAL):
 - Do NOT alter, blur, distort, or stylize any face
 - Natural skin textures on all faces
 
+BODY GENERATION:
+- If only a face is available (e.g., from an ID card), generate an appropriate full body that:
+  * Matches the age and apparent characteristics of the face
+  * Wears clothing appropriate to the scene/setting
+  * Has natural posture integrated with the group
+
 TECHNICAL REQUIREMENTS:
 - Match lighting and shadows consistently across all people
 - Correct perspective so everyone appears at natural scale
@@ -52,6 +67,7 @@ TECHNICAL REQUIREMENTS:
 - No visible seams, borders, or artifacts
 
 ABSOLUTE CONSTRAINTS:
+- Do NOT include any ID cards, documents, or cards in the final image
 - Do NOT remove or ignore any person from either image
 - Do NOT add people who are not in the original images
 - Do NOT add text, watermarks, or logos
