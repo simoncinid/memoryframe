@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState, useRef } from "react";
-import Image from "next/image";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { TipModal } from "@/components/TipModal";
 import { useToast } from "@/components/Toast";
@@ -151,48 +150,47 @@ export default function PaintByNumbersClient() {
           <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-4 shadow-sm">
             <div 
               ref={sliderContainerRef}
-              className="relative aspect-square max-w-3xl mx-auto rounded-xl overflow-hidden bg-white cursor-ew-resize select-none"
+              className="relative max-w-3xl mx-auto rounded-xl overflow-hidden bg-white cursor-ew-resize select-none"
               onMouseMove={handleMouseMove}
               onMouseDown={(e) => handleSliderMove(e.clientX)}
               onTouchMove={handleTouchMove}
               onTouchStart={(e) => handleSliderMove(e.touches[0].clientX)}
             >
-              {/* Colored Image (background) */}
-              <Image
-                src={coloredImage}
-                alt="Colored preview of paint by numbers"
-                fill
-                className="object-contain pointer-events-none"
-                priority
+              {/* Template Image (base layer, determines size) */}
+              <img
+                src={resultImage}
+                alt="Paint by numbers template"
+                className="w-full h-auto block pointer-events-none"
                 draggable={false}
               />
               
-              {/* Template Image (clipped by slider) */}
+              {/* Colored Image (overlay, clipped from right) */}
               <div 
                 className="absolute inset-0 overflow-hidden"
-                style={{ width: `${sliderPosition}%` }}
+                style={{ 
+                  clipPath: `inset(0 0 0 ${sliderPosition}%)`,
+                }}
               >
-                <div className="relative w-full h-full" style={{ width: `${100 / (sliderPosition / 100)}%` }}>
-                  <Image
-                    src={resultImage}
-                    alt="Paint by numbers template"
-                    fill
-                    className="object-contain pointer-events-none"
-                    priority
-                    draggable={false}
-                  />
-                </div>
+                <img
+                  src={coloredImage}
+                  alt="Colored preview of paint by numbers"
+                  className="w-full h-full object-cover pointer-events-none"
+                  draggable={false}
+                />
               </div>
               
               {/* Slider Line */}
               <div 
-                className="absolute top-0 bottom-0 w-1 bg-stone-800 shadow-lg pointer-events-none"
+                className="absolute top-0 bottom-0 w-0.5 bg-stone-800 shadow-lg pointer-events-none"
                 style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
               >
                 {/* Slider Handle */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full border-2 border-stone-800 shadow-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-stone-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <svg className="w-5 h-5 text-stone-800 -ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
               </div>
@@ -208,13 +206,11 @@ export default function PaintByNumbersClient() {
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-4 shadow-sm">
-            <div className="relative aspect-square max-w-3xl mx-auto rounded-xl overflow-hidden bg-white">
-              <Image
+            <div className="relative max-w-3xl mx-auto rounded-xl overflow-hidden bg-white">
+              <img
                 src={resultImage}
                 alt="Paint by numbers template generated from photo"
-                fill
-                className="object-contain"
-                priority
+                className="w-full h-auto block"
               />
             </div>
           </div>

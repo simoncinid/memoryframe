@@ -16,9 +16,9 @@ const CONFIG = {
   outlineWidth: 1,          // Black outline thickness
   fontSize: 7,              // Base font size for numbers (smaller for density)
   minFontSize: 5,           // Minimum font size
-  legendSwatchSize: 18,     // Size of color swatches in legend
-  legendPadding: 12,        // Padding around legend
-  legendRowHeight: 24,      // Height of each legend row
+  legendSwatchSize: 16,     // Size of color swatches in legend
+  legendPadding: 10,        // Padding around legend
+  legendRowHeight: 32,      // Height of each legend row (space for number below)
 };
 
 interface Color {
@@ -447,7 +447,7 @@ function renderPaintByNumbers(
   regions: Region[]
 ): ReturnType<typeof createCanvas> {
   // Calculate legend dimensions
-  const colorsPerRow = Math.min(10, palette.length);
+  const colorsPerRow = Math.min(16, palette.length);
   const legendRows = Math.ceil(palette.length / colorsPerRow);
   const legendHeight = CONFIG.legendPadding * 2 + legendRows * CONFIG.legendRowHeight;
 
@@ -622,6 +622,7 @@ function drawLegend(
 
 /**
  * Render the colored preview (how it looks when painted)
+ * Same dimensions as template for perfect overlay in slider
  */
 function renderColoredPreview(
   colorMap: Uint8Array,
@@ -629,10 +630,20 @@ function renderColoredPreview(
   height: number,
   palette: Color[]
 ): ReturnType<typeof createCanvas> {
-  const canvas = createCanvas(width, height);
+  // Calculate legend dimensions (same as template)
+  const colorsPerRow = Math.min(16, palette.length);
+  const legendRows = Math.ceil(palette.length / colorsPerRow);
+  const legendHeight = CONFIG.legendPadding * 2 + legendRows * CONFIG.legendRowHeight;
+  const totalHeight = height + legendHeight;
+
+  const canvas = createCanvas(width, totalHeight);
   const ctx = canvas.getContext('2d');
 
-  // Create ImageData for direct pixel manipulation
+  // Fill entire canvas with white first
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, width, totalHeight);
+
+  // Create ImageData for the image portion only
   const imageData = ctx.createImageData(width, height);
   const data = imageData.data;
 
@@ -650,7 +661,7 @@ function renderColoredPreview(
   ctx.putImageData(imageData, 0, 0);
 
   // Draw subtle outlines for definition
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
   ctx.lineWidth = 0.5;
 
   for (let y = 0; y < height; y++) {
@@ -675,6 +686,9 @@ function renderColoredPreview(
       }
     }
   }
+
+  // Draw legend at bottom (same as template for perfect alignment)
+  drawLegend(ctx, palette, width, height, legendHeight);
 
   return canvas;
 }
