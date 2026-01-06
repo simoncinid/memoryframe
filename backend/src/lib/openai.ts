@@ -92,6 +92,34 @@ interface GenerateImageResult {
   mimeType: string;
 }
 
+interface GeneratePaintByNumbersOptions {
+  photoBase64: string;
+}
+
+function buildPaintByNumbersPrompt(): string {
+  return `
+TASK: Transform the input photo into a PRINTABLE paint-by-numbers template.
+
+OUTPUT REQUIREMENTS (CRITICAL):
+- Black ink line art on a pure white background
+- Clean, closed regions separated by clear outlines
+- Add a SINGLE number inside each region (1..N). Numbers must be readable.
+- No colors, no grayscale shading, no gradients, no halftones
+- No textures, no background clutter
+- No text except region numbers
+- No watermarks, no signatures, no logos
+
+SIMPLIFICATION:
+- Preserve the main subject (face/pet/object) clearly and recognizably
+- Simplify small details into larger paintable regions
+- Keep lines thin but visible and consistent
+
+PRINT-FRIENDLY:
+- High contrast
+- Avoid tiny regions that are impossible to paint
+`.trim();
+}
+
 interface WaveSpeedSubmitResponse {
   data: {
     id: string;
@@ -231,6 +259,39 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
 
   // Download the result image
   console.log('[SeedDream] Downloading result image...');
+  const imageBase64 = await downloadImageAsBase64(outputUrl);
+
+  return {
+    imageBase64,
+    mimeType: 'image/png',
+  };
+}
+
+export async function generatePaintByNumbers(
+  options: GeneratePaintByNumbersOptions
+): Promise<GenerateImageResult> {
+  const { photoBase64 } = options;
+
+  if (config.isMockMode) {
+    return generateMockImage();
+  }
+
+  console.log('[SeedDream] Starting paint-by-numbers generation...');
+
+  const image = `data:image/png;base64,${photoBase64}`;
+  const prompt = buildPaintByNumbersPrompt();
+
+  // SeedDream edit endpoint is proven with 2 images in our existing flow.
+  // To maximize compatibility, we submit the same image twice.
+  console.log('[SeedDream] Submitting paint-by-numbers task...');
+  const requestId = await submitSeedreamTask([image, image], prompt);
+  console.log(`[SeedDream] Task submitted, request ID: ${requestId}`);
+
+  console.log('[SeedDream] Polling for paint-by-numbers result...');
+  const outputUrl = await pollForResult(requestId);
+  console.log(`[SeedDream] Output URL: ${outputUrl}`);
+
+  console.log('[SeedDream] Downloading paint-by-numbers image...');
   const imageBase64 = await downloadImageAsBase64(outputUrl);
 
   return {

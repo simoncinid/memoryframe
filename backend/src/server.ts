@@ -5,6 +5,7 @@ import multipart from '@fastify/multipart';
 import { config, validateConfig } from './lib/config.js';
 import healthRoutes from './routes/health.js';
 import generateRoutes from './routes/generate.js';
+import paintByNumbersRoutes from './routes/paintByNumbers.js';
 
 // Validate configuration on startup before initializing server
 validateConfig();
@@ -50,6 +51,7 @@ async function start() {
     // Register routes
     await fastify.register(healthRoutes);
     await fastify.register(generateRoutes);
+    await fastify.register(paintByNumbersRoutes);
 
     // Global error handler
     fastify.setErrorHandler((error: Error & { code?: string }, request, reply) => {
