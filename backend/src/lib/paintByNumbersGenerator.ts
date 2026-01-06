@@ -9,16 +9,16 @@ import { createCanvas, CanvasRenderingContext2D } from 'canvas';
 
 // Configuration
 const CONFIG = {
-  maxWidth: 1000,           // Max dimension for processing
-  numColors: 24,            // Number of colors in palette (more = more detail)
-  minRegionSize: 250,       // Minimum pixels for a region (balanced: detail + readability)
-  minRegionForNumber: 150,  // Minimum region size to display a number
+  maxWidth: 1200,           // Max dimension for processing (higher res)
+  numColors: 48,            // Number of colors in palette (rich detail)
+  minRegionSize: 80,        // Minimum pixels for a region (fine detail)
+  minRegionForNumber: 60,   // Minimum region size to display a number
   outlineWidth: 1,          // Black outline thickness
-  fontSize: 9,              // Base font size for numbers
-  minFontSize: 6,           // Minimum font size
-  legendSwatchSize: 22,     // Size of color swatches in legend
-  legendPadding: 16,        // Padding around legend
-  legendRowHeight: 30,      // Height of each legend row
+  fontSize: 7,              // Base font size for numbers (smaller for density)
+  minFontSize: 5,           // Minimum font size
+  legendSwatchSize: 18,     // Size of color swatches in legend
+  legendPadding: 12,        // Padding around legend
+  legendRowHeight: 24,      // Height of each legend row
 };
 
 interface Color {
@@ -588,12 +588,12 @@ function drawLegend(
   ctx.lineTo(width, startY);
   ctx.stroke();
 
-  // Calculate layout
-  const colorsPerRow = Math.min(10, palette.length);
+  // Calculate layout - more colors per row for larger palettes
+  const colorsPerRow = Math.min(16, palette.length);
   const itemWidth = (width - CONFIG.legendPadding * 2) / colorsPerRow;
   const swatchSize = CONFIG.legendSwatchSize;
 
-  ctx.font = 'bold 12px Arial';
+  ctx.font = 'bold 9px Arial';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
