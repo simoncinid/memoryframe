@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { TipModal } from "@/components/TipModal";
@@ -23,9 +23,13 @@ export default function PaintByNumbersClient() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingMessage, setGeneratingMessage] = useState("");
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [coloredImage, setColoredImage] = useState<string | null>(null);
+  const [sliderPosition, setSliderPosition] = useState(50);
 
   const [showTipModal, setShowTipModal] = useState(false);
   const [hasShownTipModal, setHasShownTipModal] = useState(false);
+  
+  const sliderContainerRef = useRef<HTMLDivElement>(null);
 
   // Show tip modal shortly after result appears
   useEffect(() => {
@@ -70,6 +74,7 @@ export default function PaintByNumbersClient() {
       }
 
       setResultImage(data.resultImageUrl);
+      setColoredImage(data.coloredImageUrl || null);
       trackEvent("paint_by_numbers_generate_success");
     } catch (error) {
       const message =
@@ -103,10 +108,30 @@ export default function PaintByNumbersClient() {
   const handleReset = useCallback(() => {
     setUploadedPhoto(null);
     setResultImage(null);
+    setColoredImage(null);
+    setSliderPosition(50);
     setIsGenerating(false);
     setGeneratingMessage("");
     setHasShownTipModal(false);
   }, []);
+
+  // Handle slider drag
+  const handleSliderMove = useCallback((clientX: number) => {
+    if (!sliderContainerRef.current) return;
+    const rect = sliderContainerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setSliderPosition(percentage);
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (e.buttons !== 1) return; // Only when mouse button is pressed
+    handleSliderMove(e.clientX);
+  }, [handleSliderMove]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    handleSliderMove(e.touches[0].clientX);
+  }, [handleSliderMove]);
 
   // Result View
   if (resultImage) {
@@ -121,17 +146,86 @@ export default function PaintByNumbersClient() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-8 shadow-sm">
-          <div className="relative aspect-square max-w-3xl mx-auto rounded-xl overflow-hidden bg-white">
-            <Image
-              src={resultImage}
-              alt="Paint by numbers template generated from photo"
-              fill
-              className="object-contain"
-              priority
-            />
+        {/* Comparison Slider */}
+        {coloredImage ? (
+          <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-4 shadow-sm">
+            <div 
+              ref={sliderContainerRef}
+              className="relative aspect-square max-w-3xl mx-auto rounded-xl overflow-hidden bg-white cursor-ew-resize select-none"
+              onMouseMove={handleMouseMove}
+              onMouseDown={(e) => handleSliderMove(e.clientX)}
+              onTouchMove={handleTouchMove}
+              onTouchStart={(e) => handleSliderMove(e.touches[0].clientX)}
+            >
+              {/* Colored Image (background) */}
+              <Image
+                src={coloredImage}
+                alt="Colored preview of paint by numbers"
+                fill
+                className="object-contain pointer-events-none"
+                priority
+                draggable={false}
+              />
+              
+              {/* Template Image (clipped by slider) */}
+              <div 
+                className="absolute inset-0 overflow-hidden"
+                style={{ width: `${sliderPosition}%` }}
+              >
+                <div className="relative w-full h-full" style={{ width: `${100 / (sliderPosition / 100)}%` }}>
+                  <Image
+                    src={resultImage}
+                    alt="Paint by numbers template"
+                    fill
+                    className="object-contain pointer-events-none"
+                    priority
+                    draggable={false}
+                  />
+                </div>
+              </div>
+              
+              {/* Slider Line */}
+              <div 
+                className="absolute top-0 bottom-0 w-1 bg-stone-800 shadow-lg pointer-events-none"
+                style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
+              >
+                {/* Slider Handle */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full border-2 border-stone-800 shadow-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-stone-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Labels */}
+              <div className="absolute top-3 left-3 bg-white/90 px-3 py-1 rounded-full text-sm font-medium text-stone-700 shadow pointer-events-none">
+                Template
+              </div>
+              <div className="absolute top-3 right-3 bg-white/90 px-3 py-1 rounded-full text-sm font-medium text-stone-700 shadow pointer-events-none">
+                Colored
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-4 shadow-sm">
+            <div className="relative aspect-square max-w-3xl mx-auto rounded-xl overflow-hidden bg-white">
+              <Image
+                src={resultImage}
+                alt="Paint by numbers template generated from photo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Slider instruction */}
+        {coloredImage && (
+          <p className="text-center text-stone-500 text-sm mb-6">
+            ← Drag the slider to compare template vs colored preview →
+          </p>
+        )}
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <button

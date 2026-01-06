@@ -10,14 +10,15 @@ import { createCanvas, CanvasRenderingContext2D } from 'canvas';
 // Configuration
 const CONFIG = {
   maxWidth: 1000,           // Max dimension for processing
-  numColors: 20,            // Number of colors in palette (16-24 is typical)
-  minRegionSize: 100,       // Minimum pixels for a region (smaller ones get merged)
+  numColors: 16,            // Number of colors in palette (reduced for cleaner result)
+  minRegionSize: 800,       // Minimum pixels for a region (larger = more readable numbers)
+  minRegionForNumber: 300,  // Minimum region size to display a number
   outlineWidth: 1,          // Black outline thickness
-  fontSize: 10,             // Base font size for numbers
-  minFontSize: 6,           // Minimum font size
-  legendSwatchSize: 24,     // Size of color swatches in legend
+  fontSize: 12,             // Base font size for numbers (increased)
+  minFontSize: 8,           // Minimum font size (increased)
+  legendSwatchSize: 28,     // Size of color swatches in legend
   legendPadding: 20,        // Padding around legend
-  legendRowHeight: 32,      // Height of each legend row
+  legendRowHeight: 36,      // Height of each legend row
 };
 
 interface Color {
@@ -36,7 +37,8 @@ interface Region {
 }
 
 interface PaintByNumbersResult {
-  imageBase64: string;
+  imageBase64: string;      // Template (B/W with numbers)
+  coloredBase64: string;    // Colored preview (how it looks when painted)
   mimeType: string;
 }
 
@@ -71,22 +73,32 @@ export async function generatePaintByNumbersTemplate(
   // Step 6: Calculate centroids for number placement
   calculateCentroids(mergedRegions, width);
 
-  // Step 7: Render the final image with outlines, numbers, and legend
-  const finalImage = renderPaintByNumbers(
+  // Step 7: Render the template (B/W with numbers and legend)
+  const templateImage = renderPaintByNumbers(
     colorMap,
     width,
     height,
     palette,
     mergedRegions
   );
-  console.log('[PBN] Image rendered');
+  console.log('[PBN] Template rendered');
 
-  // Convert to PNG buffer then base64
-  const pngBuffer = finalImage.toBuffer('image/png');
-  const base64 = pngBuffer.toString('base64');
+  // Step 8: Render the colored preview (how it looks when painted)
+  const coloredImage = renderColoredPreview(
+    colorMap,
+    width,
+    height,
+    palette
+  );
+  console.log('[PBN] Colored preview rendered');
+
+  // Convert to PNG buffers then base64
+  const templateBuffer = templateImage.toBuffer('image/png');
+  const coloredBuffer = coloredImage.toBuffer('image/png');
 
   return {
-    imageBase64: base64,
+    imageBase64: templateBuffer.toString('base64'),
+    coloredBase64: coloredBuffer.toString('base64'),
     mimeType: 'image/png',
   };
 }
@@ -523,8 +535,8 @@ function drawNumbers(
     const regionRadius = Math.sqrt(region.area / Math.PI);
     const fontSize = Math.min(CONFIG.fontSize, Math.max(CONFIG.minFontSize, regionRadius / 2));
 
-    // Skip very small regions
-    if (region.area < 50) continue;
+    // Skip regions too small to display a readable number
+    if (region.area < CONFIG.minRegionForNumber) continue;
 
     // Check if position overlaps with existing numbers
     const minDist = fontSize * 1.5;
@@ -606,5 +618,64 @@ function drawLegend(
     ctx.fillStyle = '#000000';
     ctx.fillText(String(i + 1), x, y + swatchSize / 2 + 8);
   }
+}
+
+/**
+ * Render the colored preview (how it looks when painted)
+ */
+function renderColoredPreview(
+  colorMap: Uint8Array,
+  width: number,
+  height: number,
+  palette: Color[]
+): ReturnType<typeof createCanvas> {
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+
+  // Create ImageData for direct pixel manipulation
+  const imageData = ctx.createImageData(width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < width * height; i++) {
+    const colorIndex = colorMap[i];
+    const color = palette[colorIndex];
+    const pixelIdx = i * 4;
+
+    data[pixelIdx] = color.r;
+    data[pixelIdx + 1] = color.g;
+    data[pixelIdx + 2] = color.b;
+    data[pixelIdx + 3] = 255; // Alpha
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+
+  // Draw subtle outlines for definition
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+  ctx.lineWidth = 0.5;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = y * width + x;
+      const currentColor = colorMap[idx];
+
+      // Check right neighbor
+      if (x < width - 1 && colorMap[idx + 1] !== currentColor) {
+        ctx.beginPath();
+        ctx.moveTo(x + 1, y);
+        ctx.lineTo(x + 1, y + 1);
+        ctx.stroke();
+      }
+
+      // Check bottom neighbor
+      if (y < height - 1 && colorMap[idx + width] !== currentColor) {
+        ctx.beginPath();
+        ctx.moveTo(x, y + 1);
+        ctx.lineTo(x + 1, y + 1);
+        ctx.stroke();
+      }
+    }
+  }
+
+  return canvas;
 }
 

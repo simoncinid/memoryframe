@@ -100,15 +100,19 @@ export async function POST(request: NextRequest) {
 
     const mimeType = typeof data.mime_type === "string" ? data.mime_type : "image/png";
     const imageBase64 = typeof data.image_base64 === "string" ? data.image_base64 : null;
+    const coloredBase64 = typeof data.colored_base64 === "string" ? data.colored_base64 : null;
+    
     if (!imageBase64) {
       return NextResponse.json({ error: "Backend service error. Please try again." }, { status: 502 });
     }
 
     const resultImageUrl = `data:${mimeType};base64,${imageBase64}`;
+    const coloredImageUrl = coloredBase64 ? `data:${mimeType};base64,${coloredBase64}` : null;
 
     return NextResponse.json({
       success: true,
       resultImageUrl,
+      coloredImageUrl,
       generationId: typeof data.request_id === "string" ? data.request_id : undefined,
       createdAt: new Date().toISOString(),
       generation_time_ms: typeof data.generation_time_ms === "number" ? data.generation_time_ms : undefined,

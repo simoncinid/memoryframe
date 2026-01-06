@@ -5,7 +5,7 @@ import { validateFile, validateDeletePolicy } from '../lib/validation.js';
 import { checkAndReserveSlot, removeReservation, checkIpRateLimit } from '../lib/globalRateLimit.js';
 import { generatePaintByNumbersTemplate } from '../lib/paintByNumbersGenerator.js';
 import { RateLimitError, AppError, formatErrorResponse } from '../lib/errors.js';
-import type { FileInfo, GenerateResponse } from '../types.js';
+import type { FileInfo } from '../types.js';
 
 interface ParsedMultipart {
   files: Map<string, FileInfo>;
@@ -84,9 +84,11 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
         'Paint-by-numbers generation completed'
       );
 
-      const response: GenerateResponse = {
+      // Return both template and colored preview
+      const response = {
         request_id: requestId,
         image_base64: result.imageBase64,
+        colored_base64: result.coloredBase64,
         mime_type: result.mimeType,
         generation_time_ms: generationTimeMs,
       };
