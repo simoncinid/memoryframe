@@ -3,7 +3,7 @@ import type { MultipartFile } from '@fastify/multipart';
 import { generateRequestId } from '../lib/id.js';
 import { validateFile, validateDeletePolicy } from '../lib/validation.js';
 import { checkAndReserveSlot, removeReservation, checkIpRateLimit } from '../lib/globalRateLimit.js';
-import { generatePaintByNumbers } from '../lib/openai.js';
+import { generatePaintByNumbersTemplate } from '../lib/paintByNumbersGenerator.js';
 import { RateLimitError, AppError, formatErrorResponse } from '../lib/errors.js';
 import type { FileInfo, GenerateResponse } from '../types.js';
 
@@ -70,11 +70,8 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
         'Paint-by-numbers generation started'
       );
 
-      const photoBase64 = photo!.buffer.toString('base64');
-
-      const result = await generatePaintByNumbers({
-        photoBase64,
-      });
+      // Use deterministic algorithm (not AI) for professional paint-by-numbers
+      const result = await generatePaintByNumbersTemplate(photo!.buffer);
 
       const generationTimeMs = Date.now() - startTime;
 
