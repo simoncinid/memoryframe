@@ -10,15 +10,15 @@ import { createCanvas, CanvasRenderingContext2D } from 'canvas';
 // Configuration
 const CONFIG = {
   maxWidth: 1000,           // Max dimension for processing
-  numColors: 16,            // Number of colors in palette (reduced for cleaner result)
-  minRegionSize: 800,       // Minimum pixels for a region (larger = more readable numbers)
-  minRegionForNumber: 300,  // Minimum region size to display a number
+  numColors: 24,            // Number of colors in palette (more = more detail)
+  minRegionSize: 250,       // Minimum pixels for a region (balanced: detail + readability)
+  minRegionForNumber: 150,  // Minimum region size to display a number
   outlineWidth: 1,          // Black outline thickness
-  fontSize: 12,             // Base font size for numbers (increased)
-  minFontSize: 8,           // Minimum font size (increased)
-  legendSwatchSize: 28,     // Size of color swatches in legend
-  legendPadding: 20,        // Padding around legend
-  legendRowHeight: 36,      // Height of each legend row
+  fontSize: 9,              // Base font size for numbers
+  minFontSize: 6,           // Minimum font size
+  legendSwatchSize: 22,     // Size of color swatches in legend
+  legendPadding: 16,        // Padding around legend
+  legendRowHeight: 30,      // Height of each legend row
 };
 
 interface Color {
