@@ -98,25 +98,42 @@ interface GeneratePaintByNumbersOptions {
 
 function buildPaintByNumbersPrompt(): string {
   return `
-TASK: Transform the input photo into a PRINTABLE paint-by-numbers template.
+TASK: Create a PRINTABLE paint-by-numbers worksheet from the input photo.
 
-OUTPUT REQUIREMENTS (CRITICAL):
-- Black ink line art on a pure white background
-- Clean, closed regions separated by clear outlines
-- Add a SINGLE number inside each region (1..N). Numbers must be readable.
-- No colors, no grayscale shading, no gradients, no halftones
-- No textures, no background clutter
-- No text except region numbers
-- No watermarks, no signatures, no logos
+ABSOLUTE OUTPUT FORMAT (CRITICAL):
+- Single page worksheet on a pure white background
+- Main template centered (portrait orientation)
+- A LEGEND/PALETTE area at the bottom or right side that maps each number to a color swatch
 
-SIMPLIFICATION:
-- Preserve the main subject (face/pet/object) clearly and recognizably
-- Simplify small details into larger paintable regions
-- Keep lines thin but visible and consistent
+PAINT-BY-NUMBERS TEMPLATE (CRITICAL):
+- Use clean black outlines only (no sketchy hatching)
+- Regions must be CLOSED and clearly separated
+- Every region MUST contain exactly ONE number inside the region boundary (1..N)
+- Numbers must be placed inside the region (centered when possible), never outside or floating
+- No duplicate numbers in the same region
+- Do not place any numbers on the white background outside regions
+
+COLOR SYSTEM + LEGEND (CRITICAL):
+- Use a limited palette of 16 colors total (N=16)
+- Numbers must be exactly 1..16
+- Add a legend with 16 color swatches and labels "1".."16"
+- Swatches must be clearly filled with their color; the template itself remains black/white outlines with numbers
+- The legend must be readable when printed (avoid tiny text)
+
+DETAIL LEVEL:
+- More detailed than a simple outline: create many medium-small regions to allow real painting detail
+- Preserve key facial features / fur patterns / clothing folds as separate regions
+- Avoid micro-regions smaller than a pencil eraser; merge extremely tiny areas into nearby regions
+
+STYLE RULES:
+- Do NOT add grayscale shading, gradients, halftones, or textures
+- Do NOT add any other text except the region numbers and legend labels
+- Do NOT add watermarks, signatures, logos, or extra decorations
 
 PRINT-FRIENDLY:
 - High contrast
-- Avoid tiny regions that are impossible to paint
+- Consistent line weight
+- Clean margins around the page
 `.trim();
 }
 
