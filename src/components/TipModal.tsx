@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { trackEvent } from "@/lib/analytics";
 
 interface TipModalProps {
@@ -10,21 +10,13 @@ interface TipModalProps {
 
 export function TipModal({ isOpen, onClose }: TipModalProps) {
   const buyMeACoffeeUrl = "https://buymeacoffee.com/diegosimoncini";
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  // Genera un costo random tra $1.01 e $1.99 - memorizzato per sessione
-  const generationCost = useMemo(() => {
-    return (1.01 + Math.random() * 0.98).toFixed(2);
-  }, []);
+  const generationCost = "1.49";
+  const tippedToday = 18;
 
   useEffect(() => {
     if (isOpen) {
       trackEvent("tip_modal_open");
-      // Start animation after modal opens
-      const timer = setTimeout(() => setIsAnimating(true), 100);
-      return () => clearTimeout(timer);
-    } else {
-      setIsAnimating(false);
+      return;
     }
   }, [isOpen]);
 
@@ -65,7 +57,7 @@ export function TipModal({ isOpen, onClose }: TipModalProps) {
         className={`
           relative bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden
           transform transition-all duration-500 ease-out
-          ${isAnimating ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
+          scale-100 opacity-100
         `}
       >
         {/* Header semplice con gradiente sottile */}
@@ -94,7 +86,6 @@ export function TipModal({ isOpen, onClose }: TipModalProps) {
           {/* Costo Box con effetto attention */}
           <div className={`
             relative bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 mb-5
-            ${isAnimating ? 'animate-pulse-subtle' : ''}
           `}>
             <div className="absolute -top-3 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
               GENERATION COST
@@ -124,7 +115,7 @@ export function TipModal({ isOpen, onClose }: TipModalProps) {
           <div className="flex items-center justify-center gap-4 mb-6 text-xs text-stone-500">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-ping-slow" />
-              <span>{Math.floor(Math.random() * 20) + 12} people tipped today</span>
+              <span>{tippedToday} people tipped today</span>
             </div>
           </div>
 
@@ -138,7 +129,6 @@ export function TipModal({ isOpen, onClose }: TipModalProps) {
               shadow-lg hover:shadow-xl transition-all duration-300 
               focus:outline-none focus:ring-4 focus:ring-yellow-300
               transform hover:scale-[1.02] active:scale-[0.98]
-              ${isAnimating ? 'animate-glow' : ''}
             `}
           >
             <span className="flex items-center justify-center gap-2">

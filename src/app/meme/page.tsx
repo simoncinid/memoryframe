@@ -2,7 +2,6 @@
 
 import { useState, useCallback, Suspense } from "react";
 import Image from "next/image";
-import Head from "next/head";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { TipModal } from "@/components/TipModal";
 import { useToast } from "@/components/Toast";
@@ -29,6 +28,13 @@ const MEME_OPTIONS = [
   },
 ];
 
+const GENERATING_MESSAGES = [
+  "Analyzing your face...",
+  "Applying meme magic...",
+  "Blending facial features...",
+  "Adding the finishing touches...",
+];
+
 function MemePageContent() {
   const { showToast } = useToast();
 
@@ -40,13 +46,6 @@ function MemePageContent() {
 
   const [showTipModal, setShowTipModal] = useState(false);
   const [hasShownTipModal, setHasShownTipModal] = useState(false);
-
-  const generatingMessages = [
-    "Analyzing your face...",
-    "Applying meme magic...",
-    "Blending facial features...",
-    "Adding the finishing touches...",
-  ];
 
   const handleGenerate = useCallback(async (memeId: string) => {
     if (!uploadedPhoto) {
@@ -60,10 +59,10 @@ function MemePageContent() {
 
     // Cycle through generating messages
     let messageIndex = 0;
-    setGeneratingMessage(generatingMessages[0]);
+    setGeneratingMessage(GENERATING_MESSAGES[0]);
     const messageInterval = setInterval(() => {
-      messageIndex = (messageIndex + 1) % generatingMessages.length;
-      setGeneratingMessage(generatingMessages[messageIndex]);
+      messageIndex = (messageIndex + 1) % GENERATING_MESSAGES.length;
+      setGeneratingMessage(GENERATING_MESSAGES[messageIndex]);
     }, 1500);
 
     try {
@@ -102,7 +101,7 @@ function MemePageContent() {
       clearInterval(messageInterval);
       setIsGenerating(false);
     }
-  }, [uploadedPhoto, showToast, hasShownTipModal, generatingMessages]);
+  }, [uploadedPhoto, showToast, hasShownTipModal]);
 
   const handleDownload = useCallback(() => {
     if (!resultImage) return;

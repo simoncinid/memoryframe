@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -98,10 +99,10 @@ export default function RootLayout({
     <html lang="en" className={dmSans.variable}>
       <head>
         {/* CookieYes Banner */}
-        <script
+        <Script
           id="cookieyes"
-          type="text/javascript"
           src="https://cdn-cookieyes.com/client_data/aa7f58b0c622fb45e5c2fd3a91841679/script.js"
+          strategy="afterInteractive"
         />
         <script
           type="application/ld+json"

@@ -14,7 +14,11 @@ type AnalyticsEvent =
   | "meme_generate_started"
   | "meme_generate_success"
   | "meme_generate_error"
-  | "meme_download_click";
+  | "meme_download_click"
+  | "paint_by_numbers_generate_started"
+  | "paint_by_numbers_generate_success"
+  | "paint_by_numbers_generate_error"
+  | "paint_by_numbers_download_click";
 
 interface EventProperties {
   [key: string]: string | number | boolean | undefined;
