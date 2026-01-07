@@ -49,10 +49,15 @@ export async function POST(request: NextRequest) {
     const personAMime = getMimeType(body.personA);
     const personBMime = getMimeType(body.personB);
     
+    // Truncate prompt to 500 characters max (backend limit)
+    const truncatedPrompt = body.prompt.length > 500 
+      ? body.prompt.substring(0, 500) 
+      : body.prompt;
+    
     formData.append("personA", base64ToBlob(body.personA, personAMime), "personA.jpg");
     formData.append("personB", base64ToBlob(body.personB, personBMime), "personB.jpg");
     formData.append("style", body.style);
-    formData.append("scene", body.prompt);
+    formData.append("scene", truncatedPrompt);
     formData.append("delete_policy", body.deleteImmediately ? "immediate" : "24h");
 
     // Forward client IP for rate limiting
