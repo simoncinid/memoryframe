@@ -6,17 +6,29 @@ let pool: Pool | null = null;
 
 export function getDatabasePool(): Pool {
   if (!pool) {
-    const dbUrl = config.databaseUrl;
+    let dbUrl = config.databaseUrl;
     
     // Configura SSL per PostgreSQL
     // Su Render e altri provider cloud, PostgreSQL richiede SSL
     const sslConfig: any = {};
     let needsSsl = false;
     
-    // Se la connection string contiene già parametri SSL, rispettali
-    if (dbUrl.includes('sslmode') || dbUrl.includes('ssl=true')) {
-      needsSsl = true;
-    } else if (config.nodeEnv === 'production') {
+    // Rimuovi parametri SSL dalla connection string per evitare conflitti
+    // Gestiremo SSL solo tramite l'oggetto ssl nel Pool
+    // I parametri SSL nella connection string (come sslmode=require) forzano la verifica del certificato
+    const sslParams = ['sslmode', 'ssl', 'sslcert', 'sslkey', 'sslrootcert', 'sslcrl'];
+    const urlParts = dbUrl.split('?');
+    if (urlParts.length > 1) {
+      const baseUrl = urlParts[0];
+      const queryString = urlParts[1];
+      const params = new URLSearchParams(queryString);
+      sslParams.forEach(param => params.delete(param));
+      const newQueryString = params.toString();
+      dbUrl = newQueryString ? `${baseUrl}?${newQueryString}` : baseUrl;
+    }
+    
+    // Determina se serve SSL
+    if (config.nodeEnv === 'production') {
       // In produzione, abilita sempre SSL
       needsSsl = true;
     }
@@ -37,8 +49,12 @@ export function getDatabasePool(): Pool {
       } catch (error) {
         console.warn('[Database] Failed to read CA_FILE, falling back to rejectUnauthorized:', error);
         sslConfig.rejectUnauthorized = config.databaseSslRejectUnauthorized;
+        needsSsl = true;
       }
-    } else if (needsSsl) {
+    }
+    
+    // Se siamo in produzione o abbiamo bisogno di SSL, configura rejectUnauthorized
+    if (needsSsl && !sslConfig.ca) {
       // Se siamo in produzione senza CA_FILE, usa rejectUnauthorized dalla config
       // Su Render i certificati sono spesso autofirmati, quindi impostiamo false
       sslConfig.rejectUnauthorized = config.databaseSslRejectUnauthorized;
