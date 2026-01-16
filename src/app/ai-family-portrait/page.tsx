@@ -82,8 +82,8 @@ export default function AIFamilyPortraitPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-stone-800 mb-4">{pageData.h1}</h1>
-          <p className="text-lg text-stone-600 max-w-3xl mx-auto">{pageData.intro}</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-[#A4193D] mb-4">{pageData.h1}</h1>
+          <p className="text-lg text-[#A4193D] max-w-3xl mx-auto">{pageData.intro}</p>
         </div>
 
         {/* Free Service Banner */}
@@ -93,25 +93,25 @@ export default function AIFamilyPortraitPage() {
 
         {/* How It Works Steps - Visual Version */}
         <section className="mb-16">
-          <h2 className="text-3xl font-semibold text-stone-800 mb-8 text-center">
+          <h2 className="text-3xl font-semibold text-[#A4193D] mb-8 text-center">
             How It Works
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 - Upload Photos */}
-            <div className="p-6 bg-white border border-stone-200 rounded-2xl shadow-sm">
-              <div className="w-12 h-12 bg-stone-800 text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+            <div className="p-6 bg-white border border-[#FFDFB9] rounded-2xl shadow-sm">
+              <div className="w-12 h-12 bg-[#A4193D] text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
                 1
               </div>
-              <h3 className="font-semibold text-stone-800 mb-3 text-lg">
+              <h3 className="font-semibold text-[#A4193D] mb-3 text-lg">
                 Upload Photos
               </h3>
-              <p className="text-stone-600 text-sm mb-4">Upload clear photos of two people you want to combine.</p>
+              <p className="text-[#A4193D] text-sm mb-4">Upload clear photos of two people you want to combine.</p>
               
               {/* Visual Example */}
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <p className="text-xs text-stone-500 mb-1 font-medium">Person 1</p>
-                  <div className="aspect-square rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
+                  <p className="text-xs text-[#7D132E] mb-1 font-medium">Person 1</p>
+                  <div className="aspect-square rounded-lg overflow-hidden border-2 border-[#FFDFB9] bg-[#FFE8D1]">
                     <Image 
                       src="/examplephoto1.png" 
                       alt="Example person 1" 
@@ -122,8 +122,8 @@ export default function AIFamilyPortraitPage() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-stone-500 mb-1 font-medium">Person 2</p>
-                  <div className="aspect-square rounded-lg overflow-hidden border-2 border-stone-200 bg-stone-100">
+                  <p className="text-xs text-[#7D132E] mb-1 font-medium">Person 2</p>
+                  <div className="aspect-square rounded-lg overflow-hidden border-2 border-[#FFDFB9] bg-[#FFE8D1]">
                     <Image 
                       src="/examplephoto2.png" 
                       alt="Example person 2" 
@@ -137,57 +137,57 @@ export default function AIFamilyPortraitPage() {
             </div>
 
             {/* Step 2 - Pick a Style */}
-            <div className="p-6 bg-white border border-stone-200 rounded-2xl shadow-sm">
-              <div className="w-12 h-12 bg-stone-800 text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+            <div className="p-6 bg-white border border-[#FFDFB9] rounded-2xl shadow-sm">
+              <div className="w-12 h-12 bg-[#A4193D] text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
                 2
               </div>
-              <h3 className="font-semibold text-stone-800 mb-3 text-lg">
+              <h3 className="font-semibold text-[#A4193D] mb-3 text-lg">
                 Pick a Style
               </h3>
-              <p className="text-stone-600 text-sm mb-4">Select from classic, painterly, cinematic, and more artistic styles.</p>
+              <p className="text-[#A4193D] text-sm mb-4">Select from classic, painterly, cinematic, and more artistic styles.</p>
               
               {/* Visual Example - Style Cards */}
               <div className="grid grid-cols-2 gap-2">
                 {/* Selected Style */}
-                <div className="p-3 bg-stone-800 rounded-lg border-2 border-stone-800 relative">
+                <div className="p-3 bg-[#A4193D] rounded-lg border-2 border-[#A4193D] relative">
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <div className="w-full aspect-square rounded bg-gradient-to-br from-stone-600 to-stone-800 mb-2" />
+                  <div className="w-full aspect-square rounded bg-gradient-to-br from-[#C51D4D] to-[#A4193D] mb-2" />
                   <p className="text-xs text-white font-medium text-center">Classic</p>
                 </div>
                 
                 {/* Other Styles */}
-                <div className="p-3 bg-stone-50 rounded-lg border border-stone-200 opacity-60">
+                <div className="p-3 bg-[#FFF5EB] rounded-lg border border-[#FFDFB9] opacity-60">
                   <div className="w-full aspect-square rounded bg-gradient-to-br from-amber-500 to-orange-700 mb-2" />
-                  <p className="text-xs text-stone-600 font-medium text-center">Painterly</p>
+                  <p className="text-xs text-[#A4193D] font-medium text-center">Painterly</p>
                 </div>
-                <div className="p-3 bg-stone-50 rounded-lg border border-stone-200 opacity-60">
-                  <div className="w-full aspect-square rounded bg-gradient-to-br from-slate-700 to-slate-900 mb-2" />
-                  <p className="text-xs text-stone-600 font-medium text-center">Cinematic</p>
+                <div className="p-3 bg-[#FFF5EB] rounded-lg border border-[#FFDFB9] opacity-60">
+                  <div className="w-full aspect-square rounded bg-gradient-to-br from-[#7D132E] to-[#A4193D] mb-2" />
+                  <p className="text-xs text-[#A4193D] font-medium text-center">Cinematic</p>
                 </div>
-                <div className="p-3 bg-stone-50 rounded-lg border border-stone-200 opacity-60">
+                <div className="p-3 bg-[#FFF5EB] rounded-lg border border-[#FFDFB9] opacity-60">
                   <div className="w-full aspect-square rounded bg-gradient-to-br from-amber-600 to-amber-800 mb-2" />
-                  <p className="text-xs text-stone-600 font-medium text-center">Vintage</p>
+                  <p className="text-xs text-[#A4193D] font-medium text-center">Vintage</p>
                 </div>
               </div>
             </div>
 
             {/* Step 3 - Generate & Download */}
-            <div className="p-6 bg-white border border-stone-200 rounded-2xl shadow-sm">
-              <div className="w-12 h-12 bg-stone-800 text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+            <div className="p-6 bg-white border border-[#FFDFB9] rounded-2xl shadow-sm">
+              <div className="w-12 h-12 bg-[#A4193D] text-white rounded-xl flex items-center justify-center text-xl font-bold mb-4">
                 3
               </div>
-              <h3 className="font-semibold text-stone-800 mb-3 text-lg">
+              <h3 className="font-semibold text-[#A4193D] mb-3 text-lg">
                 Generate & Download
               </h3>
-              <p className="text-stone-600 text-sm mb-4">Get your portrait in seconds. Download in high quality.</p>
+              <p className="text-[#A4193D] text-sm mb-4">Get your portrait in seconds. Download in high quality.</p>
               
               {/* Visual Example - Result */}
               <div className="relative">
-                <div className="aspect-[4/5] rounded-xl overflow-hidden border-2 border-stone-200 bg-stone-100 shadow-lg">
+                <div className="aspect-[4/5] rounded-xl overflow-hidden border-2 border-[#FFDFB9] bg-[#FFE8D1] shadow-lg">
                   <Image 
                     src="/examplemerged.png" 
                     alt="Example merged portrait result" 
@@ -212,7 +212,7 @@ export default function AIFamilyPortraitPage() {
         <div className="text-center mb-16">
           <Link
             href="/create"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-stone-800 text-white rounded-xl font-medium text-lg hover:bg-stone-700 transition-colors shadow-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#A4193D] text-white rounded-xl font-medium text-lg hover:bg-[#7D132E] transition-colors shadow-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -223,17 +223,17 @@ export default function AIFamilyPortraitPage() {
 
         {/* Use Cases / Perfect For */}
         <section className="mb-16">
-          <h2 className="text-3xl font-semibold text-stone-800 mb-8 text-center">
+          <h2 className="text-3xl font-semibold text-[#A4193D] mb-8 text-center">
             Perfect For
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {pageData.useCases.map((useCase, index) => (
               <div
                 key={index}
-                className="bg-stone-50 rounded-2xl border border-stone-200 overflow-hidden"
+                className="bg-[#FFF5EB] rounded-2xl border border-[#FFDFB9] overflow-hidden"
               >
                 {/* Image */}
-                <div className="aspect-video bg-stone-200 overflow-hidden">
+                <div className="aspect-video bg-[#FFDFB9] overflow-hidden">
                   <Image 
                     src={`/img${index + 1}.png`}
                     alt={useCase.title}
@@ -244,10 +244,10 @@ export default function AIFamilyPortraitPage() {
                 </div>
                 {/* Content */}
                 <div className="p-6">
-                  <h3 className="font-semibold text-stone-800 mb-2 text-lg">
+                  <h3 className="font-semibold text-[#A4193D] mb-2 text-lg">
                     {useCase.title}
                   </h3>
-                  <p className="text-stone-600">{useCase.description}</p>
+                  <p className="text-[#A4193D]">{useCase.description}</p>
                 </div>
               </div>
             ))}
@@ -257,14 +257,14 @@ export default function AIFamilyPortraitPage() {
         {/* Example Prompts */}
         {prompts && prompts.length > 0 && (
           <section className="mb-16">
-            <h2 className="text-3xl font-semibold text-stone-800 mb-8 text-center">
+            <h2 className="text-3xl font-semibold text-[#A4193D] mb-8 text-center">
               Example Prompts to Try
             </h2>
             <div className="grid md:grid-cols-3 gap-6">
               {prompts.map((p, i) => (
-                <div key={i} className="p-6 bg-white border border-stone-200 rounded-xl">
-                  <p className="text-stone-800 font-medium mb-2">{p.name}</p>
-                  <p className="text-stone-600 text-sm">{p.prompt}</p>
+                <div key={i} className="p-6 bg-white border border-[#FFDFB9] rounded-xl">
+                  <p className="text-[#A4193D] font-medium mb-2">{p.name}</p>
+                  <p className="text-[#A4193D] text-sm">{p.prompt}</p>
                 </div>
               ))}
             </div>
@@ -273,7 +273,7 @@ export default function AIFamilyPortraitPage() {
 
         {/* Common Mistakes / Tips */}
         <section className="mb-16">
-          <h2 className="text-3xl font-semibold text-stone-800 mb-8 text-center">
+          <h2 className="text-3xl font-semibold text-[#A4193D] mb-8 text-center">
             Tips for Best Results
           </h2>
           <div className="max-w-3xl mx-auto">
@@ -283,7 +283,7 @@ export default function AIFamilyPortraitPage() {
                   <span className="shrink-0 w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-lg font-bold">
                     !
                   </span>
-                  <span className="text-stone-700 pt-1">Avoid: {mistake}</span>
+                  <span className="text-[#A4193D] pt-1">Avoid: {mistake}</span>
                 </li>
               ))}
             </ul>
@@ -298,20 +298,20 @@ export default function AIFamilyPortraitPage() {
         </section>
 
         {/* Mid CTA */}
-        <section className="text-center py-16 bg-gradient-to-br from-stone-800 to-stone-900 rounded-2xl mb-16 px-4">
+        <section className="text-center py-16 bg-gradient-to-br from-[#A4193D] to-[#7D132E] rounded-2xl mb-16 px-4">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Create Your Portrait?
           </h2>
-          <p className="text-stone-300 mb-2">
+          <p className="text-white/70 mb-2">
             Free to use. No signup required. No watermarks.
           </p>
-          <p className="text-stone-400 text-sm mb-8">
+          <p className="text-[#7D132E] text-sm mb-8">
             Tips help us keep this tool free for everyone 💜
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/create"
-              className="px-8 py-4 bg-white text-stone-800 rounded-xl font-medium text-lg hover:bg-stone-100 transition-colors"
+              className="px-8 py-4 bg-white text-[#A4193D] rounded-xl font-medium text-lg hover:bg-[#FFE8D1] transition-colors"
             >
               Start Creating Now
             </Link>
@@ -330,8 +330,8 @@ export default function AIFamilyPortraitPage() {
         </section>
 
         {/* Related Pages */}
-        <div className="pt-8 border-t border-stone-200">
-          <h3 className="text-lg font-semibold text-stone-800 mb-4">
+        <div className="pt-8 border-t border-[#FFDFB9]">
+          <h3 className="text-lg font-semibold text-[#A4193D] mb-4">
             Related Guides
           </h3>
           <div className="flex flex-wrap gap-4">
@@ -339,7 +339,7 @@ export default function AIFamilyPortraitPage() {
               <Link
                 key={i}
                 href={page.href}
-                className="text-stone-600 hover:text-stone-800 underline underline-offset-4"
+                className="text-[#A4193D] hover:text-[#A4193D] underline underline-offset-4"
               >
                 {page.label}
               </Link>

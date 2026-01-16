@@ -67,9 +67,9 @@ export default function PurchaseCreditsPage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Acquista Crediti</h1>
+        <h1 className="text-4xl font-bold text-[#A4193D] mb-4">Acquista Crediti</h1>
         {user && (
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-[#A4193D]">
             Crediti attuali: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
           </p>
         )}
@@ -81,13 +81,13 @@ export default function PurchaseCreditsPage() {
             {pricing.photoPacks.map((pack: any) => (
               <div
                 key={pack.id}
-                className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
+                className="border border-[#FFDFB9] rounded-lg p-6 hover:shadow-lg transition-shadow"
               >
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{pack.name}</h3>
+                <h3 className="text-2xl font-bold text-[#A4193D] mb-2">{pack.name}</h3>
                 <p className="text-4xl font-bold text-blue-600 mb-4">
                   ${pack.price.toFixed(2)}
                 </p>
-                <p className="text-gray-600 mb-6">{pack.credits} crediti</p>
+                <p className="text-[#A4193D] mb-6">{pack.credits} crediti</p>
                 <button
                   onClick={() => handlePurchase(pack.credits)}
                   disabled={processing}
@@ -100,10 +100,10 @@ export default function PurchaseCreditsPage() {
           </div>
 
           <div className="border-t pt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Acquisto Personalizzato</h2>
+            <h2 className="text-2xl font-bold text-[#A4193D] mb-4">Acquisto Personalizzato</h2>
             <div className="flex flex-col sm:flex-row gap-4 items-end">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#A4193D] mb-2">
                   Numero di crediti
                 </label>
                 <input
@@ -111,9 +111,9 @@ export default function PurchaseCreditsPage() {
                   min="1"
                   value={customCredits}
                   onChange={(e) => setCustomCredits(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-[#FFDFB9] rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-[#7D132E]">
                   Totale: ${((customCredits * pricing.pricePerCredit) / 100).toFixed(2)}
                 </p>
               </div>
@@ -129,7 +129,7 @@ export default function PurchaseCreditsPage() {
         </>
       )}
 
-      <div className="mt-12 text-center text-gray-600">
+      <div className="mt-12 text-center text-[#A4193D]">
         <p>I crediti vengono accreditati immediatamente dopo il pagamento.</p>
         <p className="mt-2">
           Prezzo per credito: <span className="font-bold">${((pricing?.pricePerCredit || 0) / 100).toFixed(2)}</span>

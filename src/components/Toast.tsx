@@ -55,7 +55,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               "flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg animate-in slide-in-from-right-5 fade-in duration-200 max-w-sm",
               toast.type === "success" && "bg-green-50 text-green-800 border border-green-200",
               toast.type === "error" && "bg-red-50 text-red-800 border border-red-200",
-              toast.type === "info" && "bg-stone-50 text-stone-800 border border-stone-200"
+              toast.type === "info" && "bg-[#FFF5EB] text-[#A4193D] border border-[#FFDFB9]"
             )}
             role="alert"
           >
@@ -72,7 +72,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 </svg>
               )}
               {toast.type === "info" && (
-                <svg className="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#A4193D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               )}
@@ -84,7 +84,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             {/* Close */}
             <button
               onClick={() => removeToast(toast.id)}
-              className="shrink-0 text-stone-400 hover:text-stone-600 transition-colors focus:outline-none"
+              className="shrink-0 text-[#7D132E] hover:text-[#A4193D] transition-colors focus:outline-none"
               aria-label="Close notification"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

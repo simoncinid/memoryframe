@@ -165,13 +165,13 @@ function CreatePageContent() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-stone-800 mb-2">
+          <h1 className="text-3xl font-bold text-[#A4193D] mb-2">
             {copy.create.result.title}
           </h1>
         </div>
 
-        <div className="bg-stone-50 rounded-2xl p-4 mb-8">
-          <div className="relative aspect-square max-w-2xl mx-auto rounded-xl overflow-hidden bg-stone-200">
+        <div className="bg-[#FFF5EB] rounded-2xl p-4 mb-8">
+          <div className="relative aspect-square max-w-2xl mx-auto rounded-xl overflow-hidden bg-[#FFDFB9]">
             <Image
               src={resultImage}
               alt="Generated portrait"
@@ -185,7 +185,7 @@ function CreatePageContent() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <button
             onClick={handleDownload}
-            className="px-8 py-3 bg-stone-800 text-white rounded-xl font-medium hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500"
+            className="px-8 py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D]"
           >
             {copy.create.result.downloadButton}
           </button>
@@ -194,7 +194,7 @@ function CreatePageContent() {
         <div className="text-center">
           <button
             onClick={handleReset}
-            className="text-stone-600 hover:text-stone-800 underline underline-offset-4"
+            className="text-[#A4193D] hover:text-[#A4193D] underline underline-offset-4"
           >
             Create another portrait
           </button>
@@ -213,11 +213,11 @@ function CreatePageContent() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
-          <div className="w-16 h-16 border-4 border-stone-200 border-t-stone-800 rounded-full animate-spin mb-6" />
-          <h2 className="text-xl font-semibold text-stone-800 mb-2">
+          <div className="w-16 h-16 border-4 border-[#FFDFB9] border-t-[#A4193D] rounded-full animate-spin mb-6" />
+          <h2 className="text-xl font-semibold text-[#A4193D] mb-2">
             {copy.create.generating.title}
           </h2>
-          <p className="text-stone-600 animate-pulse-soft">{generatingMessage}</p>
+          <p className="text-[#A4193D] animate-pulse-soft">{generatingMessage}</p>
         </div>
       </div>
     );
@@ -227,7 +227,7 @@ function CreatePageContent() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-stone-800">
+        <h1 className="text-3xl font-bold text-[#A4193D]">
           {copy.create.title}
         </h1>
       </div>
@@ -250,15 +250,15 @@ function CreatePageContent() {
               {copy.create.uploadGuidelines.map((guideline, index) => (
                 <span
                   key={index}
-                  className="text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded-full whitespace-nowrap"
+                  className="text-xs text-[#7D132E] bg-[#FFE8D1] px-2 py-1 rounded-full whitespace-nowrap"
                 >
                   {guideline}
                 </span>
               ))}
             </div>
             <div className="max-w-md mx-auto">
-              <h2 className="text-lg font-semibold text-stone-800 mb-3 text-center">
-                {copy.create.steps.personA.title} — <span className="font-normal text-stone-500">{copy.create.steps.personA.description}</span>
+              <h2 className="text-lg font-semibold text-[#A4193D] mb-3 text-center">
+                {copy.create.steps.personA.title} — <span className="font-normal text-[#7D132E]">{copy.create.steps.personA.description}</span>
               </h2>
               <UploadDropzone
                 onFileSelect={setPersonA}
@@ -278,15 +278,15 @@ function CreatePageContent() {
               {copy.create.uploadGuidelines.map((guideline, index) => (
                 <span
                   key={index}
-                  className="text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded-full whitespace-nowrap"
+                  className="text-xs text-[#7D132E] bg-[#FFE8D1] px-2 py-1 rounded-full whitespace-nowrap"
                 >
                   {guideline}
                 </span>
               ))}
             </div>
             <div className="max-w-md mx-auto">
-              <h2 className="text-lg font-semibold text-stone-800 mb-3 text-center">
-                {copy.create.steps.personB.title} — <span className="font-normal text-stone-500">{copy.create.steps.personB.description}</span>
+              <h2 className="text-lg font-semibold text-[#A4193D] mb-3 text-center">
+                {copy.create.steps.personB.title} — <span className="font-normal text-[#7D132E]">{copy.create.steps.personB.description}</span>
               </h2>
               <UploadDropzone
                 onFileSelect={setPersonB}
@@ -302,10 +302,10 @@ function CreatePageContent() {
         {/* Step 3: Style */}
         {currentStep === 2 && (
           <div>
-            <h2 className="text-xl font-semibold text-stone-800 mb-2">
+            <h2 className="text-xl font-semibold text-[#A4193D] mb-2">
               {copy.create.steps.style.title}
             </h2>
-            <p className="text-stone-600 mb-6">
+            <p className="text-[#A4193D] mb-6">
               {copy.create.steps.style.description}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -329,15 +329,15 @@ function CreatePageContent() {
         {/* Step 4: Prompt */}
         {currentStep === 3 && (
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-xl font-semibold text-stone-800 mb-2">
+            <h2 className="text-xl font-semibold text-[#A4193D] mb-2">
               {copy.create.steps.prompt.title}
             </h2>
-            <p className="text-stone-600 mb-6">
+            <p className="text-[#A4193D] mb-6">
               {copy.create.steps.prompt.description}
             </p>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-stone-700 mb-2">
+              <label className="block text-sm font-medium text-[#A4193D] mb-2">
                 Suggested prompts
               </label>
               <PromptChips
@@ -350,7 +350,7 @@ function CreatePageContent() {
             <div className="mb-6">
               <label
                 htmlFor="prompt"
-                className="block text-sm font-medium text-stone-700 mb-2"
+                className="block text-sm font-medium text-[#A4193D] mb-2"
               >
                 Or write your own
               </label>
@@ -360,7 +360,7 @@ function CreatePageContent() {
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Describe the scene you want to create..."
                 rows={4}
-                className="w-full px-4 py-3 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-3 border border-[#FFDFB9] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C51D4D] focus:border-transparent resize-none"
               />
             </div>
 
@@ -368,7 +368,7 @@ function CreatePageContent() {
             <button
               onClick={handleGenerate}
               disabled={!prompt}
-              className="w-full py-4 bg-stone-800 text-white rounded-xl font-medium text-lg hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-[#A4193D] text-white rounded-xl font-medium text-lg hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {copy.create.generateButton}
             </button>
@@ -381,7 +381,7 @@ function CreatePageContent() {
         <button
           onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
           disabled={currentStep === 0}
-          className="px-6 py-2 text-stone-600 hover:text-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 text-[#A4193D] hover:text-[#A4193D] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           ← Back
         </button>
@@ -393,7 +393,7 @@ function CreatePageContent() {
               (currentStep === 1 && !personB) ||
               (currentStep === 2 && !selectedStyle)
             }
-            className="px-6 py-2 text-stone-800 font-medium hover:text-stone-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 text-[#A4193D] font-medium hover:text-[#A4193D] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next →
           </button>
@@ -408,7 +408,7 @@ export default function CreatePage() {
     <Suspense fallback={
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="w-8 h-8 border-4 border-stone-200 border-t-stone-800 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[#FFDFB9] border-t-[#A4193D] rounded-full animate-spin" />
         </div>
       </div>
     }>

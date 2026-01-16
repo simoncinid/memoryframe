@@ -134,14 +134,14 @@ function MemePageContent() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-stone-800 mb-2">
+          <h1 className="text-3xl font-bold text-[#A4193D] mb-2">
             You&apos;ve Been {selectedMeme === "kirk" ? "Kirkified" : "Maduro-fied"}! 🎉
           </h1>
-          <p className="text-stone-600">Share this masterpiece with the world</p>
+          <p className="text-[#A4193D]">Share this masterpiece with the world</p>
         </div>
 
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 mb-8 border border-amber-200">
-          <div className="relative aspect-square max-w-2xl mx-auto rounded-xl overflow-hidden bg-stone-200 shadow-xl">
+          <div className="relative aspect-square max-w-2xl mx-auto rounded-xl overflow-hidden bg-[#FFDFB9] shadow-xl">
             <Image
               src={resultImage}
               alt={`Face swapped with ${selectedMemeData?.name}`}
@@ -164,7 +164,7 @@ function MemePageContent() {
         <div className="text-center">
           <button
             onClick={handleReset}
-            className="text-stone-600 hover:text-stone-800 underline underline-offset-4"
+            className="text-[#A4193D] hover:text-[#A4193D] underline underline-offset-4"
           >
             Create another meme
           </button>
@@ -184,10 +184,10 @@ function MemePageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
           <div className="w-20 h-20 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-6" />
-          <h2 className="text-xl font-semibold text-stone-800 mb-2">
+          <h2 className="text-xl font-semibold text-[#A4193D] mb-2">
             Creating Your Meme...
           </h2>
-          <p className="text-stone-600 animate-pulse">{generatingMessage}</p>
+          <p className="text-[#A4193D] animate-pulse">{generatingMessage}</p>
         </div>
       </div>
     );
@@ -201,7 +201,7 @@ function MemePageContent() {
         <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-[#A4193D] to-[#C51D4D] mb-4">
           AI Face Swap Meme Generator
         </h1>
-        <p className="text-lg text-stone-600 max-w-2xl mx-auto mb-4">
+        <p className="text-lg text-[#A4193D] max-w-2xl mx-auto mb-4">
           Kirkify yourself or transform into Maduro with our viral AI face swap tool. 
           Upload your photo and watch the magic happen!
         </p>
@@ -214,11 +214,11 @@ function MemePageContent() {
 
       {/* Upload Section */}
       <div className="mb-12">
-        <div className="bg-white rounded-2xl border-2 border-stone-200 p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-800 mb-2 text-center">
+        <div className="bg-white rounded-2xl border-2 border-[#FFDFB9] p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-[#A4193D] mb-2 text-center">
             Step 1: Upload Your Photo
           </h2>
-          <p className="text-stone-500 text-sm mb-4 text-center">
+          <p className="text-[#7D132E] text-sm mb-4 text-center">
             Use a clear, front-facing photo with good lighting for best results
           </p>
           <div className="max-w-md mx-auto">
@@ -235,10 +235,10 @@ function MemePageContent() {
 
       {/* Meme Selection */}
       <div className="mb-12">
-        <h2 className="text-xl font-semibold text-stone-800 mb-2 text-center">
+        <h2 className="text-xl font-semibold text-[#A4193D] mb-2 text-center">
           Step 2: Choose Your Meme
         </h2>
-        <p className="text-stone-500 text-sm mb-6 text-center">
+        <p className="text-[#7D132E] text-sm mb-6 text-center">
           Click a button to swap your face with the meme
         </p>
         
@@ -249,7 +249,7 @@ function MemePageContent() {
               className={`relative bg-white rounded-2xl border-2 overflow-hidden transition-all hover:shadow-xl ${
                 uploadedPhoto 
                   ? "border-orange-300 hover:border-orange-500" 
-                  : "border-stone-200 opacity-75"
+                  : "border-[#FFDFB9] opacity-75"
               }`}
             >
               {/* Meme Image */}
@@ -264,8 +264,8 @@ function MemePageContent() {
               
               {/* Meme Info */}
               <div className="p-6">
-                <h3 className="font-bold text-stone-800 text-xl mb-1">{meme.name}</h3>
-                <p className="text-stone-500 text-sm mb-4">{meme.description}</p>
+                <h3 className="font-bold text-[#A4193D] text-xl mb-1">{meme.name}</h3>
+                <p className="text-[#7D132E] text-sm mb-4">{meme.description}</p>
                 
                 <button
                   onClick={() => handleGenerate(meme.id)}
@@ -275,7 +275,7 @@ function MemePageContent() {
                       ? meme.id === "kirk"
                         ? "bg-gradient-to-r from-blue-500 to-[#A4193D] text-white hover:from-blue-600 hover:to-[#7D132E] shadow-lg"
                         : "bg-gradient-to-r from-red-500 to-yellow-500 text-white hover:from-red-600 hover:to-yellow-600 shadow-lg"
-                      : "bg-stone-200 text-stone-400 cursor-not-allowed"
+                      : "bg-[#FFDFB9] text-[#7D132E] cursor-not-allowed"
                   }`}
                 >
                   {meme.buttonText}
@@ -287,24 +287,24 @@ function MemePageContent() {
       </div>
 
       {/* SEO Content Section */}
-      <div className="bg-stone-50 rounded-2xl p-8 mb-12 border border-stone-200">
-        <h2 className="text-2xl font-bold text-stone-800 mb-6 text-center">
+      <div className="bg-[#FFF5EB] rounded-2xl p-8 mb-12 border border-[#FFDFB9]">
+        <h2 className="text-2xl font-bold text-[#A4193D] mb-6 text-center">
           What is Kirkification?
         </h2>
         <div className="prose prose-stone max-w-none">
-          <p className="text-stone-600 mb-4">
+          <p className="text-[#A4193D] mb-4">
             <strong>Kirkification</strong> (also known as &quot;getting kirkified&quot;) is a viral internet meme where 
             people&apos;s faces are edited to resemble Charlie Kirk, the founder of Turning Point USA (TPUSA). 
             The meme typically involves making the face appear smaller in proportion to the head, creating 
             a comedic effect that has taken social media by storm.
           </p>
-          <p className="text-stone-600 mb-4">
+          <p className="text-[#A4193D] mb-4">
             Our <strong>AI face swap tool</strong> uses advanced image generation technology to seamlessly 
             blend your facial features with the iconic Kirk look, preserving your photo&apos;s background 
             and body while applying the meme transformation.
           </p>
-          <h3 className="text-lg font-semibold text-stone-800 mt-6 mb-3">Maduro Face Swap</h3>
-          <p className="text-stone-600">
+          <h3 className="text-lg font-semibold text-[#A4193D] mt-6 mb-3">Maduro Face Swap</h3>
+          <p className="text-[#A4193D]">
             The <strong>Nicolás Maduro face swap</strong> lets you transform into the Venezuelan president, 
             another viral meme format that&apos;s been trending across social media. Perfect for creating 
             political satire content or just having fun with friends!
@@ -314,51 +314,51 @@ function MemePageContent() {
 
       {/* FAQ Section for SEO */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold text-stone-800 mb-6 text-center">
+        <h2 className="text-2xl font-bold text-[#A4193D] mb-6 text-center">
           Frequently Asked Questions
         </h2>
         <div className="space-y-4 max-w-3xl mx-auto">
-          <details className="bg-white rounded-xl border border-stone-200 p-4 group">
-            <summary className="font-semibold text-stone-800 cursor-pointer list-none flex justify-between items-center">
+          <details className="bg-white rounded-xl border border-[#FFDFB9] p-4 group">
+            <summary className="font-semibold text-[#A4193D] cursor-pointer list-none flex justify-between items-center">
               Is this face swap AI free?
               <span className="transform group-open:rotate-180 transition-transform">▼</span>
             </summary>
-            <p className="text-stone-600 mt-3">
+            <p className="text-[#A4193D] mt-3">
               Yes! Our AI face swap meme generator is completely free to use. No signup required, 
               no watermarks on your images. We&apos;re supported by optional tips from users who love their results.
             </p>
           </details>
           
-          <details className="bg-white rounded-xl border border-stone-200 p-4 group">
-            <summary className="font-semibold text-stone-800 cursor-pointer list-none flex justify-between items-center">
+          <details className="bg-white rounded-xl border border-[#FFDFB9] p-4 group">
+            <summary className="font-semibold text-[#A4193D] cursor-pointer list-none flex justify-between items-center">
               How does the kirkification AI work?
               <span className="transform group-open:rotate-180 transition-transform">▼</span>
             </summary>
-            <p className="text-stone-600 mt-3">
+            <p className="text-[#A4193D] mt-3">
               Our AI analyzes your uploaded photo, identifies your facial features, and intelligently 
               blends them with the target meme face (Charlie Kirk or Maduro) while preserving your 
               photo&apos;s background and body. The result is a seamless, hilarious face swap!
             </p>
           </details>
           
-          <details className="bg-white rounded-xl border border-stone-200 p-4 group">
-            <summary className="font-semibold text-stone-800 cursor-pointer list-none flex justify-between items-center">
+          <details className="bg-white rounded-xl border border-[#FFDFB9] p-4 group">
+            <summary className="font-semibold text-[#A4193D] cursor-pointer list-none flex justify-between items-center">
               What&apos;s the best photo to use for face swap?
               <span className="transform group-open:rotate-180 transition-transform">▼</span>
             </summary>
-            <p className="text-stone-600 mt-3">
+            <p className="text-[#A4193D] mt-3">
               For best results, use a clear, front-facing photo with good lighting. Photos with 
               a single person visible work best. Avoid heavily filtered photos or images where 
               the face is partially obscured.
             </p>
           </details>
           
-          <details className="bg-white rounded-xl border border-stone-200 p-4 group">
-            <summary className="font-semibold text-stone-800 cursor-pointer list-none flex justify-between items-center">
+          <details className="bg-white rounded-xl border border-[#FFDFB9] p-4 group">
+            <summary className="font-semibold text-[#A4193D] cursor-pointer list-none flex justify-between items-center">
               Do you store my photos?
               <span className="transform group-open:rotate-180 transition-transform">▼</span>
             </summary>
-            <p className="text-stone-600 mt-3">
+            <p className="text-[#A4193D] mt-3">
               No! We never store your photos. All processing happens via real-time API calls and 
               your images are immediately discarded after generation. Your privacy is guaranteed.
             </p>
@@ -367,7 +367,7 @@ function MemePageContent() {
       </div>
 
       {/* Related Keywords for SEO */}
-      <div className="text-center text-sm text-stone-400 border-t border-stone-200 pt-8">
+      <div className="text-center text-sm text-[#7D132E] border-t border-[#FFDFB9] pt-8">
         <p>
           Popular searches: kirkify, kirkified, kirkification, charlie kirk face swap, 
           maduro meme, venezuela meme, ai face swap, free face swap online, 
@@ -383,7 +383,7 @@ export default function MemePage() {
     <Suspense fallback={
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="w-8 h-8 border-4 border-stone-200 border-t-orange-500 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[#FFDFB9] border-t-orange-500 rounded-full animate-spin" />
         </div>
       </div>
     }>

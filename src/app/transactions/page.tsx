@@ -62,7 +62,7 @@ export default function TransactionsPage() {
       case 'refund':
         return 'text-blue-600';
       default:
-        return 'text-gray-600';
+        return 'text-[#A4193D]';
     }
   };
 
@@ -76,11 +76,11 @@ export default function TransactionsPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-4xl font-bold text-gray-900 mb-8">Le tue transazioni</h1>
+      <h1 className="text-4xl font-bold text-[#A4193D] mb-8">Le tue transazioni</h1>
 
       {transactions.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-600">Nessuna transazione trovata.</p>
+          <p className="text-[#A4193D]">Nessuna transazione trovata.</p>
         </div>
       ) : (
         <>
@@ -94,12 +94,12 @@ export default function TransactionsPage() {
                         <span className={`font-medium ${getKindColor(tx.kind)}`}>
                           {getKindLabel(tx.kind)}
                         </span>
-                        <span className="ml-4 text-gray-600">
+                        <span className="ml-4 text-[#A4193D]">
                           {tx.photoDelta > 0 ? '+' : ''}{tx.photoDelta} crediti
                         </span>
                       </div>
-                      <p className="mt-1 text-sm text-gray-500">{tx.reason}</p>
-                      <p className="mt-1 text-xs text-gray-400">{formatDate(tx.createdAt)}</p>
+                      <p className="mt-1 text-sm text-[#7D132E]">{tx.reason}</p>
+                      <p className="mt-1 text-xs text-[#7D132E]">{formatDate(tx.createdAt)}</p>
                     </div>
                   </div>
                 </li>

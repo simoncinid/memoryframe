@@ -92,27 +92,27 @@ export function TipModal({ isOpen, onClose }: TipModalProps) {
             </div>
             
             <div className="text-center pt-2">
-              <p className="text-stone-600 text-sm mb-1">This image cost us approximately</p>
+              <p className="text-[#A4193D] text-sm mb-1">This image cost us approximately</p>
               <div className="flex items-center justify-center gap-1">
                 <span className="text-4xl font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                   ${generationCost}
                 </span>
               </div>
-              <p className="text-stone-500 text-xs mt-1">in API & server costs</p>
+              <p className="text-[#7D132E] text-xs mt-1">in API & server costs</p>
             </div>
           </div>
 
           {/* Messaggio empatico */}
           <div className="text-center mb-6">
-            <p className="text-stone-700 text-sm leading-relaxed">
-              <span className="font-semibold text-stone-900">MemoryFrame is 100% free</span> — we don&apos;t run ads, and we never will.
+            <p className="text-[#A4193D] text-sm leading-relaxed">
+              <span className="font-semibold text-[#7D132E]">MemoryFrame is 100% free</span> — we don&apos;t run ads, and we never will.
               <br />
               <span className="text-amber-600 font-medium">Your tips are the only way</span> we can keep this tool alive and free for everyone.
             </p>
           </div>
 
           {/* Stats di supporto sociale */}
-          <div className="flex items-center justify-center gap-4 mb-6 text-xs text-stone-500">
+          <div className="flex items-center justify-center gap-4 mb-6 text-xs text-[#7D132E]">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-ping-slow" />
               <span>{tippedToday} people tipped today</span>
@@ -124,7 +124,7 @@ export function TipModal({ isOpen, onClose }: TipModalProps) {
             onClick={handleBuyMeACoffee}
             className={`
               relative w-full py-4 bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 
-              text-stone-900 rounded-2xl font-bold text-lg
+              text-[#7D132E] rounded-2xl font-bold text-lg
               hover:from-yellow-500 hover:via-yellow-600 hover:to-amber-600 
               shadow-lg hover:shadow-xl transition-all duration-300 
               focus:outline-none focus:ring-4 focus:ring-yellow-300
@@ -142,7 +142,7 @@ export function TipModal({ isOpen, onClose }: TipModalProps) {
           {/* Skip Note */}
           <button
             onClick={onClose}
-            className="w-full text-center text-xs text-stone-400 hover:text-stone-500 transition-colors py-3 mt-2"
+            className="w-full text-center text-xs text-[#7D132E] hover:text-[#7D132E] transition-colors py-3 mt-2"
           >
             Maybe later, thanks
           </button>

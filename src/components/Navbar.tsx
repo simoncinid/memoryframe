@@ -31,7 +31,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#FFDFB9]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -43,7 +43,7 @@ export function Navbar() {
               height={72}
               className="w-[72px] h-[72px]"
             />
-            <span className="font-semibold text-stone-800 text-lg">
+            <span className="font-semibold text-[#A4193D] text-lg">
               {copy.brand.name}
             </span>
           </Link>
@@ -54,7 +54,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
               >
                 {link.label}
               </Link>
@@ -65,19 +65,19 @@ export function Navbar() {
                   <>
                     <Link
                       href="/purchase-credits"
-                      className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                      className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
                     >
                       Crediti: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
                     </Link>
                     <Link
                       href="/transactions"
-                      className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                      className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
                     >
                       Transazioni
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                      className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
                     >
                       Logout
                     </button>
@@ -85,7 +85,7 @@ export function Navbar() {
                 ) : (
                   <Link
                     href="/login"
-                    className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                    className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
                   >
                     Login
                   </Link>
@@ -94,7 +94,7 @@ export function Navbar() {
             )}
             <Link
               href="/create"
-              className="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2"
+              className="bg-[#A4193D] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D] focus:ring-offset-2"
             >
               {copy.navbar.ctaLabel}
             </Link>
@@ -103,7 +103,7 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-stone-600 hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-500 rounded-lg"
+            className="md:hidden p-2 text-[#A4193D] hover:text-[#7D132E] focus:outline-none focus:ring-2 focus:ring-[#C51D4D] rounded-lg"
             aria-label="Toggle menu"
           >
             <svg
@@ -133,13 +133,13 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-stone-200">
+          <div className="md:hidden py-4 border-t border-[#FFDFB9]">
             <div className="flex flex-col gap-4">
               {copy.navbar.links.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1"
+                  className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
@@ -151,14 +151,14 @@ export function Navbar() {
                     <>
                       <Link
                         href="/purchase-credits"
-                        className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1"
+                        className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Crediti: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
                       </Link>
                       <Link
                         href="/transactions"
-                        className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1"
+                        className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Transazioni
@@ -168,7 +168,7 @@ export function Navbar() {
                           handleLogout();
                           setIsMenuOpen(false);
                         }}
-                        className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1 text-left"
+                        className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1 text-left"
                       >
                         Logout
                       </button>
@@ -176,7 +176,7 @@ export function Navbar() {
                   ) : (
                     <Link
                       href="/login"
-                      className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1"
+                      className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Login
@@ -186,7 +186,7 @@ export function Navbar() {
               )}
               <Link
                 href="/create"
-                className="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-700 transition-colors text-center"
+                className="bg-[#A4193D] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#7D132E] transition-colors text-center"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {copy.navbar.ctaLabel}

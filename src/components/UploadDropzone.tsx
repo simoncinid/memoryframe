@@ -91,7 +91,7 @@ export function UploadDropzone({
 
   if (preview && value) {
     return (
-      <div className="relative rounded-xl border-2 border-stone-300 overflow-hidden bg-stone-50">
+      <div className="relative rounded-xl border-2 border-[#FFDFB9] overflow-hidden bg-[#FFF5EB]">
         <div className="aspect-square relative">
           <Image
             src={preview}
@@ -143,7 +143,7 @@ export function UploadDropzone({
           {guidelines.map((guideline, index) => (
             <span
               key={index}
-              className="text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded-full"
+              className="text-xs text-[#7D132E] bg-[#FFE8D1] px-2 py-1 rounded-full"
             >
               {guideline}
             </span>
@@ -160,8 +160,8 @@ export function UploadDropzone({
         className={cn(
           "relative rounded-xl border-2 border-dashed cursor-pointer transition-colors aspect-square flex flex-col items-center justify-center p-6 text-center",
           isDragging
-            ? "border-stone-800 bg-stone-100"
-            : "border-stone-300 hover:border-stone-400 bg-stone-50"
+            ? "border-[#A4193D] bg-[#FFE8D1]"
+            : "border-[#FFDFB9] hover:border-[#A4193D] bg-[#FFF5EB]"
         )}
       >
         <input
@@ -173,9 +173,9 @@ export function UploadDropzone({
           aria-label={label || "Upload image"}
         />
 
-        <div className="w-12 h-12 rounded-full bg-stone-200 flex items-center justify-center mb-4">
+        <div className="w-12 h-12 rounded-full bg-[#FFDFB9] flex items-center justify-center mb-4">
           <svg
-            className="w-6 h-6 text-stone-500"
+            className="w-6 h-6 text-[#7D132E]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -189,10 +189,10 @@ export function UploadDropzone({
           </svg>
         </div>
 
-        <p className="text-sm font-medium text-stone-700 mb-1">
+        <p className="text-sm font-medium text-[#A4193D] mb-1">
           {label || "Click to upload or drag and drop"}
         </p>
-        <p className="text-xs text-stone-500">JPG, PNG, WebP up to 10MB</p>
+        <p className="text-xs text-[#7D132E]">JPG, PNG, WebP up to 10MB</p>
       </div>
 
       {/* Error */}

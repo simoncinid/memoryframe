@@ -21,10 +21,10 @@ export function StyleCard({
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left p-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2",
+        "w-full text-left p-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-[#C51D4D] focus:ring-offset-2",
         isSelected
-          ? "border-stone-800 bg-stone-50 shadow-md"
-          : "border-stone-200 hover:border-stone-300 bg-white"
+          ? "border-[#A4193D] bg-[#FFF5EB] shadow-md"
+          : "border-[#FFDFB9] hover:border-[#A4193D] bg-white"
       )}
     >
       {/* Style Preview Placeholder */}
@@ -40,12 +40,12 @@ export function StyleCard({
       </div>
 
       {/* Style Info */}
-      <h3 className="font-medium text-stone-800 mb-1">{name}</h3>
-      <p className="text-sm text-stone-500 line-clamp-2">{description}</p>
+      <h3 className="font-medium text-[#A4193D] mb-1">{name}</h3>
+      <p className="text-sm text-[#7D132E] line-clamp-2">{description}</p>
 
       {/* Selected Indicator */}
       {isSelected && (
-        <div className="mt-3 flex items-center gap-2 text-stone-800">
+        <div className="mt-3 flex items-center gap-2 text-[#A4193D]">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
@@ -62,15 +62,15 @@ export function StyleCard({
 
 function getStyleGradient(styleId: string): string {
   const gradients: Record<string, string> = {
-    classic: "bg-gradient-to-br from-stone-600 to-stone-800",
+    classic: "bg-gradient-to-br from-[#C51D4D] to-[#A4193D]",
     painterly: "bg-gradient-to-br from-amber-500 to-orange-700",
-    cinematic: "bg-gradient-to-br from-slate-700 to-slate-900",
+    cinematic: "bg-gradient-to-br from-[#7D132E] to-[#A4193D]",
     vintage: "bg-gradient-to-br from-amber-600 to-amber-800",
-    blackwhite: "bg-gradient-to-br from-gray-600 to-gray-900",
+    blackwhite: "bg-gradient-to-br from-[#7D132E] to-[#A4193D]",
     watercolor: "bg-gradient-to-br from-sky-400 to-blue-600",
     "pop-art": "bg-gradient-to-br from-[#A4193D] to-[#7D132E]",
     renaissance: "bg-gradient-to-br from-yellow-700 to-amber-900",
   };
-  return gradients[styleId] || "bg-gradient-to-br from-stone-500 to-stone-700";
+  return gradients[styleId] || "bg-gradient-to-br from-[#C51D4D] to-[#A4193D]";
 }
 

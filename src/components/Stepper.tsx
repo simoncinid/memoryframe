@@ -20,16 +20,16 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
       {/* Mobile View */}
       <div className="md:hidden mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-stone-800">
+          <span className="text-sm font-medium text-[#A4193D]">
             Step {currentStep + 1} of {steps.length}
           </span>
-          <span className="text-sm text-stone-600">
+          <span className="text-sm text-[#A4193D]">
             {steps[currentStep]?.title}
           </span>
         </div>
-        <div className="w-full bg-stone-200 rounded-full h-2">
+        <div className="w-full bg-[#FFDFB9] rounded-full h-2">
           <div
-            className="bg-stone-800 h-2 rounded-full transition-all duration-300"
+            className="bg-[#A4193D] h-2 rounded-full transition-all duration-300"
             style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
           />
         </div>
@@ -56,9 +56,9 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
                 <div
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
-                    isCompleted && "bg-stone-800 text-white",
-                    isCurrent && "bg-stone-800 text-white ring-4 ring-stone-200",
-                    !isCompleted && !isCurrent && "bg-stone-200 text-stone-500"
+                    isCompleted && "bg-[#A4193D] text-white",
+                    isCurrent && "bg-[#A4193D] text-white ring-4 ring-stone-200",
+                    !isCompleted && !isCurrent && "bg-[#FFDFB9] text-[#7D132E]"
                   )}
                 >
                   {isCompleted ? (
@@ -85,7 +85,7 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
                   <p
                     className={cn(
                       "text-sm font-medium",
-                      isCurrent ? "text-stone-800" : "text-stone-500"
+                      isCurrent ? "text-[#A4193D]" : "text-[#7D132E]"
                     )}
                   >
                     {step.title}
@@ -99,7 +99,7 @@ export function Stepper({ steps, currentStep, onStepClick }: StepperProps) {
                   <div
                     className={cn(
                       "h-0.5 rounded-full",
-                      index < currentStep ? "bg-stone-800" : "bg-stone-200"
+                      index < currentStep ? "bg-[#A4193D]" : "bg-[#FFDFB9]"
                     )}
                   />
                 </div>

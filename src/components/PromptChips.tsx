@@ -18,10 +18,10 @@ export function PromptChips({ prompts, onSelect, selectedPrompt }: PromptChipsPr
             key={index}
             onClick={() => onSelect(prompt)}
             className={cn(
-              "px-3 py-2 rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 text-left",
+              "px-3 py-2 rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#C51D4D] focus:ring-offset-2 text-left",
               isSelected
-                ? "bg-stone-800 text-white"
-                : "bg-stone-100 text-stone-700 hover:bg-stone-200"
+                ? "bg-[#A4193D] text-white"
+                : "bg-[#FFE8D1] text-[#A4193D] hover:bg-[#FFDFB9]"
             )}
           >
             {prompt.length > 60 ? prompt.substring(0, 60) + "..." : prompt}
@@ -41,17 +41,17 @@ interface PromptCategoryProps {
 export function PromptCategory({ categoryName, prompts, onCopy }: PromptCategoryProps) {
   return (
     <div className="mb-8">
-      <h3 className="text-lg font-semibold text-stone-800 mb-4">{categoryName}</h3>
+      <h3 className="text-lg font-semibold text-[#A4193D] mb-4">{categoryName}</h3>
       <div className="space-y-3">
         {prompts.map((prompt, index) => (
           <div
             key={index}
-            className="flex items-start gap-3 p-4 bg-stone-50 rounded-xl border border-stone-200"
+            className="flex items-start gap-3 p-4 bg-[#FFF5EB] rounded-xl border border-[#FFDFB9]"
           >
-            <p className="flex-1 text-stone-700 text-sm">{prompt}</p>
+            <p className="flex-1 text-[#A4193D] text-sm">{prompt}</p>
             <button
               onClick={() => onCopy(prompt)}
-              className="shrink-0 px-3 py-1.5 text-xs font-medium bg-stone-800 text-white rounded-lg hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500"
+              className="shrink-0 px-3 py-1.5 text-xs font-medium bg-[#A4193D] text-white rounded-lg hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D]"
             >
               Copy
             </button>

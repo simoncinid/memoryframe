@@ -19,25 +19,25 @@ export function FAQ({ items, title }: FAQProps) {
   return (
     <div>
       {title && (
-        <h2 className="text-2xl font-semibold text-stone-800 mb-6">{title}</h2>
+        <h2 className="text-2xl font-semibold text-[#A4193D] mb-6">{title}</h2>
       )}
       <div className="space-y-3">
         {items.map((item, index) => (
           <div
             key={index}
-            className="border border-stone-200 rounded-xl overflow-hidden"
+            className="border border-[#FFDFB9] rounded-xl overflow-hidden"
           >
             <button
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              className="w-full flex items-center justify-between p-4 text-left bg-white hover:bg-stone-50 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-stone-500"
+              className="w-full flex items-center justify-between p-4 text-left bg-white hover:bg-[#FFF5EB] transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#C51D4D]"
               aria-expanded={openIndex === index}
             >
-              <span className="font-medium text-stone-800 pr-4">
+              <span className="font-medium text-[#A4193D] pr-4">
                 {item.question}
               </span>
               <svg
                 className={cn(
-                  "w-5 h-5 text-stone-500 shrink-0 transition-transform duration-200",
+                  "w-5 h-5 text-[#7D132E] shrink-0 transition-transform duration-200",
                   openIndex === index && "rotate-180"
                 )}
                 fill="none"
@@ -58,7 +58,7 @@ export function FAQ({ items, title }: FAQProps) {
                 openIndex === index ? "max-h-96" : "max-h-0"
               )}
             >
-              <div className="p-4 pt-0 text-stone-600">{item.answer}</div>
+              <div className="p-4 pt-0 text-[#A4193D]">{item.answer}</div>
             </div>
           </div>
         ))}

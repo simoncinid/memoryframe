@@ -109,7 +109,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
       </head>
-      <body className="font-sans antialiased bg-white text-stone-900">
+      <body className="font-sans antialiased bg-white text-[#7D132E]">
         <ToastProvider>
           <Navbar />
           <main className="min-h-screen pt-20">{children}</main>

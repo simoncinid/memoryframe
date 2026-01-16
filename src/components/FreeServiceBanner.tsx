@@ -17,15 +17,15 @@ export function FreeServiceBanner({ variant = "inline" }: FreeServiceBannerProps
             </div>
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h3 className="font-semibold text-stone-800 mb-1">100% Free — Supported by Tips</h3>
-            <p className="text-sm text-stone-600">
+            <h3 className="font-semibold text-[#A4193D] mb-1">100% Free — Supported by Tips</h3>
+            <p className="text-sm text-[#A4193D]">
               This tool is completely free to use. Running AI costs real money, but generous tips from users like you keep it free for everyone. No signup, no hidden fees — just create your portrait and enjoy!
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
             <Link
               href="/create"
-              className="px-6 py-3 bg-stone-800 text-white rounded-xl font-medium hover:bg-stone-700 transition-all text-center"
+              className="px-6 py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] transition-all text-center"
             >
               Start Creating →
             </Link>
@@ -47,7 +47,7 @@ export function FreeServiceBanner({ variant = "inline" }: FreeServiceBannerProps
   }
 
   return (
-    <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 mb-6">
+    <div className="bg-[#FFF5EB] border border-[#FFDFB9] rounded-xl p-4 mb-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
         <div className="flex items-start gap-3 flex-1">
           <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -56,8 +56,8 @@ export function FreeServiceBanner({ variant = "inline" }: FreeServiceBannerProps
             </svg>
           </div>
           <div>
-            <p className="font-medium text-stone-800">This tool is 100% free</p>
-            <p className="text-sm text-stone-600">
+            <p className="font-medium text-[#A4193D]">This tool is 100% free</p>
+            <p className="text-sm text-[#A4193D]">
               Generous tips from users help us cover the AI costs and keep MemoryFrame free for families everywhere.
             </p>
           </div>
