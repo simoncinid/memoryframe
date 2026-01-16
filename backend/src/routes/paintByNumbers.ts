@@ -78,10 +78,11 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
       }
       reservationMade = true;
 
-      // Check authentication and credits
+      // Check authentication and credits (but don't spend yet - only after successful generation)
       const authHeader = request.headers.authorization;
       let userId: string | null = null;
       let usedFreeQuota = false;
+      let userHasCredits = false;
 
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
@@ -90,40 +91,14 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
         if (payload && payload.userId) {
           userId = payload.userId;
           
-          // Check user credits
-          const hasCredits = await checkUserCreditsMemoryFrame(db, userId, 1);
+          // Check user credits (but don't spend yet)
+          userHasCredits = await checkUserCreditsMemoryFrame(db, userId, 1);
           
-          if (hasCredits) {
-            // Spend user credits
-            const spent = await spendCreditsMemoryFrame(
-              db,
-              userId,
-              1,
-              'Paint-by-numbers generation',
-              jobId
-            );
-            
-            if (!spent) {
-              // Fallback to free quota if spending failed
-              const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
-              if (hasQuota) {
-                await useFreeQuotaMemoryFrame(db, ipHash);
-                usedFreeQuota = true;
-              } else {
-                return reply.status(402).send({
-                  error: 'INSUFFICIENT_CREDITS',
-                  message: 'Insufficient credits. Buy credits or use the free quota tomorrow.',
-                });
-              }
-            } else {
-              creditsUsed = true;
-            }
-          } else {
+          if (!userHasCredits) {
             // No credits, try free quota
             const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
             if (hasQuota) {
-              await useFreeQuotaMemoryFrame(db, ipHash);
-              usedFreeQuota = true;
+              // We'll use free quota after successful generation
             } else {
               return reply.status(402).send({
                 error: 'INSUFFICIENT_CREDITS',
@@ -135,10 +110,7 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
       } else {
         // Anonymous user - check free quota
         const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
-        if (hasQuota) {
-          await useFreeQuotaMemoryFrame(db, ipHash);
-          usedFreeQuota = true;
-        } else {
+        if (!hasQuota) {
           return reply.status(402).send({
             error: 'FREE_QUOTA_EXHAUSTED',
             message: 'Free quota exhausted. Register or buy credits to continue.',
@@ -165,6 +137,36 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
       const result = await generatePaintByNumbersTemplate(photo!.buffer);
 
       const generationTimeMs = Date.now() - startTime;
+
+      // NOW that generation succeeded, spend credits or use free quota
+      if (userId && userHasCredits) {
+        // Spend user credits
+        const spent = await spendCreditsMemoryFrame(
+          db,
+          userId,
+          1,
+          'Paint-by-numbers generation',
+          jobId
+        );
+        
+        if (spent) {
+          creditsUsed = true;
+        } else {
+          // Fallback to free quota if spending failed (shouldn't happen, but handle gracefully)
+          const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+          if (hasQuota) {
+            await useFreeQuotaMemoryFrame(db, ipHash);
+            usedFreeQuota = true;
+          }
+        }
+      } else {
+        // Use free quota for anonymous users or users without credits
+        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+        if (hasQuota) {
+          await useFreeQuotaMemoryFrame(db, ipHash);
+          usedFreeQuota = true;
+        }
+      }
 
       // Update job status
       await db.query(

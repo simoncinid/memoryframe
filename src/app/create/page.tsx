@@ -13,6 +13,7 @@ import { useToast } from "@/components/Toast";
 import { copy } from "@/content/copy";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
+import { getAccessToken } from "@/lib/auth";
 
 const steps = [
   { id: "personA", title: copy.create.steps.personA.title },
@@ -90,9 +91,15 @@ function CreatePageContent() {
         fileToBase64(personB),
       ]);
 
+      const token = getAccessToken();
+      const headers: HeadersInit = { "Content-Type": "application/json" };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           personA: personABase64,
           personB: personBBase64,

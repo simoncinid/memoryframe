@@ -46,14 +46,21 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 120000);
 
+    // Get authentication token from request header
+    const authHeader = request.headers.get("authorization");
+    const headers: HeadersInit = {
+      "X-Forwarded-For": clientIp,
+    };
+    if (authHeader) {
+      headers["Authorization"] = authHeader;
+    }
+
     let backendResponse: Response;
     try {
       backendResponse = await fetch(`${BACKEND_URL}/api/paint-by-numbers`, {
         method: "POST",
         body: formData,
-        headers: {
-          "X-Forwarded-For": clientIp,
-        },
+        headers,
         signal: controller.signal,
       });
     } catch (fetchError) {

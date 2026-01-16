@@ -5,6 +5,7 @@ import { UploadDropzone } from "@/components/UploadDropzone";
 import { useToast } from "@/components/Toast";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
+import { getAccessToken } from "@/lib/auth";
 
 const generatingMessages = [
   "Analyzing your photo...",
@@ -48,9 +49,15 @@ export default function PaintByNumbersClient() {
     try {
       const photoBase64 = await fileToBase64(uploadedPhoto);
 
+      const token = getAccessToken();
+      const headers: HeadersInit = { "Content-Type": "application/json" };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch("/api/paint-by-numbers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ photo: photoBase64 }),
       });
 
