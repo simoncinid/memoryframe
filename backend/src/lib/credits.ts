@@ -135,7 +135,7 @@ export async function spendCreditsMemoryFrame(
       [photoAmount, userId]
     );
 
-    // Crea transazione
+    // Create transaction
     await client.query(
       `INSERT INTO credit_transactions_memory_frame 
        (id, user_id, kind, photo_delta, reason, job_id)
@@ -177,7 +177,7 @@ export async function grantCreditsMemoryFrame(
       [photoAmount, userId]
     );
 
-    // Crea transazione
+    // Create transaction
     await client.query(
       `INSERT INTO credit_transactions_memory_frame 
        (id, user_id, kind, photo_delta, reason, stripe_event_id)

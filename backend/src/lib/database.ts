@@ -13,9 +13,9 @@ export function getDatabasePool(): Pool {
     const sslConfig: any = {};
     let needsSsl = false;
     
-    // Rimuovi parametri SSL dalla connection string per evitare conflitti
-    // Gestiremo SSL solo tramite l'oggetto ssl nel Pool
-    // I parametri SSL nella connection string (come sslmode=require) forzano la verifica del certificato
+    // Remove SSL parameters from connection string to avoid conflicts
+    // We'll handle SSL only through the ssl object in the Pool
+    // SSL parameters in the connection string (like sslmode=require) force certificate verification
     const sslParams = ['sslmode', 'ssl', 'sslcert', 'sslkey', 'sslrootcert', 'sslcrl'];
     const urlParts = dbUrl.split('?');
     if (urlParts.length > 1) {
@@ -27,21 +27,21 @@ export function getDatabasePool(): Pool {
       dbUrl = newQueryString ? `${baseUrl}?${newQueryString}` : baseUrl;
     }
     
-    // Determina se serve SSL
+    // Determine if SSL is needed
     if (config.nodeEnv === 'production') {
-      // In produzione, abilita sempre SSL
+      // In production, always enable SSL
       needsSsl = true;
     }
     
-    // Se CA_FILE è presente, gestiscilo (può essere un percorso o il contenuto del certificato)
+    // If CA_FILE is present, handle it (can be a path or certificate content)
     if (config.databaseCaFile) {
       try {
-        // Se inizia con "-----BEGIN", è il contenuto del certificato stesso
+        // If it starts with "-----BEGIN", it's the certificate content itself
         if (config.databaseCaFile.trim().startsWith('-----BEGIN')) {
-          // Usa direttamente il contenuto, sostituendo \n con newline reali
+          // Use the content directly, replacing \n with real newlines
           sslConfig.ca = config.databaseCaFile.replace(/\\n/g, '\n');
         } else {
-          // Altrimenti, è un percorso a un file
+          // Otherwise, it's a file path
           sslConfig.ca = readFileSync(config.databaseCaFile).toString();
         }
         sslConfig.rejectUnauthorized = config.databaseSslRejectUnauthorized;
@@ -53,10 +53,10 @@ export function getDatabasePool(): Pool {
       }
     }
     
-    // Se siamo in produzione o abbiamo bisogno di SSL, configura rejectUnauthorized
+    // If we're in production or need SSL, configure rejectUnauthorized
     if (needsSsl && !sslConfig.ca) {
-      // Se siamo in produzione senza CA_FILE, usa rejectUnauthorized dalla config
-      // Su Render i certificati sono spesso autofirmati, quindi impostiamo false
+      // If we're in production without CA_FILE, use rejectUnauthorized from config
+      // On Render certificates are often self-signed, so we set false
       sslConfig.rejectUnauthorized = config.databaseSslRejectUnauthorized;
     }
     

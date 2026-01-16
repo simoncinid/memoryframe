@@ -3,10 +3,10 @@ import type { FastifyRequest } from 'fastify';
 import { config } from './config.js';
 
 /**
- * Estrae l'IP reale del client da request, gestendo proxy e load balancer
+ * Extracts the real client IP from request, handling proxy and load balancer
  */
 export function getClientIpMemoryFrame(request: FastifyRequest): string {
-  // Controlla x-forwarded-for header (primo elemento se multipli)
+  // Check x-forwarded-for header (first element if multiple)
   const forwardedFor = request.headers['x-forwarded-for'];
   if (forwardedFor) {
     const ips = typeof forwardedFor === 'string' 
@@ -17,12 +17,12 @@ export function getClientIpMemoryFrame(request: FastifyRequest): string {
     }
   }
 
-  // Fallback a request.ip (già gestito da Fastify con trustProxy)
+  // Fallback to request.ip (already handled by Fastify with trustProxy)
   return request.ip || '0.0.0.0';
 }
 
 /**
- * Hash SHA256 dell'IP concatenato con salt per privacy
+ * SHA256 hash of IP concatenated with salt for privacy
  */
 export function hashIpMemoryFrame(ip: string): string {
   const salt = config.ipSalt;
