@@ -77,12 +77,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/meme`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
       url: `${baseUrl}/paint-by-numbers-from-photo`,
       lastModified: new Date(),
       changeFrequency: "weekly",

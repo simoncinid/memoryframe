@@ -608,7 +608,6 @@ export const copy = {
         { label: "Add Person to Photo", href: "/add-person-to-photo" },
         { label: "Merge Photos AI", href: "/merge-photos-ai" },
         { label: "Portrait AI Generator", href: "/portrait-ai-generator" },
-        { label: "Meme Face Swap", href: "/meme" },
         { label: "Paint by Numbers from Photo", href: "/paint-by-numbers-from-photo" },
       ],
       legal: [
@@ -624,7 +623,6 @@ export const copy = {
     links: [
       { label: "Home", href: "/" },
       { label: "Paint by Numbers", href: "/paint-by-numbers-from-photo" },
-      { label: "Meme Face Swap", href: "/meme" },
       { label: "Styles", href: "/styles" },
       { label: "Prompts", href: "/prompts" },
     ],
