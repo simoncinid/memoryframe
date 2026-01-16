@@ -109,6 +109,12 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                href="/create"
+                className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
+              >
+                Family Portrait
+              </Link>
             </div>
 
             {/* Right side: Credits, Buy Credits, Logout */}
@@ -206,6 +212,13 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                href="/create"
+                className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Family Portrait
+              </Link>
               {authChecked && (
                 <>
                   {user ? (
