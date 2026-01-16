@@ -33,7 +33,7 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
 
   const handlePurchase = async () => {
     if (!credits || credits < 1) {
-      showToast('Inserisci un numero valido di crediti', 'error');
+      showToast('Enter a valid number of credits', 'error');
       return;
     }
 
@@ -54,10 +54,11 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 min-h-screen"
       role="dialog"
       aria-modal="true"
       aria-labelledby="buy-credits-modal-title"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
     >
       {/* Backdrop */}
       <div
@@ -66,7 +67,7 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden z-10">
         {/* Header */}
         <div className="relative bg-gradient-to-r from-[#A4193D] to-[#C51D4D] px-6 py-5">
           <button
@@ -80,7 +81,7 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
           </button>
 
           <h2 id="buy-credits-modal-title" className="text-xl font-bold text-white">
-            Acquista Crediti
+            Buy Credits
           </h2>
         </div>
 
@@ -94,7 +95,7 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
             <>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-[#A4193D] mb-2">
-                  Numero di crediti
+                  Number of credits
                 </label>
                 <input
                   type="number"
@@ -108,13 +109,13 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
                   placeholder="50"
                 />
                 <p className="mt-2 text-sm text-[#7D132E]">
-                  Prezzo per credito: <span className="font-bold">${pricePerCredit.toFixed(2)}</span>
+                  Price per credit: <span className="font-bold">${pricePerCredit.toFixed(2)}</span>
                 </p>
               </div>
 
               <div className="bg-[#FFF5EB] border-2 border-[#FFDFB9] rounded-xl p-4 mb-6">
                 <div className="flex justify-between items-center">
-                  <span className="text-[#A4193D] font-medium">Totale:</span>
+                  <span className="text-[#A4193D] font-medium">Total:</span>
                   <span className="text-2xl font-bold text-[#A4193D]">${totalPrice}</span>
                 </div>
               </div>
@@ -124,11 +125,11 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
                 disabled={processing || credits < 1}
                 className="w-full py-4 bg-gradient-to-r from-[#A4193D] to-[#C51D4D] text-white rounded-xl font-bold text-lg hover:from-[#7D132E] hover:to-[#A4193D] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {processing ? 'Elaborazione...' : 'Procedi al Pagamento'}
+                {processing ? 'Processing...' : 'Proceed to Payment'}
               </button>
 
               <p className="mt-4 text-xs text-center text-[#7D132E]">
-                I crediti verranno accreditati immediatamente dopo il pagamento
+                Credits will be credited immediately after payment
               </p>
             </>
           )}
