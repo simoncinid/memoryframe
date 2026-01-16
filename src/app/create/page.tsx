@@ -9,7 +9,6 @@ import { Stepper } from "@/components/Stepper";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { StyleCard } from "@/components/StyleCard";
 import { PromptChips } from "@/components/PromptChips";
-import { TipModal } from "@/components/TipModal";
 import { useToast } from "@/components/Toast";
 import { copy } from "@/content/copy";
 import { fileToBase64 } from "@/lib/utils";
@@ -40,8 +39,6 @@ function CreatePageContent() {
   const [generatingMessage, setGeneratingMessage] = useState("");
   const [resultImage, setResultImage] = useState<string | null>(null);
 
-  const [showTipModal, setShowTipModal] = useState(false);
-  const [hasShownTipModal, setHasShownTipModal] = useState(false);
 
   // Handle style from URL
   useEffect(() => {
@@ -68,16 +65,6 @@ function CreatePageContent() {
     if (selectedStyle && currentStep === 2) setCurrentStep(3);
   }, [selectedStyle, currentStep]);
 
-  // Show tip modal after result
-  useEffect(() => {
-    if (resultImage && !hasShownTipModal) {
-      const timer = setTimeout(() => {
-        setShowTipModal(true);
-        setHasShownTipModal(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [resultImage, hasShownTipModal]);
 
   const handleGenerate = useCallback(async () => {
     if (!personA || !personB || !selectedStyle || !prompt) {
@@ -137,12 +124,6 @@ function CreatePageContent() {
 
     trackEvent("download_click");
 
-    // Show tip modal on download if not shown yet
-    if (!hasShownTipModal) {
-      setShowTipModal(true);
-      setHasShownTipModal(true);
-    }
-
     // Download the image
     const link = document.createElement("a");
     link.href = resultImage;
@@ -159,7 +140,6 @@ function CreatePageContent() {
     setPrompt("");
     setResultImage(null);
     setCurrentStep(0);
-    setHasShownTipModal(false);
   }, []);
 
   // Result View
@@ -201,11 +181,6 @@ function CreatePageContent() {
             Create another portrait
           </button>
         </div>
-
-        <TipModal
-          isOpen={showTipModal}
-          onClose={() => setShowTipModal(false)}
-        />
       </div>
     );
   }

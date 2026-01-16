@@ -50,14 +50,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { user } = await createUserMemoryFrame(db, email, password);
 
-      const accessToken = generateAccessToken({
-        userId: user.id,
-        email: user.email,
-        emailVerified: user.email_verified,
-      });
-
-      const refreshToken = await generateRefreshTokenMemoryFrame(db, user.id);
-
+      // Non restituiamo token finché l'email non è verificata
       return reply.status(201).send({
         user: {
           id: user.id,
@@ -65,9 +58,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
           emailVerified: user.email_verified,
           creditsPhoto: user.credits_photo,
         },
-        accessToken,
-        refreshToken,
-        expiresIn: 7 * 24 * 60 * 60, // 7 giorni in secondi
+        message: 'Registrazione completata. Controlla la tua email per il codice di verifica.',
       });
     } catch (error) {
       request.log.error(error);
@@ -162,24 +153,31 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
 
-  // Verifica email
-  fastify.get('/v1/auth/verify-email', async (request, reply) => {
+  // Verifica email con codice (POST)
+  fastify.post('/v1/auth/verify-email', async (request, reply) => {
     try {
-      const { token } = request.query as { token?: string };
+      const { code } = request.body as { code?: string };
 
-      if (!token) {
+      if (!code) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Token di verifica obbligatorio',
+          message: 'Codice di verifica obbligatorio',
         });
       }
 
-      const success = await verifyEmailMemoryFrame(db, token);
+      if (!/^\d{6}$/.test(code)) {
+        return reply.status(400).send({
+          error: 'VALIDATION_ERROR',
+          message: 'Il codice deve essere di 6 cifre',
+        });
+      }
+
+      const success = await verifyEmailMemoryFrame(db, code);
 
       if (!success) {
         return reply.status(400).send({
-          error: 'INVALID_TOKEN',
-          message: 'Token di verifica non valido o scaduto',
+          error: 'INVALID_CODE',
+          message: 'Codice di verifica non valido o scaduto',
         });
       }
 

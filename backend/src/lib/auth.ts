@@ -21,14 +21,21 @@ export interface AuthTokens {
 /**
  * Crea un nuovo utente con password hashata
  */
+/**
+ * Genera codice di verifica numerico a 6 cifre
+ */
+function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 export async function createUserMemoryFrame(
   db: Pool,
   email: string,
   password: string
-): Promise<{ user: User; verificationToken: string }> {
+): Promise<{ user: User; verificationCode: string }> {
   const userId = uuidv4();
   const passwordHash = await bcrypt.hash(password, 10);
-  const verificationToken = uuidv4();
+  const verificationCode = generateVerificationCode();
 
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24); // 24 ore
@@ -37,14 +44,14 @@ export async function createUserMemoryFrame(
     `INSERT INTO users_memory_frame 
      (id, email, password_hash, email_verified, email_verification_token, email_verification_expires_at, credits_photo)
      VALUES ($1, $2, $3, FALSE, $4, $5, 0)`,
-    [userId, email, passwordHash, verificationToken, expiresAt]
+    [userId, email, passwordHash, verificationCode, expiresAt]
   );
 
   // Crea record email verification
   await db.query(
     `INSERT INTO email_verifications_memory_frame (id, user_id, token, expires_at)
      VALUES ($1, $2, $3, $4)`,
-    [uuidv4(), userId, verificationToken, expiresAt]
+    [uuidv4(), userId, verificationCode, expiresAt]
   );
 
   const result = await db.query(
@@ -55,9 +62,9 @@ export async function createUserMemoryFrame(
   const user = result.rows[0] as User;
 
   // Invia email di verifica
-  await sendVerificationEmail(email, verificationToken);
+  await sendVerificationEmail(email, verificationCode);
 
-  return { user, verificationToken };
+  return { user, verificationCode };
 }
 
 /**
@@ -193,18 +200,18 @@ export async function refreshAccessTokenMemoryFrame(
 }
 
 /**
- * Verifica email utente
+ * Verifica email utente con codice
  */
 export async function verifyEmailMemoryFrame(
   db: Pool,
-  token: string
+  code: string
 ): Promise<boolean> {
   const result = await db.query(
     `SELECT ev.*, u.id as user_id
      FROM email_verifications_memory_frame ev
      JOIN users_memory_frame u ON ev.user_id = u.id
      WHERE ev.token = $1 AND ev.expires_at > NOW() AND ev.verified_at IS NULL`,
-    [token]
+    [code]
   );
 
   if (result.rows.length === 0) {
@@ -256,8 +263,8 @@ export async function resendVerificationEmailMemoryFrame(
     return false; // Già verificato
   }
 
-  // Genera nuovo token
-  const verificationToken = uuidv4();
+  // Genera nuovo codice
+  const verificationCode = generateVerificationCode();
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24);
 
@@ -266,19 +273,19 @@ export async function resendVerificationEmailMemoryFrame(
      SET email_verification_token = $1, 
          email_verification_expires_at = $2
      WHERE id = $3`,
-    [verificationToken, expiresAt, userId]
+    [verificationCode, expiresAt, userId]
   );
 
   // Crea nuovo record verifica
   await db.query(
     `INSERT INTO email_verifications_memory_frame (id, user_id, token, expires_at)
      VALUES ($1, $2, $3, $4)`,
-    [uuidv4(), userId, verificationToken, expiresAt]
+    [uuidv4(), userId, verificationCode, expiresAt]
   );
 
   // Invia email
   if (user.email) {
-    await sendVerificationEmail(user.email, verificationToken);
+    await sendVerificationEmail(user.email, verificationCode);
   }
 
   return true;

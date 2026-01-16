@@ -20,14 +20,12 @@ function getTransporter(): nodemailer.Transporter {
 }
 
 /**
- * Invia email di verifica
+ * Invia email di verifica con codice
  */
 export async function sendVerificationEmail(
   email: string,
-  token: string
+  code: string
 ): Promise<void> {
-  const verificationUrl = `${config.frontendOrigin}/verify-email?token=${token}`;
-
   const mailOptions = {
     from: `"${config.emailFromName}" <${config.emailFrom}>`,
     to: email,
@@ -40,18 +38,17 @@ export async function sendVerificationEmail(
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .button { display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-          .button:hover { background-color: #0056b3; }
+          .code-box { display: inline-block; padding: 20px 30px; background-color: #f0f0f0; border: 2px solid #007bff; border-radius: 8px; font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #007bff; margin: 20px 0; }
         </style>
       </head>
       <body>
         <div class="container">
           <h1>Benvenuto su MemoryFrame!</h1>
-          <p>Grazie per esserti registrato. Per completare la registrazione, clicca sul pulsante qui sotto per verificare il tuo indirizzo email:</p>
-          <a href="${verificationUrl}" class="button">Verifica Email</a>
-          <p>Oppure copia e incolla questo link nel tuo browser:</p>
-          <p><a href="${verificationUrl}">${verificationUrl}</a></p>
-          <p>Questo link scadrà tra 24 ore.</p>
+          <p>Grazie per esserti registrato. Per completare la registrazione, inserisci il seguente codice di verifica:</p>
+          <div style="text-align: center;">
+            <div class="code-box">${code}</div>
+          </div>
+          <p>Il codice scadrà tra 24 ore.</p>
           <p>Se non hai richiesto questa registrazione, puoi ignorare questa email.</p>
         </div>
       </body>
@@ -60,10 +57,11 @@ export async function sendVerificationEmail(
     text: `
       Benvenuto su MemoryFrame!
       
-      Grazie per esserti registrato. Per completare la registrazione, visita questo link:
-      ${verificationUrl}
+      Grazie per esserti registrato. Per completare la registrazione, inserisci il seguente codice di verifica:
       
-      Questo link scadrà tra 24 ore.
+      ${code}
+      
+      Il codice scadrà tra 24 ore.
       
       Se non hai richiesto questa registrazione, puoi ignorare questa email.
     `,

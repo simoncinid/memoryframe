@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState, useRef } from "react";
 import { UploadDropzone } from "@/components/UploadDropzone";
-import { TipModal } from "@/components/TipModal";
 import { useToast } from "@/components/Toast";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
@@ -25,21 +24,9 @@ export default function PaintByNumbersClient() {
   const [coloredImage, setColoredImage] = useState<string | null>(null);
   const [sliderPosition, setSliderPosition] = useState(50);
 
-  const [showTipModal, setShowTipModal] = useState(false);
-  const [hasShownTipModal, setHasShownTipModal] = useState(false);
   
   const sliderContainerRef = useRef<HTMLDivElement>(null);
 
-  // Show tip modal shortly after result appears
-  useEffect(() => {
-    if (resultImage && !hasShownTipModal) {
-      const timer = setTimeout(() => {
-        setShowTipModal(true);
-        setHasShownTipModal(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [resultImage, hasShownTipModal]);
 
   const handleGenerate = useCallback(async () => {
     if (!uploadedPhoto) {
@@ -91,18 +78,13 @@ export default function PaintByNumbersClient() {
 
     trackEvent("paint_by_numbers_download_click");
 
-    if (!hasShownTipModal) {
-      setShowTipModal(true);
-      setHasShownTipModal(true);
-    }
-
     const link = document.createElement("a");
     link.href = resultImage;
     link.download = `paint-by-numbers-${Date.now()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }, [resultImage, hasShownTipModal]);
+  }, [resultImage]);
 
   const handleReset = useCallback(() => {
     setUploadedPhoto(null);
@@ -111,7 +93,6 @@ export default function PaintByNumbersClient() {
     setSliderPosition(50);
     setIsGenerating(false);
     setGeneratingMessage("");
-    setHasShownTipModal(false);
   }, []);
 
   // Handle slider drag
@@ -241,7 +222,6 @@ export default function PaintByNumbersClient() {
           </button>
         </div>
 
-        <TipModal isOpen={showTipModal} onClose={() => setShowTipModal(false)} />
       </div>
     );
   }

@@ -6,11 +6,13 @@ import { useState, useEffect } from "react";
 import { copy } from "@/content/copy";
 import { getUser, isAuthenticated, logout } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import { BuyCreditsModal } from "@/components/BuyCreditsModal";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,6 +24,52 @@ export function Navbar() {
       setAuthChecked(true);
     };
     checkAuth();
+
+    // Aggiorna user quando cambia lo stato di autenticazione
+    const updateUser = async () => {
+      if (isAuthenticated()) {
+        const userData = await getUser();
+        if (userData) {
+          setUser(userData);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    const interval = setInterval(updateUser, 2000); // Controlla ogni 2 secondi
+
+    // Aggiorna anche quando la pagina diventa visibile (dopo login in altra tab o dopo redirect)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        updateUser();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Aggiorna anche quando si fa focus sulla finestra
+    window.addEventListener('focus', updateUser);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', updateUser);
+    };
+  }, []);
+
+  // Listener per eventi di storage (quando si fa login in un'altra tab)
+  useEffect(() => {
+    const handleStorageChange = async () => {
+      if (isAuthenticated()) {
+        const userData = await getUser();
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const handleLogout = async () => {
@@ -63,12 +111,17 @@ export function Navbar() {
               <>
                 {user ? (
                   <>
-                    <Link
-                      href="/purchase-credits"
-                      className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
-                    >
-                      Credits: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#A4193D] text-sm font-medium">
+                        Credits: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
+                      </span>
+                      <button
+                        onClick={() => setShowBuyCreditsModal(true)}
+                        className="px-3 py-1 bg-[#A4193D] text-white rounded-lg text-xs font-medium hover:bg-[#7D132E] transition-colors"
+                      >
+                        Buy Credits
+                      </button>
+                    </div>
                     <Link
                       href="/transactions"
                       className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
@@ -149,13 +202,20 @@ export function Navbar() {
                 <>
                   {user ? (
                     <>
-                      <Link
-                        href="/purchase-credits"
-                        className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Credits: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
-                      </Link>
+                      <div className="px-2 py-1">
+                        <span className="text-[#A4193D] text-sm font-medium">
+                          Credits: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
+                        </span>
+                        <button
+                          onClick={() => {
+                            setShowBuyCreditsModal(true);
+                            setIsMenuOpen(false);
+                          }}
+                          className="mt-2 w-full px-3 py-1 bg-[#A4193D] text-white rounded-lg text-xs font-medium hover:bg-[#7D132E] transition-colors"
+                        >
+                          Buy Credits
+                        </button>
+                      </div>
                       <Link
                         href="/transactions"
                         className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
@@ -195,6 +255,11 @@ export function Navbar() {
           </div>
         )}
       </div>
+
+      <BuyCreditsModal
+        isOpen={showBuyCreditsModal}
+        onClose={() => setShowBuyCreditsModal(false)}
+      />
     </nav>
   );
 }

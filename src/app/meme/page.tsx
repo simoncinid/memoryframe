@@ -3,7 +3,6 @@
 import { useState, useCallback, Suspense } from "react";
 import Image from "next/image";
 import { UploadDropzone } from "@/components/UploadDropzone";
-import { TipModal } from "@/components/TipModal";
 import { useToast } from "@/components/Toast";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
@@ -44,8 +43,6 @@ function MemePageContent() {
   const [generatingMessage, setGeneratingMessage] = useState("");
   const [resultImage, setResultImage] = useState<string | null>(null);
 
-  const [showTipModal, setShowTipModal] = useState(false);
-  const [hasShownTipModal, setHasShownTipModal] = useState(false);
 
   const handleGenerate = useCallback(async (memeId: string) => {
     if (!uploadedPhoto) {
@@ -85,14 +82,6 @@ function MemePageContent() {
 
       setResultImage(data.resultImageUrl);
       trackEvent("meme_generate_success", { meme: memeId });
-
-      // Show tip modal after result
-      if (!hasShownTipModal) {
-        setTimeout(() => {
-          setShowTipModal(true);
-          setHasShownTipModal(true);
-        }, 2000);
-      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Generation failed";
       showToast(message, "error");
@@ -101,17 +90,12 @@ function MemePageContent() {
       clearInterval(messageInterval);
       setIsGenerating(false);
     }
-  }, [uploadedPhoto, showToast, hasShownTipModal]);
+  }, [uploadedPhoto, showToast]);
 
   const handleDownload = useCallback(() => {
     if (!resultImage) return;
 
     trackEvent("meme_download_click");
-
-    if (!hasShownTipModal) {
-      setShowTipModal(true);
-      setHasShownTipModal(true);
-    }
 
     const link = document.createElement("a");
     link.href = resultImage;
@@ -119,13 +103,12 @@ function MemePageContent() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }, [resultImage, hasShownTipModal, selectedMeme]);
+  }, [resultImage, selectedMeme]);
 
   const handleReset = useCallback(() => {
     setUploadedPhoto(null);
     setSelectedMeme(null);
     setResultImage(null);
-    setHasShownTipModal(false);
   }, []);
 
   // Result View
@@ -170,10 +153,6 @@ function MemePageContent() {
           </button>
         </div>
 
-        <TipModal
-          isOpen={showTipModal}
-          onClose={() => setShowTipModal(false)}
-        />
       </div>
     );
   }

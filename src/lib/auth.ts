@@ -54,7 +54,7 @@ export function isAuthenticated(): boolean {
 }
 
 // API calls
-export async function register(email: string, password: string): Promise<AuthResponse> {
+export async function register(email: string, password: string): Promise<{ message: string }> {
   const response = await fetch(`${BACKEND_URL}/v1/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -167,9 +167,13 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 }
 
-export async function verifyEmail(token: string): Promise<void> {
-  const response = await fetch(`${BACKEND_URL}/v1/auth/verify-email?token=${token}`, {
-    method: 'GET',
+export async function verifyEmail(code: string): Promise<void> {
+  const response = await fetch(`${BACKEND_URL}/v1/auth/verify-email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ code }),
   });
 
   if (!response.ok) {

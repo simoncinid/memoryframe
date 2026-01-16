@@ -21,15 +21,18 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const data = isLogin
-        ? await login(email, password)
-        : await register(email, password);
-
-      setAuthData(data);
-      showToast(isLogin ? 'Login successful!' : 'Registration completed!', 'success');
-      
-      const redirect = searchParams.get('redirect') || '/';
-      router.push(redirect);
+      if (isLogin) {
+        const data = await login(email, password);
+        setAuthData(data);
+        showToast('Login successful!', 'success');
+        const redirect = searchParams.get('redirect') || '/';
+        router.push(redirect);
+      } else {
+        // Registrazione - non facciamo login, reindirizziamo alla verifica email
+        await register(email, password);
+        showToast('Registrazione completata! Controlla la tua email per il codice di verifica.', 'success');
+        router.push('/verify-email');
+      }
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Error during operation', 'error');
     } finally {
