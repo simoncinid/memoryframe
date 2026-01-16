@@ -26,7 +26,7 @@ const creditsRoutes: FastifyPluginAsync = async (fastify) => {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante il controllo quota',
+        message: 'Error checking quota',
       });
     }
   });
@@ -38,7 +38,7 @@ const creditsRoutes: FastifyPluginAsync = async (fastify) => {
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return reply.status(401).send({
           error: 'UNAUTHORIZED',
-          message: 'Autenticazione obbligatoria',
+          message: 'Authentication required',
         });
       }
 
@@ -48,7 +48,7 @@ const creditsRoutes: FastifyPluginAsync = async (fastify) => {
       if (!payload || !payload.userId) {
         return reply.status(401).send({
           error: 'INVALID_TOKEN',
-          message: 'Token non valido',
+          message: 'Token invalid',
         });
       }
 
@@ -80,7 +80,7 @@ const creditsRoutes: FastifyPluginAsync = async (fastify) => {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante il recupero transazioni',
+        message: 'Error retrieving transactions',
       });
     }
   });

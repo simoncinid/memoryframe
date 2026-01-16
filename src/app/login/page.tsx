@@ -28,9 +28,9 @@ function LoginForm() {
         const redirect = searchParams.get('redirect') || '/';
         router.push(redirect);
       } else {
-        // Registrazione - non facciamo login, reindirizziamo alla verifica email
+        // Registration - don't login, redirect to email verification
         await register(email, password);
-        showToast('Registrazione completata! Controlla la tua email per il codice di verifica.', 'success');
+        showToast('Registration completed! Check your email for the verification code.', 'success');
         router.push('/verify-email');
       }
     } catch (error) {

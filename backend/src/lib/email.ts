@@ -20,7 +20,7 @@ function getTransporter(): nodemailer.Transporter {
 }
 
 /**
- * Invia email di verifica con codice
+ * Sends verification email with code
  */
 export async function sendVerificationEmail(
   email: string,
@@ -29,7 +29,7 @@ export async function sendVerificationEmail(
   const mailOptions = {
     from: `"${config.emailFromName}" <${config.emailFrom}>`,
     to: email,
-    subject: 'Verifica il tuo account MemoryFrame',
+    subject: 'Verify your MemoryFrame account',
     html: `
       <!DOCTYPE html>
       <html>
@@ -43,27 +43,27 @@ export async function sendVerificationEmail(
       </head>
       <body>
         <div class="container">
-          <h1>Benvenuto su MemoryFrame!</h1>
-          <p>Grazie per esserti registrato. Per completare la registrazione, inserisci il seguente codice di verifica:</p>
+          <h1>Welcome to MemoryFrame!</h1>
+          <p>Thank you for registering. To complete your registration, enter the following verification code:</p>
           <div style="text-align: center;">
             <div class="code-box">${code}</div>
           </div>
-          <p>Il codice scadrà tra 24 ore.</p>
-          <p>Se non hai richiesto questa registrazione, puoi ignorare questa email.</p>
+          <p>The code will expire in 24 hours.</p>
+          <p>If you did not request this registration, you can ignore this email.</p>
         </div>
       </body>
       </html>
     `,
     text: `
-      Benvenuto su MemoryFrame!
+      Welcome to MemoryFrame!
       
-      Grazie per esserti registrato. Per completare la registrazione, inserisci il seguente codice di verifica:
+      Thank you for registering. To complete your registration, enter the following verification code:
       
       ${code}
       
-      Il codice scadrà tra 24 ore.
+      The code will expire in 24 hours.
       
-      Se non hai richiesto questa registrazione, puoi ignorare questa email.
+      If you did not request this registration, you can ignore this email.
     `,
   };
 
@@ -72,7 +72,7 @@ export async function sendVerificationEmail(
 }
 
 /**
- * Invia email di reset password (opzionale, per futuro)
+ * Sends password reset email (optional, for future use)
  */
 export async function sendPasswordResetEmail(
   email: string,
@@ -98,12 +98,12 @@ export async function sendPasswordResetEmail(
       <body>
         <div class="container">
           <h1>Reset Password</h1>
-          <p>Hai richiesto il reset della password. Clicca sul pulsante qui sotto per reimpostare la tua password:</p>
+          <p>You requested a password reset. Click the button below to reset your password:</p>
           <a href="${resetUrl}" class="button">Reset Password</a>
-          <p>Oppure copia e incolla questo link nel tuo browser:</p>
+          <p>Or copy and paste this link into your browser:</p>
           <p><a href="${resetUrl}">${resetUrl}</a></p>
-          <p>Questo link scadrà tra 1 ora.</p>
-          <p>Se non hai richiesto il reset della password, puoi ignorare questa email.</p>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you did not request a password reset, you can ignore this email.</p>
         </div>
       </body>
       </html>

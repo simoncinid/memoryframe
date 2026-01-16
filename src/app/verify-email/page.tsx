@@ -19,7 +19,7 @@ function VerifyEmailContent() {
     e.preventDefault();
     
     if (!code || code.length !== 6) {
-      showToast('Inserisci un codice di 6 cifre', 'error');
+      showToast('Enter a 6-digit code', 'error');
       return;
     }
 
@@ -27,15 +27,15 @@ function VerifyEmailContent() {
     try {
       await verifyEmail(code);
       setStatus('success');
-      setMessage('Email verificata con successo!');
-      showToast('Email verificata con successo!', 'success');
+      setMessage('Email verified successfully!');
+      showToast('Email verified successfully!', 'success');
       setTimeout(() => {
         router.push('/login');
       }, 2000);
     } catch (error) {
       setStatus('error');
-      setMessage(error instanceof Error ? error.message : 'Errore durante la verifica');
-      showToast(error instanceof Error ? error.message : 'Errore durante la verifica', 'error');
+      setMessage(error instanceof Error ? error.message : 'Error during verification');
+      showToast(error instanceof Error ? error.message : 'Error during verification', 'error');
     } finally {
       setLoading(false);
     }
@@ -46,10 +46,10 @@ function VerifyEmailContent() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-[#A4193D]">
-            Verifica la tua email
+            Verify your email
           </h2>
           <p className="mt-2 text-sm text-[#A4193D]">
-            Inserisci il codice di verifica che ti abbiamo inviato via email
+            Enter the verification code we sent you via email
           </p>
         </div>
 
@@ -57,7 +57,7 @@ function VerifyEmailContent() {
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="code" className="sr-only">
-                Codice di verifica
+                Verification code
               </label>
               <input
                 id="code"
@@ -84,7 +84,7 @@ function VerifyEmailContent() {
                 disabled={loading || code.length !== 6}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Verifica in corso...' : 'Verifica'}
+                {loading ? 'Verifying...' : 'Verify'}
               </button>
             </div>
 
@@ -93,7 +93,7 @@ function VerifyEmailContent() {
                 href="/login"
                 className="text-sm text-blue-600 hover:text-blue-500"
               >
-                Torna al login
+                Back to login
               </a>
             </div>
           </form>
@@ -102,16 +102,16 @@ function VerifyEmailContent() {
         {status === 'success' && (
           <div className="text-center space-y-4">
             <div className="text-green-600 text-5xl mb-4">✓</div>
-            <h2 className="text-2xl font-bold text-[#A4193D]">Email verificata!</h2>
+            <h2 className="text-2xl font-bold text-[#A4193D]">Email verified!</h2>
             <p className="text-[#A4193D]">{message}</p>
-            <p className="text-sm text-[#7D132E]">Reindirizzamento al login...</p>
+            <p className="text-sm text-[#7D132E]">Redirecting to login...</p>
           </div>
         )}
 
         {status === 'error' && (
           <div className="text-center space-y-4">
             <div className="text-red-600 text-5xl mb-4">✗</div>
-            <h2 className="text-2xl font-bold text-[#A4193D]">Errore</h2>
+            <h2 className="text-2xl font-bold text-[#A4193D]">Error</h2>
             <p className="text-[#A4193D]">{message}</p>
             <button
               onClick={() => {
@@ -121,14 +121,14 @@ function VerifyEmailContent() {
               }}
               className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              Riprova
+              Try again
             </button>
             <div className="mt-4">
               <a
                 href="/login"
                 className="text-sm text-blue-600 hover:text-blue-500"
               >
-                Torna al login
+                Back to login
               </a>
             </div>
           </div>

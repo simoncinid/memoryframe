@@ -25,7 +25,7 @@ export function Navbar() {
     };
     checkAuth();
 
-    // Aggiorna user quando cambia lo stato di autenticazione
+    // Update user when authentication state changes
     const updateUser = async () => {
       if (isAuthenticated()) {
         const userData = await getUser();
@@ -37,9 +37,9 @@ export function Navbar() {
       }
     };
 
-    const interval = setInterval(updateUser, 2000); // Controlla ogni 2 secondi
+    const interval = setInterval(updateUser, 2000); // Check every 2 seconds
 
-    // Aggiorna anche quando la pagina diventa visibile (dopo login in altra tab o dopo redirect)
+    // Also update when page becomes visible (after login in another tab or after redirect)
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         updateUser();
@@ -47,7 +47,7 @@ export function Navbar() {
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Aggiorna anche quando si fa focus sulla finestra
+    // Also update when window gets focus
     window.addEventListener('focus', updateUser);
 
     return () => {

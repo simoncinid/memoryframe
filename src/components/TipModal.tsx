@@ -102,7 +102,7 @@ export function TipModal({ isOpen, onClose }: TipModalProps) {
             </div>
           </div>
 
-          {/* Messaggio empatico */}
+          {/* Empathetic message */}
           <div className="text-center mb-6">
             <p className="text-[#A4193D] text-sm leading-relaxed">
               <span className="font-semibold text-[#7D132E]">MemoryFrame is 100% free</span> — we don&apos;t run ads, and we never will.

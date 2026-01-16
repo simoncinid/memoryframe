@@ -112,7 +112,7 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
               } else {
                 return reply.status(402).send({
                   error: 'INSUFFICIENT_CREDITS',
-                  message: 'Crediti insufficienti. Acquista crediti o usa la quota gratuita domani.',
+                  message: 'Insufficient credits. Buy credits or use the free quota tomorrow.',
                 });
               }
             } else {
@@ -127,7 +127,7 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
             } else {
               return reply.status(402).send({
                 error: 'INSUFFICIENT_CREDITS',
-                message: 'Crediti insufficienti. Acquista crediti o usa la quota gratuita domani.',
+                message: 'Insufficient credits. Buy credits or use the free quota tomorrow.',
               });
             }
           }
@@ -141,7 +141,7 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
         } else {
           return reply.status(402).send({
             error: 'FREE_QUOTA_EXHAUSTED',
-            message: 'Quota gratuita esaurita. Registrati o acquista crediti per continuare.',
+            message: 'Free quota exhausted. Register or buy credits to continue.',
           });
         }
       }

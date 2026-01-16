@@ -19,10 +19,10 @@ export interface AuthTokens {
 }
 
 /**
- * Crea un nuovo utente con password hashata
+ * Creates a new user with hashed password
  */
 /**
- * Genera codice di verifica numerico a 6 cifre
+ * Generates a 6-digit numeric verification code
  */
 function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -38,7 +38,7 @@ export async function createUserMemoryFrame(
   const verificationCode = generateVerificationCode();
 
   const expiresAt = new Date();
-  expiresAt.setHours(expiresAt.getHours() + 24); // 24 ore
+  expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours
 
   await db.query(
     `INSERT INTO users_memory_frame 
@@ -47,7 +47,7 @@ export async function createUserMemoryFrame(
     [userId, email, passwordHash, verificationCode, expiresAt]
   );
 
-  // Crea record email verification
+  // Create email verification record
   await db.query(
     `INSERT INTO email_verifications_memory_frame (id, user_id, token, expires_at)
      VALUES ($1, $2, $3, $4)`,
@@ -61,14 +61,14 @@ export async function createUserMemoryFrame(
 
   const user = result.rows[0] as User;
 
-  // Invia email di verifica
+  // Send verification email
   await sendVerificationEmail(email, verificationCode);
 
   return { user, verificationCode };
 }
 
 /**
- * Verifica credenziali utente
+ * Verifies user credentials
  */
 export async function verifyUserCredentialsMemoryFrame(
   db: Pool,
@@ -108,7 +108,7 @@ export function generateAccessToken(payload: JWTPayload): string {
 }
 
 /**
- * Genera refresh token e lo salva nel database
+ * Generates refresh token and saves it to the database
  */
 export async function generateRefreshTokenMemoryFrame(
   db: Pool,
@@ -120,7 +120,7 @@ export async function generateRefreshTokenMemoryFrame(
   } as SignOptions);
 
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 30); // 30 giorni
+  expiresAt.setDate(expiresAt.getDate() + 30); // 30 days
 
   await db.query(
     `INSERT INTO refresh_tokens_memory_frame (id, user_id, token, expires_at)
@@ -132,7 +132,7 @@ export async function generateRefreshTokenMemoryFrame(
 }
 
 /**
- * Verifica e decodifica access token
+ * Verifies and decodes access token
  */
 export function verifyAccessToken(token: string): JWTPayload | null {
   try {
@@ -144,17 +144,17 @@ export function verifyAccessToken(token: string): JWTPayload | null {
 }
 
 /**
- * Verifica refresh token e restituisce nuovo access token
+ * Verifies refresh token and returns new access token
  */
 export async function refreshAccessTokenMemoryFrame(
   db: Pool,
   refreshToken: string
 ): Promise<{ accessToken: string; refreshToken: string } | null> {
   try {
-    // Verifica token
+    // Verify token
     const decoded = jwt.verify(refreshToken, config.jwtSecret) as { userId: string; tokenId: string };
 
-    // Verifica che esista nel database
+    // Verify it exists in database
     const result = await db.query(
       `SELECT * FROM refresh_tokens_memory_frame 
        WHERE id = $1 AND token = $2 AND expires_at > NOW()`,
@@ -165,7 +165,7 @@ export async function refreshAccessTokenMemoryFrame(
       return null;
     }
 
-    // Carica utente
+    // Load user
     const userResult = await db.query(
       `SELECT * FROM users_memory_frame WHERE id = $1`,
       [decoded.userId]
@@ -177,17 +177,17 @@ export async function refreshAccessTokenMemoryFrame(
 
     const user = userResult.rows[0] as User;
 
-    // Genera nuovo access token
+    // Generate new access token
     const accessToken = generateAccessToken({
       userId: user.id,
       email: user.email,
       emailVerified: user.email_verified,
     });
 
-    // Genera nuovo refresh token
+    // Generate new refresh token
     const newRefreshToken = await generateRefreshTokenMemoryFrame(db, user.id);
 
-    // Elimina vecchio refresh token
+    // Delete old refresh token
     await db.query(
       `DELETE FROM refresh_tokens_memory_frame WHERE id = $1`,
       [decoded.tokenId]
@@ -200,7 +200,7 @@ export async function refreshAccessTokenMemoryFrame(
 }
 
 /**
- * Verifica email utente con codice
+ * Verifies user email with code
  */
 export async function verifyEmailMemoryFrame(
   db: Pool,
@@ -220,7 +220,7 @@ export async function verifyEmailMemoryFrame(
 
   const verification = result.rows[0];
 
-  // Aggiorna utente
+  // Update user
   await db.query(
     `UPDATE users_memory_frame 
      SET email_verified = TRUE, 
@@ -230,7 +230,7 @@ export async function verifyEmailMemoryFrame(
     [verification.user_id]
   );
 
-  // Marca verifica come completata
+  // Mark verification as completed
   await db.query(
     `UPDATE email_verifications_memory_frame 
      SET verified_at = NOW() 
@@ -242,7 +242,7 @@ export async function verifyEmailMemoryFrame(
 }
 
 /**
- * Invia nuova email di verifica
+ * Sends new verification email
  */
 export async function resendVerificationEmailMemoryFrame(
   db: Pool,
@@ -260,10 +260,10 @@ export async function resendVerificationEmailMemoryFrame(
   const user = result.rows[0] as User;
 
   if (user.email_verified) {
-    return false; // Già verificato
+    return false; // Already verified
   }
 
-  // Genera nuovo codice
+  // Generate new code
   const verificationCode = generateVerificationCode();
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24);
@@ -276,14 +276,14 @@ export async function resendVerificationEmailMemoryFrame(
     [verificationCode, expiresAt, userId]
   );
 
-  // Crea nuovo record verifica
+  // Create new verification record
   await db.query(
     `INSERT INTO email_verifications_memory_frame (id, user_id, token, expires_at)
      VALUES ($1, $2, $3, $4)`,
     [uuidv4(), userId, verificationCode, expiresAt]
   );
 
-  // Invia email
+  // Send email
   if (user.email) {
     await sendVerificationEmail(user.email, verificationCode);
   }
@@ -292,7 +292,7 @@ export async function resendVerificationEmailMemoryFrame(
 }
 
 /**
- * Logout - elimina refresh token
+ * Logout - deletes refresh token
  */
 export async function logoutMemoryFrame(
   db: Pool,

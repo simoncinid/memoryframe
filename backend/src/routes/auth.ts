@@ -16,7 +16,7 @@ import { getUserById } from '../lib/credits.js';
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   const db = getDatabasePool();
 
-  // Registrazione
+  // Registration
   fastify.post('/v1/auth/register', async (request, reply) => {
     try {
       const { email, password } = request.body as { email?: string; password?: string };
@@ -24,18 +24,18 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!email || !password) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Email e password sono obbligatorie',
+          message: 'Email and password are required',
         });
       }
 
       if (password.length < 8) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'La password deve essere di almeno 8 caratteri',
+          message: 'Password must be at least 8 characters',
         });
       }
 
-      // Verifica se email esiste già
+      // Check if email already exists
       const existingResult = await db.query(
         `SELECT id FROM users_memory_frame WHERE email = $1`,
         [email]
@@ -44,13 +44,13 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (existingResult.rows.length > 0) {
         return reply.status(409).send({
           error: 'EMAIL_EXISTS',
-          message: 'Questa email è già registrata',
+          message: 'This email is already registered',
         });
       }
 
       const { user } = await createUserMemoryFrame(db, email, password);
 
-      // Non restituiamo token finché l'email non è verificata
+      // Don't return token until email is verified
       return reply.status(201).send({
         user: {
           id: user.id,
@@ -58,13 +58,13 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
           emailVerified: user.email_verified,
           creditsPhoto: user.credits_photo,
         },
-        message: 'Registrazione completata. Controlla la tua email per il codice di verifica.',
+        message: 'Registration completed. Check your email for the verification code.',
       });
     } catch (error) {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante la registrazione',
+        message: 'Error during registration',
       });
     }
   });
@@ -77,7 +77,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!email || !password) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Email e password sono obbligatorie',
+          message: 'Email and password are required',
         });
       }
 
@@ -86,7 +86,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!user) {
         return reply.status(401).send({
           error: 'INVALID_CREDENTIALS',
-          message: 'Email o password non corretti',
+          message: 'Email or password incorrect',
         });
       }
 
@@ -113,7 +113,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante il login',
+        message: 'Error during login',
       });
     }
   });
@@ -126,7 +126,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!refreshToken) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Refresh token obbligatorio',
+          message: 'Refresh token required',
         });
       }
 
@@ -135,7 +135,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!result) {
         return reply.status(401).send({
           error: 'INVALID_TOKEN',
-          message: 'Refresh token non valido o scaduto',
+          message: 'Refresh token invalid or expired',
         });
       }
 
@@ -148,12 +148,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante il refresh del token',
+        message: 'Error during token refresh',
       });
     }
   });
 
-  // Verifica email con codice (POST)
+  // Verify email with code (POST)
   fastify.post('/v1/auth/verify-email', async (request, reply) => {
     try {
       const { code } = request.body as { code?: string };
@@ -161,14 +161,14 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!code) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Codice di verifica obbligatorio',
+          message: 'Verification code required',
         });
       }
 
       if (!/^\d{6}$/.test(code)) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Il codice deve essere di 6 cifre',
+          message: 'Code must be 6 digits',
         });
       }
 
@@ -177,30 +177,30 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!success) {
         return reply.status(400).send({
           error: 'INVALID_CODE',
-          message: 'Codice di verifica non valido o scaduto',
+          message: 'Verification code invalid or expired',
         });
       }
 
       return reply.status(200).send({
-        message: 'Email verificata con successo',
+        message: 'Email verified successfully',
       });
     } catch (error) {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante la verifica email',
+        message: 'Error during email verification',
       });
     }
   });
 
-  // Reinvia email verifica
+  // Resend verification email
   fastify.post('/v1/auth/resend-verification', async (request, reply) => {
     try {
       const authHeader = request.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return reply.status(401).send({
           error: 'UNAUTHORIZED',
-          message: 'Token di autenticazione obbligatorio',
+          message: 'Authentication token required',
         });
       }
 
@@ -210,7 +210,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!payload) {
         return reply.status(401).send({
           error: 'INVALID_TOKEN',
-          message: 'Token non valido',
+          message: 'Token invalid',
         });
       }
 
@@ -219,18 +219,18 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!success) {
         return reply.status(400).send({
           error: 'ALREADY_VERIFIED',
-          message: 'Email già verificata o utente non trovato',
+          message: 'Email already verified or user not found',
         });
       }
 
       return reply.status(200).send({
-        message: 'Email di verifica inviata',
+        message: 'Verification email sent',
       });
     } catch (error) {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante l\'invio email',
+        message: 'Error sending email',
       });
     }
   });
@@ -243,20 +243,20 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!refreshToken) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Refresh token obbligatorio',
+          message: 'Refresh token required',
         });
       }
 
       await logoutMemoryFrame(db, refreshToken);
 
       return reply.status(200).send({
-        message: 'Logout effettuato con successo',
+        message: 'Logout successful',
       });
     } catch (error) {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante il logout',
+        message: 'Error during logout',
       });
     }
   });
@@ -268,7 +268,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return reply.status(401).send({
           error: 'UNAUTHORIZED',
-          message: 'Token di autenticazione obbligatorio',
+          message: 'Authentication token required',
         });
       }
 
@@ -278,7 +278,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!payload) {
         return reply.status(401).send({
           error: 'INVALID_TOKEN',
-          message: 'Token non valido',
+          message: 'Token invalid',
         });
       }
 
@@ -287,7 +287,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       if (!user) {
         return reply.status(404).send({
           error: 'USER_NOT_FOUND',
-          message: 'Utente non trovato',
+          message: 'User not found',
         });
       }
 
@@ -304,7 +304,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante il recupero utente',
+        message: 'Error retrieving user',
       });
     }
   });

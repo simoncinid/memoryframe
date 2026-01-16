@@ -12,15 +12,15 @@ const stripe = new Stripe(config.stripeSecretKey, {
 const stripeRoutes: FastifyPluginAsync = async (fastify) => {
   const db = getDatabasePool();
 
-  // Crea checkout session per acquisto dinamico crediti
+  // Create checkout session for dynamic credit purchase
   fastify.post('/v1/stripe/create-dynamic-checkout', async (request, reply) => {
     try {
-      // Verifica autenticazione
+      // Verify authentication
       const authHeader = request.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return reply.status(401).send({
           error: 'UNAUTHORIZED',
-          message: 'Autenticazione obbligatoria',
+          message: 'Authentication required',
         });
       }
 
@@ -30,7 +30,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
       if (!payload || !payload.userId) {
         return reply.status(401).send({
           error: 'INVALID_TOKEN',
-          message: 'Token non valido',
+          message: 'Token invalid',
         });
       }
 
@@ -39,32 +39,32 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
       if (!photo_credits || photo_credits <= 0 || !Number.isInteger(photo_credits)) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'photo_credits deve essere un numero intero positivo',
+          message: 'photo_credits must be a positive integer',
         });
       }
 
-      // Calcola totale
-      const unitAmount = config.pricePerPhotoCredit; // in centesimi
+      // Calculate total
+      const unitAmount = config.pricePerPhotoCredit; // in cents
       const totalAmount = photo_credits * unitAmount;
 
-      // Verifica minimo Stripe ($0.50 = 50 centesimi)
+      // Verify Stripe minimum ($0.50 = 50 cents)
       if (totalAmount < 50) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Importo minimo è $0.50',
+          message: 'Minimum amount is $0.50',
         });
       }
 
-      // Carica utente
+      // Load user
       const user = await getUserById(db, payload.userId);
       if (!user) {
         return reply.status(404).send({
           error: 'USER_NOT_FOUND',
-          message: 'Utente non trovato',
+          message: 'User not found',
         });
       }
 
-      // Crea o aggiorna Stripe Customer
+      // Create or update Stripe Customer
       let customerId = user.stripe_customer_id;
       if (!customerId) {
         const customer = await stripe.customers.create({
@@ -75,14 +75,14 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
         });
         customerId = customer.id;
 
-        // Salva customer ID
+        // Save customer ID
         await db.query(
           `UPDATE users_memory_frame SET stripe_customer_id = $1 WHERE id = $2`,
           [customerId, user.id]
         );
       }
 
-      // Crea checkout session
+      // Create checkout session
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
@@ -93,7 +93,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
               currency: 'usd',
               product_data: {
                 name: 'Photo Credits',
-                description: `${photo_credits} crediti per generare immagini`,
+                description: `${photo_credits} credits to generate images`,
               },
               unit_amount: unitAmount,
             },
@@ -112,14 +112,14 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(200).send({
         url: session.url,
         sessionId: session.id,
-        totalAmount: totalAmount / 100, // in dollari
+        totalAmount: totalAmount / 100, // in dollars
         photoCredits: photo_credits,
       });
     } catch (error) {
       request.log.error(error);
       return reply.status(500).send({
         error: 'INTERNAL_ERROR',
-        message: 'Errore durante la creazione checkout',
+        message: 'Error creating checkout',
       });
     }
   });
@@ -131,7 +131,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
     if (!sig) {
       return reply.status(400).send({
         error: 'MISSING_SIGNATURE',
-        message: 'Stripe signature mancante',
+        message: 'Stripe signature missing',
       });
     }
 
@@ -142,7 +142,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
       if (!rawBody) {
         return reply.status(400).send({
           error: 'MISSING_BODY',
-          message: 'Request body mancante',
+          message: 'Request body missing',
         });
       }
 
@@ -155,16 +155,16 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
       request.log.error({ err }, 'Webhook signature verification failed');
       return reply.status(400).send({
         error: 'INVALID_SIGNATURE',
-        message: 'Firma webhook non valida',
+        message: 'Webhook signature invalid',
       });
     }
 
-    // Gestisci evento checkout.session.completed
+    // Handle checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
 
       try {
-        // Controlla duplicati
+        // Check for duplicates
         const existingResult = await db.query(
           `SELECT id FROM credit_transactions_memory_frame 
            WHERE stripe_event_id = $1`,
@@ -172,7 +172,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
         );
 
         if (existingResult.rows.length > 0) {
-          request.log.info(`Webhook già processato: ${event.id}`);
+          request.log.info(`Webhook already processed: ${event.id}`);
           return reply.status(200).send({ status: 'ok', message: 'Already processed' });
         }
 
@@ -183,24 +183,24 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
           const userId = metadata.user_id;
 
           if (!userId || photoCredits <= 0) {
-            request.log.error({ metadata }, 'Metadata invalide nel webhook');
+            request.log.error({ metadata }, 'Invalid metadata in webhook');
             return reply.status(400).send({
               error: 'INVALID_METADATA',
-              message: 'Metadata non valide',
+              message: 'Invalid metadata',
             });
           }
 
-          // Carica utente
+          // Load user
           const user = await getUserById(db, userId);
           if (!user) {
-            request.log.error(`Utente non trovato: ${userId}`);
+            request.log.error(`User not found: ${userId}`);
             return reply.status(404).send({
               error: 'USER_NOT_FOUND',
-              message: 'Utente non trovato',
+              message: 'User not found',
             });
           }
 
-          // Aggiorna stripe_customer_id se disponibile
+          // Update stripe_customer_id if available
           if (session.customer && typeof session.customer === 'string') {
             await db.query(
               `UPDATE users_memory_frame SET stripe_customer_id = $1 WHERE id = $2`,
@@ -208,7 +208,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
             );
           }
 
-          // Assegna crediti
+          // Assign credits
           const reason = `Stripe purchase: ${photoCredits} credits (Session: ${session.id})`;
           await grantCreditsMemoryFrame(
             db,
@@ -223,29 +223,29 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
             photoCredits,
             sessionId: session.id,
             eventId: event.id,
-          }, 'Crediti assegnati via Stripe webhook');
+          }, 'Credits assigned via Stripe webhook');
 
           return reply.status(200).send({ status: 'ok' });
         } else {
-          request.log.warn({ type: metadata?.type }, 'Tipo webhook non supportato');
+          request.log.warn({ type: metadata?.type }, 'Unsupported webhook type');
           return reply.status(200).send({ status: 'ok', message: 'Unsupported type' });
         }
       } catch (error) {
-        request.log.error({ error }, 'Errore processando webhook');
+        request.log.error({ error }, 'Error processing webhook');
         return reply.status(500).send({
           error: 'INTERNAL_ERROR',
-          message: 'Errore processando webhook',
+          message: 'Error processing webhook',
         });
       }
     }
 
-    // Altri eventi vengono ignorati ma ritornano ok
+    // Other events are ignored but return ok
     return reply.status(200).send({ status: 'ok' });
   });
 
-  // Endpoint pricing
+  // Pricing endpoint
   fastify.get('/v1/pricing', async (_request, reply) => {
-    const pricePerCredit = config.pricePerPhotoCredit / 100; // in dollari
+    const pricePerCredit = config.pricePerPhotoCredit / 100; // in dollars
 
     return reply.status(200).send({
       photoPacks: [
