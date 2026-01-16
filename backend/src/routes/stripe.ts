@@ -43,6 +43,14 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
         });
       }
 
+      // Minimum 4 credits (to ensure at least $0.50)
+      if (photo_credits < 4) {
+        return reply.status(400).send({
+          error: 'VALIDATION_ERROR',
+          message: 'Minimum is 4 credits ($0.76)',
+        });
+      }
+
       // Calculate total
       const unitAmount = config.pricePerPhotoCredit; // in cents
       const totalAmount = photo_credits * unitAmount;
@@ -51,7 +59,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
       if (totalAmount < 50) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Minimum amount is $0.50',
+          message: 'Importo minimo è $0.50',
         });
       }
 

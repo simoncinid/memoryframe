@@ -13,7 +13,7 @@ export default function PurchaseCreditsPage() {
   const [pricing, setPricing] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [customCredits, setCustomCredits] = useState(50);
+  const [customCredits, setCustomCredits] = useState(4);
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
@@ -108,9 +108,12 @@ export default function PurchaseCreditsPage() {
                 </label>
                 <input
                   type="number"
-                  min="1"
+                  min="4"
                   value={customCredits}
-                  onChange={(e) => setCustomCredits(parseInt(e.target.value) || 1)}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value) || 4;
+                    setCustomCredits(Math.max(4, value));
+                  }}
                   className="w-full px-3 py-2 border border-[#FFDFB9] rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
                 <p className="mt-2 text-sm text-[#7D132E]">
@@ -119,7 +122,7 @@ export default function PurchaseCreditsPage() {
               </div>
               <button
                 onClick={() => handlePurchase(customCredits)}
-                disabled={processing || customCredits < 1}
+                disabled={processing || customCredits < 4}
                 className="py-2 px-6 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
               >
                 {processing ? 'Loading...' : 'Purchase'}

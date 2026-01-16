@@ -11,7 +11,7 @@ interface BuyCreditsModalProps {
 
 export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
   const { showToast } = useToast();
-  const [credits, setCredits] = useState(50);
+  const [credits, setCredits] = useState(4);
   const [pricing, setPricing] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -32,8 +32,8 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
   };
 
   const handlePurchase = async () => {
-    if (!credits || credits < 1) {
-      showToast('Enter a valid number of credits', 'error');
+    if (!credits || credits < 4) {
+      showToast('Minimum is 4 credits ($0.76)', 'error');
       return;
     }
 
@@ -81,7 +81,7 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
           </button>
 
           <h2 id="buy-credits-modal-title" className="text-xl font-bold text-white">
-            Buy Credits
+            Acquista Crediti
           </h2>
         </div>
 
@@ -95,21 +95,24 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
             <>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-[#A4193D] mb-2">
-                  Number of credits
+                  Numero di crediti
                 </label>
                 <input
                   type="number"
-                  min="1"
+                  min="4"
                   value={credits}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value) || 1;
-                    setCredits(Math.max(1, value));
+                    const value = parseInt(e.target.value) || 4;
+                    setCredits(Math.max(4, value));
                   }}
                   className="w-full px-4 py-3 border border-[#FFDFB9] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#C51D4D] focus:border-transparent text-lg"
-                  placeholder="50"
+                  placeholder="4"
                 />
                 <p className="mt-2 text-sm text-[#7D132E]">
-                  Price per credit: <span className="font-bold">${pricePerCredit.toFixed(2)}</span>
+                  Prezzo per credito: <span className="font-bold">${pricePerCredit.toFixed(2)}</span>
+                </p>
+                <p className="mt-1 text-xs text-[#7D132E]">
+                  Minimo: 4 crediti (€0.76)
                 </p>
               </div>
 
@@ -122,14 +125,14 @@ export function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
 
               <button
                 onClick={handlePurchase}
-                disabled={processing || credits < 1}
+                disabled={processing || credits < 4}
                 className="w-full py-4 bg-gradient-to-r from-[#A4193D] to-[#C51D4D] text-white rounded-xl font-bold text-lg hover:from-[#7D132E] hover:to-[#A4193D] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {processing ? 'Processing...' : 'Proceed to Payment'}
               </button>
 
               <p className="mt-4 text-xs text-center text-[#7D132E]">
-                Credits will be credited immediately after payment
+                I crediti verranno accreditati immediatamente dopo il pagamento
               </p>
             </>
           )}
