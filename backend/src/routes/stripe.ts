@@ -59,7 +59,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
       if (totalAmount < 50) {
         return reply.status(400).send({
           error: 'VALIDATION_ERROR',
-          message: 'Importo minimo è $0.50',
+          message: 'Minimum amount is $0.50',
         });
       }
 

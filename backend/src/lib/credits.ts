@@ -3,7 +3,7 @@ import type { Pool } from 'pg';
 import type { User, IPDailyUsage } from './database.js';
 
 /**
- * Controlla se l'IP ha ancora quota gratuita disponibile oggi
+ * Checks if the IP still has free quota available today
  * @returns (has_quota: bool, remaining: int)
  */
 export async function checkFreeQuotaMemoryFrame(
@@ -20,7 +20,7 @@ export async function checkFreeQuotaMemoryFrame(
   );
 
   if (result.rows.length === 0) {
-    // Nessun record per oggi = quota disponibile
+    // No record for today = quota available
     return { hasQuota: true, remaining: 1 };
   }
 
@@ -34,8 +34,8 @@ export async function checkFreeQuotaMemoryFrame(
 }
 
 /**
- * Usa la quota gratuita per l'IP (1 immagine al giorno)
- * @returns true se successo, false se quota esaurita
+ * Uses free quota for the IP (1 image per day)
+ * @returns true if successful, false if quota exhausted
  */
 export async function useFreeQuotaMemoryFrame(
   db: Pool,
@@ -43,7 +43,7 @@ export async function useFreeQuotaMemoryFrame(
 ): Promise<boolean> {
   const today = new Date().toISOString().split('T')[0];
 
-  // Usa INSERT ... ON CONFLICT ... DO UPDATE per atomicità
+  // Use INSERT ... ON CONFLICT ... DO UPDATE for atomicity
   await db.query(
     `INSERT INTO ip_daily_usage_memory_frame (id, ip_hash, usage_date, free_images_used)
      VALUES ($1, $2, $3, 1)
@@ -57,7 +57,7 @@ export async function useFreeQuotaMemoryFrame(
     [uuidv4(), ipHash, today]
   );
 
-  // Verifica se l'update ha effettivamente incrementato
+  // Verify if the update actually incremented
   const result = await db.query(
     `SELECT free_images_used 
      FROM ip_daily_usage_memory_frame 
@@ -74,7 +74,7 @@ export async function useFreeQuotaMemoryFrame(
 }
 
 /**
- * Controlla se l'utente ha crediti sufficienti
+ * Checks if the user has sufficient credits
  */
 export async function checkUserCreditsMemoryFrame(
   db: Pool,
@@ -95,8 +95,8 @@ export async function checkUserCreditsMemoryFrame(
 }
 
 /**
- * Spende crediti foto per un utente
- * @returns true se successo, false se crediti insufficienti
+ * Spends photo credits for a user
+ * @returns true if successful, false if insufficient credits
  */
 export async function spendCreditsMemoryFrame(
   db: Pool,
@@ -110,7 +110,7 @@ export async function spendCreditsMemoryFrame(
   try {
     await client.query('BEGIN');
 
-    // Verifica crediti disponibili
+    // Verify available credits
     const userResult = await client.query(
       `SELECT credits_photo FROM users_memory_frame WHERE id = $1 FOR UPDATE`,
       [userId]
@@ -127,7 +127,7 @@ export async function spendCreditsMemoryFrame(
       return false;
     }
 
-    // Decrementa crediti
+    // Decrement credits
     await client.query(
       `UPDATE users_memory_frame 
        SET credits_photo = credits_photo - $1, updated_at = CURRENT_TIMESTAMP 
@@ -154,8 +154,8 @@ export async function spendCreditsMemoryFrame(
 }
 
 /**
- * Assegna crediti foto a un utente
- * @returns true se successo
+ * Grants photo credits to a user
+ * @returns true if successful
  */
 export async function grantCreditsMemoryFrame(
   db: Pool,
@@ -169,7 +169,7 @@ export async function grantCreditsMemoryFrame(
   try {
     await client.query('BEGIN');
 
-    // Incrementa crediti
+    // Increment credits
     await client.query(
       `UPDATE users_memory_frame 
        SET credits_photo = credits_photo + $1, updated_at = CURRENT_TIMESTAMP 
@@ -196,7 +196,7 @@ export async function grantCreditsMemoryFrame(
 }
 
 /**
- * Ottiene l'utente dal database
+ * Gets the user from the database
  */
 export async function getUserById(
   db: Pool,
@@ -215,7 +215,7 @@ export async function getUserById(
 }
 
 /**
- * Ottiene o crea un utente per email
+ * Gets or creates a user by email
  */
 export async function getOrCreateUserByEmail(
   db: Pool,
@@ -230,7 +230,7 @@ export async function getOrCreateUserByEmail(
     return result.rows[0] as User;
   }
 
-  // Crea nuovo utente
+  // Create new user
   const userId = uuidv4();
   await db.query(
     `INSERT INTO users_memory_frame (id, email, email_verified, credits_photo)
