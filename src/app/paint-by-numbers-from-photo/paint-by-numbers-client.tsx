@@ -383,8 +383,6 @@ export default function PaintByNumbersClient() {
           paint-by-number, paint by numbers outline, ai paint by numbers
         </p>
       </div>
-
-      <TipModal isOpen={showTipModal} onClose={() => setShowTipModal(false)} />
     </div>
   );
 }

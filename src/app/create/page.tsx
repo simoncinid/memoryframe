@@ -131,7 +131,7 @@ function CreatePageContent() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }, [resultImage, hasShownTipModal]);
+  }, [resultImage]);
 
   const handleReset = useCallback(() => {
     setPersonA(null);
