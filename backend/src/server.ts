@@ -3,9 +3,13 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import { config, validateConfig } from './lib/config.js';
+import { testDatabaseConnection } from './lib/database.js';
 import healthRoutes from './routes/health.js';
 import generateRoutes from './routes/generate.js';
 import paintByNumbersRoutes from './routes/paintByNumbers.js';
+import authRoutes from './routes/auth.js';
+import stripeRoutes from './routes/stripe.js';
+import creditsRoutes from './routes/credits.js';
 
 // Validate configuration on startup before initializing server
 validateConfig();
@@ -19,6 +23,18 @@ const fastify = Fastify({
   },
   trustProxy: true,
   requestTimeout: 120000, // 2 minutes timeout for long AI generation requests
+});
+
+// Supporto rawBody per webhook Stripe
+fastify.addContentTypeParser('application/json', { parseAs: 'buffer' }, (req, body, done) => {
+  try {
+    const rawBody = body as Buffer;
+    (req as any).rawBody = rawBody;
+    const json = JSON.parse(rawBody.toString());
+    done(null, json);
+  } catch (err) {
+    done(err as Error, undefined);
+  }
 });
 
 async function start() {
@@ -45,11 +61,22 @@ async function start() {
       },
     });
 
+    // Test database connection
+    const dbConnected = await testDatabaseConnection();
+    if (!dbConnected) {
+      fastify.log.warn('[Database] Connection test failed - some features may not work');
+    } else {
+      fastify.log.info('[Database] Connection successful');
+    }
+
     // Rate limiting mode info
     fastify.log.info(`Rate limiting: in-memory (single instance)`);
 
     // Register routes
     await fastify.register(healthRoutes);
+    await fastify.register(authRoutes);
+    await fastify.register(stripeRoutes);
+    await fastify.register(creditsRoutes);
     await fastify.register(generateRoutes);
     await fastify.register(paintByNumbersRoutes);
 

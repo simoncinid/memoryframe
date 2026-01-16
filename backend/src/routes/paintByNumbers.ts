@@ -1,10 +1,20 @@
 import type { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import type { MultipartFile } from '@fastify/multipart';
+import { v4 as uuidv4 } from 'uuid';
 import { generateRequestId } from '../lib/id.js';
 import { validateFile, validateDeletePolicy } from '../lib/validation.js';
 import { checkAndReserveSlot, removeReservation, checkIpRateLimit } from '../lib/globalRateLimit.js';
 import { generatePaintByNumbersTemplate } from '../lib/paintByNumbersGenerator.js';
 import { RateLimitError, AppError, formatErrorResponse } from '../lib/errors.js';
+import { getDatabasePool } from '../lib/database.js';
+import { getClientIpMemoryFrame, hashIpMemoryFrame } from '../lib/ip.js';
+import {
+  checkFreeQuotaMemoryFrame,
+  useFreeQuotaMemoryFrame,
+  checkUserCreditsMemoryFrame,
+  spendCreditsMemoryFrame,
+} from '../lib/credits.js';
+import { verifyAccessToken } from '../lib/auth.js';
 import type { FileInfo } from '../types.js';
 
 interface ParsedMultipart {
@@ -35,15 +45,21 @@ async function parseMultipart(request: FastifyRequest): Promise<ParsedMultipart>
 }
 
 const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
+  const db = getDatabasePool();
+
   fastify.post('/api/paint-by-numbers', async (request, reply) => {
     const startTime = Date.now();
-    const clientIp = request.ip;
+    const clientIp = getClientIpMemoryFrame(request);
+    const ipHash = hashIpMemoryFrame(clientIp);
     let requestId = '';
     let reservationMade = false;
+    let jobId: string | null = null;
+    let creditsUsed = false;
 
     try {
       const { files, fields } = await parseMultipart(request);
       requestId = fields.get('client_request_id') || generateRequestId();
+      jobId = uuidv4();
 
       const photo = files.get('photo');
       validateFile(photo, 'photo');
@@ -62,6 +78,81 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
       }
       reservationMade = true;
 
+      // Check authentication and credits
+      const authHeader = request.headers.authorization;
+      let userId: string | null = null;
+      let usedFreeQuota = false;
+
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const payload = verifyAccessToken(token);
+        
+        if (payload && payload.userId) {
+          userId = payload.userId;
+          
+          // Check user credits
+          const hasCredits = await checkUserCreditsMemoryFrame(db, userId, 1);
+          
+          if (hasCredits) {
+            // Spend user credits
+            const spent = await spendCreditsMemoryFrame(
+              db,
+              userId,
+              1,
+              'Paint-by-numbers generation',
+              jobId
+            );
+            
+            if (!spent) {
+              // Fallback to free quota if spending failed
+              const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+              if (hasQuota) {
+                await useFreeQuotaMemoryFrame(db, ipHash);
+                usedFreeQuota = true;
+              } else {
+                return reply.status(402).send({
+                  error: 'INSUFFICIENT_CREDITS',
+                  message: 'Crediti insufficienti. Acquista crediti o usa la quota gratuita domani.',
+                });
+              }
+            } else {
+              creditsUsed = true;
+            }
+          } else {
+            // No credits, try free quota
+            const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+            if (hasQuota) {
+              await useFreeQuotaMemoryFrame(db, ipHash);
+              usedFreeQuota = true;
+            } else {
+              return reply.status(402).send({
+                error: 'INSUFFICIENT_CREDITS',
+                message: 'Crediti insufficienti. Acquista crediti o usa la quota gratuita domani.',
+              });
+            }
+          }
+        }
+      } else {
+        // Anonymous user - check free quota
+        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+        if (hasQuota) {
+          await useFreeQuotaMemoryFrame(db, ipHash);
+          usedFreeQuota = true;
+        } else {
+          return reply.status(402).send({
+            error: 'FREE_QUOTA_EXHAUSTED',
+            message: 'Quota gratuita esaurita. Registrati o acquista crediti per continuare.',
+          });
+        }
+      }
+
+      // Create job in database
+      await db.execute(
+        `INSERT INTO jobs_memory_frame (id, user_id, request_id, type, status)
+         VALUES (?, ?, ?, 'paint_by_numbers', 'processing')`,
+        [jobId, userId, requestId]
+      );
+
       request.log.info(
         {
           request_id: requestId,
@@ -75,9 +166,21 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
 
       const generationTimeMs = Date.now() - startTime;
 
+      // Update job status
+      await db.execute(
+        `UPDATE jobs_memory_frame 
+         SET status = 'completed', completed_at = NOW() 
+         WHERE id = ?`,
+        [jobId]
+      );
+
       request.log.info(
         {
           request_id: requestId,
+          job_id: jobId,
+          user_id: userId,
+          credits_used: creditsUsed,
+          free_quota_used: usedFreeQuota,
           generation_time_ms: generationTimeMs,
           status: 'success',
         },
@@ -95,6 +198,18 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
 
       return reply.status(200).send(response);
     } catch (error) {
+      // Update job status to failed if created
+      if (jobId) {
+        try {
+          await db.execute(
+            `UPDATE jobs_memory_frame SET status = 'failed' WHERE id = ?`,
+            [jobId]
+          );
+        } catch (updateError) {
+          request.log.error({ job_id: jobId, error: updateError }, 'Failed to update job status');
+        }
+      }
+
       if (reservationMade && requestId) {
         try {
           await removeReservation(requestId);

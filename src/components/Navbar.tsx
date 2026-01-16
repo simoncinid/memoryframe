@@ -2,11 +2,33 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { copy } from "@/content/copy";
+import { getUser, isAuthenticated, logout } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (isAuthenticated()) {
+        const userData = await getUser();
+        setUser(userData);
+      }
+      setAuthChecked(true);
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+    router.push('/');
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-200">
@@ -27,7 +49,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {copy.navbar.links.map((link) => (
               <Link
                 key={link.href}
@@ -37,6 +59,39 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {authChecked && (
+              <>
+                {user ? (
+                  <>
+                    <Link
+                      href="/purchase-credits"
+                      className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                    >
+                      Crediti: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
+                    </Link>
+                    <Link
+                      href="/transactions"
+                      className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                    >
+                      Transazioni
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium"
+                  >
+                    Login
+                  </Link>
+                )}
+              </>
+            )}
             <Link
               href="/create"
               className="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2"
@@ -90,6 +145,45 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              {authChecked && (
+                <>
+                  {user ? (
+                    <>
+                      <Link
+                        href="/purchase-credits"
+                        className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Crediti: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
+                      </Link>
+                      <Link
+                        href="/transactions"
+                        className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Transazioni
+                      </Link>
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setIsMenuOpen(false);
+                        }}
+                        className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1 text-left"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="text-stone-600 hover:text-stone-900 transition-colors text-sm font-medium px-2 py-1"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Login
+                    </Link>
+                  )}
+                </>
+              )}
               <Link
                 href="/create"
                 className="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-700 transition-colors text-center"
