@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { login, register, setAuthData } from '@/lib/auth';
 import { useToast } from '@/components/Toast';
 
-export default function LoginPage() {
+export const dynamic = 'force-dynamic';
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
@@ -122,5 +123,17 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF5EB]">
+        <div className="text-[#A4193D]">Caricamento...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
