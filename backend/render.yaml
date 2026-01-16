@@ -25,7 +25,7 @@ services:
           name: memoryframe-redis
           type: redis
           property: connectionString
-      - key: FRONTEND_ORIGIN
+      - key: CORS_ORIGIN
         sync: false
       - key: GLOBAL_LIMIT_PER_HOUR
         value: 10

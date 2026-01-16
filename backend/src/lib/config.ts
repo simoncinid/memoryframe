@@ -29,8 +29,8 @@ export const config = {
     return !!this.redisUrl;
   },
 
-  // CORS
-  frontendOrigin: getEnvOrDefault('FRONTEND_ORIGIN', 'http://localhost:3000'),
+  // CORS (supporta sia CORS_ORIGIN che FRONTEND_ORIGIN per retrocompatibilità)
+  frontendOrigin: process.env.CORS_ORIGIN || getEnvOrDefault('FRONTEND_ORIGIN', 'http://localhost:3000'),
 
   // Rate Limiting
   globalLimitPerHour: getEnvNumber('GLOBAL_LIMIT_PER_HOUR', 10),
