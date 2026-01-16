@@ -21,10 +21,17 @@ export function getDatabasePool(): Pool {
       needsSsl = true;
     }
     
-    // Se CA_FILE è presente, leggilo e usalo
+    // Se CA_FILE è presente, gestiscilo (può essere un percorso o il contenuto del certificato)
     if (config.databaseCaFile) {
       try {
-        sslConfig.ca = readFileSync(config.databaseCaFile).toString();
+        // Se inizia con "-----BEGIN", è il contenuto del certificato stesso
+        if (config.databaseCaFile.trim().startsWith('-----BEGIN')) {
+          // Usa direttamente il contenuto, sostituendo \n con newline reali
+          sslConfig.ca = config.databaseCaFile.replace(/\\n/g, '\n');
+        } else {
+          // Altrimenti, è un percorso a un file
+          sslConfig.ca = readFileSync(config.databaseCaFile).toString();
+        }
         sslConfig.rejectUnauthorized = config.databaseSslRejectUnauthorized;
         needsSsl = true;
       } catch (error) {
