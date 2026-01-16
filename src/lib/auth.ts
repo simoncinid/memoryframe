@@ -63,7 +63,7 @@ export async function register(email: string, password: string): Promise<AuthRes
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Errore durante la registrazione');
+    throw new Error(error.message || 'Error during registration');
   }
 
   return response.json();
@@ -78,7 +78,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Errore durante il login');
+    throw new Error(error.message || 'Error during login');
   }
 
   return response.json();
@@ -174,13 +174,13 @@ export async function verifyEmail(token: string): Promise<void> {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Errore durante la verifica email');
+    throw new Error(error.message || 'Error during email verification');
   }
 }
 
 export async function resendVerificationEmail(): Promise<void> {
   const token = getAccessToken();
-  if (!token) throw new Error('Non autenticato');
+  if (!token) throw new Error('Not authenticated');
 
   const response = await fetch(`${BACKEND_URL}/v1/auth/resend-verification`, {
     method: 'POST',
@@ -191,7 +191,7 @@ export async function resendVerificationEmail(): Promise<void> {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Errore durante l\'invio email');
+    throw new Error(error.message || 'Error sending email');
   }
 }
 
@@ -223,7 +223,7 @@ export async function authenticatedFetch(
       });
     } else {
       clearAuthData();
-      throw new Error('Sessione scaduta. Effettua il login.');
+      throw new Error('Session expired. Please log in.');
     }
   }
 

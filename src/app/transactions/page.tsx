@@ -30,24 +30,24 @@ export default function TransactionsPage() {
       setHasMore(data.transactions.length === 50);
       setOffset((prev) => prev + 50);
     } catch (error) {
-      showToast('Errore durante il caricamento transazioni', 'error');
+      showToast('Error loading transactions', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('it-IT');
+    return new Date(dateString).toLocaleString('en-US');
   };
 
   const getKindLabel = (kind: string) => {
     switch (kind) {
       case 'grant':
-        return 'Accreditato';
+        return 'Credited';
       case 'spend':
-        return 'Speso';
+        return 'Spent';
       case 'refund':
-        return 'Rimborsato';
+        return 'Refunded';
       default:
         return kind;
     }
@@ -76,11 +76,11 @@ export default function TransactionsPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-4xl font-bold text-[#A4193D] mb-8">Le tue transazioni</h1>
+      <h1 className="text-4xl font-bold text-[#A4193D] mb-8">Your transactions</h1>
 
       {transactions.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-[#A4193D]">Nessuna transazione trovata.</p>
+          <p className="text-[#A4193D]">No transactions found.</p>
         </div>
       ) : (
         <>
@@ -95,7 +95,7 @@ export default function TransactionsPage() {
                           {getKindLabel(tx.kind)}
                         </span>
                         <span className="ml-4 text-[#A4193D]">
-                          {tx.photoDelta > 0 ? '+' : ''}{tx.photoDelta} crediti
+                          {tx.photoDelta > 0 ? '+' : ''}{tx.photoDelta} credits
                         </span>
                       </div>
                       <p className="mt-1 text-sm text-[#7D132E]">{tx.reason}</p>
@@ -114,7 +114,7 @@ export default function TransactionsPage() {
                 disabled={loading}
                 className="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
               >
-                {loading ? 'Caricamento...' : 'Carica altre'}
+                {loading ? 'Loading...' : 'Load more'}
               </button>
             </div>
           )}

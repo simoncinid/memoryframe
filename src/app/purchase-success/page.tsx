@@ -47,13 +47,13 @@ function PurchaseSuccessContent() {
     <div className="min-h-screen flex items-center justify-center bg-[#FFF5EB] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 text-center">
         <div className="text-green-600 text-5xl mb-4">✓</div>
-        <h2 className="text-3xl font-bold text-[#A4193D]">Pagamento completato!</h2>
+        <h2 className="text-3xl font-bold text-[#A4193D]">Payment completed!</h2>
         <p className="text-[#A4193D]">
-          I tuoi crediti sono stati accreditati con successo.
+          Your credits have been successfully credited.
         </p>
         {user && (
           <p className="text-lg text-[#A4193D]">
-            Crediti attuali: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
+            Current credits: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
           </p>
         )}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -61,13 +61,13 @@ function PurchaseSuccessContent() {
             href="/purchase-credits"
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Acquista altri crediti
+            Purchase more credits
           </Link>
           <Link
             href="/create"
             className="px-6 py-2 bg-[#FFDFB9] text-[#A4193D] rounded-md hover:bg-gray-300"
           >
-            Crea immagine
+            Create image
           </Link>
         </div>
       </div>

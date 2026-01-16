@@ -19,23 +19,23 @@ function VerifyEmailContent() {
     
     if (!token) {
       setStatus('error');
-      setMessage('Token di verifica mancante');
+      setMessage('Verification token missing');
       return;
     }
 
     verifyEmail(token)
       .then(() => {
         setStatus('success');
-        setMessage('Email verificata con successo!');
-        showToast('Email verificata con successo!', 'success');
+        setMessage('Email verified successfully!');
+        showToast('Email verified successfully!', 'success');
         setTimeout(() => {
           router.push('/login');
         }, 2000);
       })
       .catch((error) => {
         setStatus('error');
-        setMessage(error instanceof Error ? error.message : 'Errore durante la verifica');
-        showToast('Errore durante la verifica email', 'error');
+        setMessage(error instanceof Error ? error.message : 'Error during verification');
+        showToast('Error during email verification', 'error');
       });
   }, [searchParams, router, showToast]);
 
@@ -45,27 +45,27 @@ function VerifyEmailContent() {
         {status === 'loading' && (
           <>
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-[#A4193D]">Verifica email in corso...</p>
+            <p className="text-[#A4193D]">Verifying email...</p>
           </>
         )}
         {status === 'success' && (
           <>
             <div className="text-green-600 text-5xl mb-4">✓</div>
-            <h2 className="text-2xl font-bold text-[#A4193D]">Email verificata!</h2>
+            <h2 className="text-2xl font-bold text-[#A4193D]">Email verified!</h2>
             <p className="text-[#A4193D]">{message}</p>
-            <p className="text-sm text-[#7D132E]">Reindirizzamento al login...</p>
+            <p className="text-sm text-[#7D132E]">Redirecting to login...</p>
           </>
         )}
         {status === 'error' && (
           <>
             <div className="text-red-600 text-5xl mb-4">✗</div>
-            <h2 className="text-2xl font-bold text-[#A4193D]">Errore</h2>
+            <h2 className="text-2xl font-bold text-[#A4193D]">Error</h2>
             <p className="text-[#A4193D]">{message}</p>
             <a
               href="/login"
               className="mt-4 inline-block text-blue-600 hover:text-blue-500"
             >
-              Vai al login
+              Go to login
             </a>
           </>
         )}
@@ -79,7 +79,7 @@ export default function VerifyEmailPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-[#FFF5EB]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="text-[#A4193D] ml-4">Caricamento...</p>
+        <p className="text-[#A4193D] ml-4">Loading...</p>
       </div>
     }>
       <VerifyEmailContent />

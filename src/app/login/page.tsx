@@ -26,12 +26,12 @@ function LoginForm() {
         : await register(email, password);
 
       setAuthData(data);
-      showToast(isLogin ? 'Login effettuato!' : 'Registrazione completata!', 'success');
+      showToast(isLogin ? 'Login successful!' : 'Registration completed!', 'success');
       
       const redirect = searchParams.get('redirect') || '/';
       router.push(redirect);
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Errore durante l\'operazione', 'error');
+      showToast(error instanceof Error ? error.message : 'Error during operation', 'error');
     } finally {
       setLoading(false);
     }
@@ -42,27 +42,27 @@ function LoginForm() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-[#A4193D]">
-            {isLogin ? 'Accedi al tuo account' : 'Crea un nuovo account'}
+            {isLogin ? 'Sign in to your account' : 'Create a new account'}
           </h2>
           <p className="mt-2 text-center text-sm text-[#A4193D]">
             {isLogin ? (
               <>
-                Non hai un account?{' '}
+                Don't have an account?{' '}
                 <button
                   onClick={() => setIsLogin(false)}
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
-                  Registrati
+                  Sign up
                 </button>
               </>
             ) : (
               <>
-                Hai già un account?{' '}
+                Already have an account?{' '}
                 <button
                   onClick={() => setIsLogin(true)}
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
-                  Accedi
+                  Sign in
                 </button>
               </>
             )}
@@ -81,7 +81,7 @@ function LoginForm() {
                 autoComplete="email"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[#FFDFB9] placeholder-gray-500 text-[#A4193D] rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Indirizzo email"
+                placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -107,7 +107,7 @@ function LoginForm() {
 
           {!isLogin && (
             <div className="text-sm text-[#A4193D]">
-              La password deve essere di almeno 8 caratteri.
+              Password must be at least 8 characters long.
             </div>
           )}
 
@@ -117,7 +117,7 @@ function LoginForm() {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Caricamento...' : isLogin ? 'Accedi' : 'Registrati'}
+              {loading ? 'Loading...' : isLogin ? 'Sign in' : 'Sign up'}
             </button>
           </div>
         </form>
@@ -130,7 +130,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-[#FFF5EB]">
-        <div className="text-[#A4193D]">Caricamento...</div>
+        <div className="text-[#A4193D]">Loading...</div>
       </div>
     }>
       <LoginForm />

@@ -67,13 +67,13 @@ export function Navbar() {
                       href="/purchase-credits"
                       className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
                     >
-                      Crediti: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
+                      Credits: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
                     </Link>
                     <Link
                       href="/transactions"
                       className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
                     >
-                      Transazioni
+                      Transactions
                     </Link>
                     <button
                       onClick={handleLogout}
@@ -154,14 +154,14 @@ export function Navbar() {
                         className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Crediti: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
+                        Credits: <span className="font-bold text-blue-600">{user.creditsPhoto}</span>
                       </Link>
                       <Link
                         href="/transactions"
                         className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Transazioni
+                        Transactions
                       </Link>
                       <button
                         onClick={() => {

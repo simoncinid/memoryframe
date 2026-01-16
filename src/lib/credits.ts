@@ -39,7 +39,7 @@ export interface CheckoutResponse {
 export async function getFreeQuota(): Promise<FreeQuota> {
   const response = await fetch(`${BACKEND_URL}/v1/free-quota`);
   if (!response.ok) {
-    throw new Error('Errore durante il recupero quota');
+    throw new Error('Error retrieving quota');
   }
   return response.json();
 }
@@ -53,7 +53,7 @@ export async function getTransactions(limit = 50, offset = 0): Promise<{
     `${BACKEND_URL}/v1/transactions?limit=${limit}&offset=${offset}`
   );
   if (!response.ok) {
-    throw new Error('Errore durante il recupero transazioni');
+    throw new Error('Error retrieving transactions');
   }
   return response.json();
 }
@@ -61,7 +61,7 @@ export async function getTransactions(limit = 50, offset = 0): Promise<{
 export async function getPricing(): Promise<Pricing> {
   const response = await fetch(`${BACKEND_URL}/v1/pricing`);
   if (!response.ok) {
-    throw new Error('Errore durante il recupero prezzi');
+    throw new Error('Error retrieving pricing');
   }
   return response.json();
 }
@@ -75,7 +75,7 @@ export async function createCheckout(photoCredits: number): Promise<CheckoutResp
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Errore durante la creazione checkout');
+    throw new Error(error.message || 'Error creating checkout');
   }
 
   return response.json();
