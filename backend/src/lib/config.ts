@@ -56,6 +56,8 @@ export const config = {
 
   // Database
   databaseUrl: getEnvOrDefault('DATABASE_URL', 'postgres://user:password@localhost:5432/memoryframe_db'),
+  databaseCaFile: process.env.CA_FILE || '',
+  databaseSslRejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== 'false',
 
   // JWT
   jwtSecret: getEnvOrDefault('JWT_SECRET', 'change-me-in-production'),

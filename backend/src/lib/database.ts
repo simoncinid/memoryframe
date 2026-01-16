@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { readFileSync } from 'fs';
 import { config } from './config.js';
 
 let pool: Pool | null = null;
@@ -7,11 +8,41 @@ export function getDatabasePool(): Pool {
   if (!pool) {
     const dbUrl = config.databaseUrl;
     
+    // Configura SSL per PostgreSQL
+    // Su Render e altri provider cloud, PostgreSQL richiede SSL
+    const sslConfig: any = {};
+    let needsSsl = false;
+    
+    // Se la connection string contiene già parametri SSL, rispettali
+    if (dbUrl.includes('sslmode') || dbUrl.includes('ssl=true')) {
+      needsSsl = true;
+    } else if (config.nodeEnv === 'production') {
+      // In produzione, abilita sempre SSL
+      needsSsl = true;
+    }
+    
+    // Se CA_FILE è presente, leggilo e usalo
+    if (config.databaseCaFile) {
+      try {
+        sslConfig.ca = readFileSync(config.databaseCaFile).toString();
+        sslConfig.rejectUnauthorized = config.databaseSslRejectUnauthorized;
+        needsSsl = true;
+      } catch (error) {
+        console.warn('[Database] Failed to read CA_FILE, falling back to rejectUnauthorized:', error);
+        sslConfig.rejectUnauthorized = config.databaseSslRejectUnauthorized;
+      }
+    } else if (needsSsl) {
+      // Se siamo in produzione senza CA_FILE, usa rejectUnauthorized dalla config
+      // Su Render i certificati sono spesso autofirmati, quindi impostiamo false
+      sslConfig.rejectUnauthorized = config.databaseSslRejectUnauthorized;
+    }
+    
     pool = new Pool({
       connectionString: dbUrl,
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,
+      ...(needsSsl ? { ssl: sslConfig } : {}),
     });
 
     pool.on('connect', () => {
