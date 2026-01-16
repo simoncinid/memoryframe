@@ -30,7 +30,7 @@ export default function TransactionsPage() {
       setHasMore(data.transactions.length === 50);
       setOffset((prev) => prev + 50);
     } catch (error) {
-      showToast('error', 'Errore durante il caricamento transazioni');
+      showToast('Errore durante il caricamento transazioni', 'error');
     } finally {
       setLoading(false);
     }

@@ -25,7 +25,7 @@ export default function VerifyEmailPage() {
       .then(() => {
         setStatus('success');
         setMessage('Email verificata con successo!');
-        showToast('success', 'Email verificata con successo!');
+        showToast('Email verificata con successo!', 'success');
         setTimeout(() => {
           router.push('/login');
         }, 2000);
@@ -33,7 +33,7 @@ export default function VerifyEmailPage() {
       .catch((error) => {
         setStatus('error');
         setMessage(error instanceof Error ? error.message : 'Errore durante la verifica');
-        showToast('error', 'Errore durante la verifica email');
+        showToast('Errore durante la verifica email', 'error');
       });
   }, [searchParams, router, showToast]);
 

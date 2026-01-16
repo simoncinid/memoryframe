@@ -48,7 +48,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         });
       }
 
-      const { user, verificationToken } = await createUserMemoryFrame(db, email, password);
+      const { user } = await createUserMemoryFrame(db, email, password);
 
       const accessToken = generateAccessToken({
         userId: user.id,

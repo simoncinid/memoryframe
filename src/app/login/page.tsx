@@ -25,12 +25,12 @@ export default function LoginPage() {
         : await register(email, password);
 
       setAuthData(data);
-      showToast('success', isLogin ? 'Login effettuato!' : 'Registrazione completata!');
+      showToast(isLogin ? 'Login effettuato!' : 'Registrazione completata!', 'success');
       
       const redirect = searchParams.get('redirect') || '/';
       router.push(redirect);
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : 'Errore durante l\'operazione');
+      showToast(error instanceof Error ? error.message : 'Errore durante l\'operazione', 'error');
     } finally {
       setLoading(false);
     }

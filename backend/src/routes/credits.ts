@@ -2,7 +2,6 @@ import type { FastifyPluginAsync } from 'fastify';
 import { getDatabasePool } from '../lib/database.js';
 import {
   checkFreeQuotaMemoryFrame,
-  checkUserCreditsMemoryFrame,
 } from '../lib/credits.js';
 import { getClientIpMemoryFrame, hashIpMemoryFrame } from '../lib/ip.js';
 import { verifyAccessToken } from '../lib/auth.js';

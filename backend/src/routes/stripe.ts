@@ -2,12 +2,12 @@ import type { FastifyPluginAsync } from 'fastify';
 import Stripe from 'stripe';
 import { getDatabasePool } from '../lib/database.js';
 import { config } from '../lib/config.js';
-import { grantCreditsMemoryFrame, getOrCreateUserByEmail, getUserById } from '../lib/credits.js';
+import { grantCreditsMemoryFrame, getUserById } from '../lib/credits.js';
 import { verifyAccessToken } from '../lib/auth.js';
 import mysql from 'mysql2/promise';
 
 const stripe = new Stripe(config.stripeSecretKey, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-02-24.acacia',
 });
 
 const stripeRoutes: FastifyPluginAsync = async (fastify) => {
@@ -153,7 +153,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
         config.stripeWebhookSecret
       );
     } catch (err) {
-      request.log.error('Webhook signature verification failed:', err);
+      request.log.error({ err }, 'Webhook signature verification failed');
       return reply.status(400).send({
         error: 'INVALID_SIGNATURE',
         message: 'Firma webhook non valida',
@@ -184,7 +184,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
           const userId = metadata.user_id;
 
           if (!userId || photoCredits <= 0) {
-            request.log.error('Metadata invalide nel webhook:', metadata);
+            request.log.error({ metadata }, 'Metadata invalide nel webhook');
             return reply.status(400).send({
               error: 'INVALID_METADATA',
               message: 'Metadata non valide',
@@ -228,11 +228,11 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
 
           return reply.status(200).send({ status: 'ok' });
         } else {
-          request.log.warn('Tipo webhook non supportato:', metadata?.type);
+          request.log.warn({ type: metadata?.type }, 'Tipo webhook non supportato');
           return reply.status(200).send({ status: 'ok', message: 'Unsupported type' });
         }
       } catch (error) {
-        request.log.error('Errore processando webhook:', error);
+        request.log.error({ error }, 'Errore processando webhook');
         return reply.status(500).send({
           error: 'INTERNAL_ERROR',
           message: 'Errore processando webhook',
@@ -245,7 +245,7 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // Endpoint pricing
-  fastify.get('/v1/pricing', async (request, reply) => {
+  fastify.get('/v1/pricing', async (_request, reply) => {
     const pricePerCredit = config.pricePerPhotoCredit / 100; // in dollari
 
     return reply.status(200).send({

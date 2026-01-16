@@ -20,12 +20,12 @@ export function getDatabasePool(): mysql.Pool {
       keepAliveInitialDelay: 0,
     });
 
-    pool.on('connection', (connection) => {
+    pool.on('connection', () => {
       console.log('[Database] New connection established');
     });
 
-    pool.on('error', (err) => {
-      console.error('[Database] Pool error:', err);
+    pool.on('error', (err: Error) => {
+      console.error('[Database] Pool error:', err.message);
     });
   }
 

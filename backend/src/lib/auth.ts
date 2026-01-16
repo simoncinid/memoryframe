@@ -4,8 +4,7 @@ import jwt from 'jsonwebtoken';
 import type { Pool } from 'mysql2/promise';
 import mysql from 'mysql2/promise';
 import { config } from './config.js';
-import { getDatabasePool } from './database.js';
-import type { User, RefreshToken } from './database.js';
+import type { User } from './database.js';
 import { sendVerificationEmail } from './email.js';
 
 export interface JWTPayload {
@@ -279,7 +278,9 @@ export async function resendVerificationEmailMemoryFrame(
   );
 
   // Invia email
-  await sendVerificationEmail(user.email, verificationToken);
+  if (user.email) {
+    await sendVerificationEmail(user.email, verificationToken);
+  }
 
   return true;
 }

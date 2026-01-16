@@ -31,7 +31,7 @@ export default function PurchaseCreditsPage() {
         setPricing(pricingData);
         setUser(userData);
       } catch (error) {
-        showToast('error', 'Errore durante il caricamento dati');
+        showToast('Errore durante il caricamento dati', 'error');
       } finally {
         setLoading(false);
       }
@@ -51,7 +51,7 @@ export default function PurchaseCreditsPage() {
       const checkout = await createCheckout(credits);
       window.location.href = checkout.url;
     } catch (error) {
-      showToast('error', error instanceof Error ? error.message : 'Errore durante la creazione checkout');
+      showToast(error instanceof Error ? error.message : 'Errore durante la creazione checkout', 'error');
       setProcessing(false);
     }
   };

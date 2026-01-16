@@ -1,8 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { Pool } from 'mysql2/promise';
 import mysql from 'mysql2/promise';
-import { getDatabasePool } from './database.js';
-import type { User, IPDailyUsage, CreditTransaction } from './database.js';
+import type { User, IPDailyUsage } from './database.js';
 
 /**
  * Controlla se l'IP ha ancora quota gratuita disponibile oggi
@@ -46,7 +45,7 @@ export async function useFreeQuotaMemoryFrame(
   const today = new Date().toISOString().split('T')[0];
 
   // Usa INSERT ... ON DUPLICATE KEY UPDATE per atomicità
-  const [result] = await db.execute(
+  await db.execute(
     `INSERT INTO ip_daily_usage_memory_frame (id, ip_hash, usage_date, free_images_used)
      VALUES (?, ?, ?, 1)
      ON DUPLICATE KEY UPDATE
