@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import type { Pool } from 'pg';
 import { config } from './config.js';
 import type { User } from './database.js';
@@ -96,8 +96,8 @@ export async function verifyUserCredentialsMemoryFrame(
  */
 export function generateAccessToken(payload: JWTPayload): string {
   return jwt.sign(payload, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
-  });
+    expiresIn: String(config.jwtExpiresIn),
+  } as SignOptions);
 }
 
 /**
@@ -109,8 +109,8 @@ export async function generateRefreshTokenMemoryFrame(
 ): Promise<string> {
   const tokenId = uuidv4();
   const token = jwt.sign({ userId, tokenId }, config.jwtSecret, {
-    expiresIn: config.jwtRefreshExpiresIn,
-  });
+    expiresIn: String(config.jwtRefreshExpiresIn),
+  } as SignOptions);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30); // 30 giorni

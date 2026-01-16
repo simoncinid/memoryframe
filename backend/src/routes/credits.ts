@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { getDatabasePool } from '../lib/database.js';
+import { getDatabasePool, type CreditTransaction } from '../lib/database.js';
 import {
   checkFreeQuotaMemoryFrame,
 } from '../lib/credits.js';
@@ -64,7 +64,7 @@ const creditsRoutes: FastifyPluginAsync = async (fastify) => {
       );
 
       return reply.status(200).send({
-        transactions: result.rows.map((row) => ({
+        transactions: result.rows.map((row: Pick<CreditTransaction, 'id' | 'kind' | 'photo_delta' | 'reason' | 'stripe_event_id' | 'job_id' | 'created_at'>) => ({
           id: row.id,
           kind: row.kind,
           photoDelta: row.photo_delta,
