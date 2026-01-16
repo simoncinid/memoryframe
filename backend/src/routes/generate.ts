@@ -175,9 +175,9 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // Create job in database
-      await db.execute(
+      await db.query(
         `INSERT INTO jobs_memory_frame (id, user_id, request_id, type, status)
-         VALUES (?, ?, ?, 't2i', 'processing')`,
+         VALUES ($1, $2, $3, 't2i', 'processing')`,
         [jobId, userId, requestId]
       );
 
@@ -210,10 +210,10 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
       const generationTimeMs = Date.now() - startTime;
 
       // Update job status
-      await db.execute(
+      await db.query(
         `UPDATE jobs_memory_frame 
          SET status = 'completed', completed_at = NOW() 
-         WHERE id = ?`,
+         WHERE id = $1`,
         [jobId]
       );
 
@@ -241,8 +241,8 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
       // Update job status to failed if created
       if (jobId) {
         try {
-          await db.execute(
-            `UPDATE jobs_memory_frame SET status = 'failed' WHERE id = ?`,
+          await db.query(
+            `UPDATE jobs_memory_frame SET status = 'failed' WHERE id = $1`,
             [jobId]
           );
         } catch (updateError) {

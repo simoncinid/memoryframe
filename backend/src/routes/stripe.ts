@@ -4,7 +4,6 @@ import { getDatabasePool } from '../lib/database.js';
 import { config } from '../lib/config.js';
 import { grantCreditsMemoryFrame, getUserById } from '../lib/credits.js';
 import { verifyAccessToken } from '../lib/auth.js';
-import mysql from 'mysql2/promise';
 
 const stripe = new Stripe(config.stripeSecretKey, {
   apiVersion: '2025-02-24.acacia',
@@ -77,8 +76,8 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
         customerId = customer.id;
 
         // Salva customer ID
-        await db.execute(
-          `UPDATE users_memory_frame SET stripe_customer_id = ? WHERE id = ?`,
+        await db.query(
+          `UPDATE users_memory_frame SET stripe_customer_id = $1 WHERE id = $2`,
           [customerId, user.id]
         );
       }
@@ -166,13 +165,13 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
 
       try {
         // Controlla duplicati
-        const [existing] = await db.execute<mysql.RowDataPacket[]>(
+        const existingResult = await db.query(
           `SELECT id FROM credit_transactions_memory_frame 
-           WHERE stripe_event_id = ?`,
+           WHERE stripe_event_id = $1`,
           [event.id]
         );
 
-        if (existing.length > 0) {
+        if (existingResult.rows.length > 0) {
           request.log.info(`Webhook già processato: ${event.id}`);
           return reply.status(200).send({ status: 'ok', message: 'Already processed' });
         }
@@ -203,8 +202,8 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
 
           // Aggiorna stripe_customer_id se disponibile
           if (session.customer && typeof session.customer === 'string') {
-            await db.execute(
-              `UPDATE users_memory_frame SET stripe_customer_id = ? WHERE id = ?`,
+            await db.query(
+              `UPDATE users_memory_frame SET stripe_customer_id = $1 WHERE id = $2`,
               [session.customer, userId]
             );
           }

@@ -55,7 +55,7 @@ export const config = {
   },
 
   // Database
-  databaseUrl: getEnvOrDefault('DATABASE_URL', 'mysql://user:password@localhost:3306/memoryframe_db'),
+  databaseUrl: getEnvOrDefault('DATABASE_URL', 'postgres://user:password@localhost:5432/memoryframe_db'),
 
   // JWT
   jwtSecret: getEnvOrDefault('JWT_SECRET', 'change-me-in-production'),

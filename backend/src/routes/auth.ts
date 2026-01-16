@@ -36,12 +36,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       // Verifica se email esiste già
-      const [existing] = await db.execute(
-        `SELECT id FROM users_memory_frame WHERE email = ?`,
+      const existingResult = await db.query(
+        `SELECT id FROM users_memory_frame WHERE email = $1`,
         [email]
       );
 
-      if (Array.isArray(existing) && existing.length > 0) {
+      if (existingResult.rows.length > 0) {
         return reply.status(409).send({
           error: 'EMAIL_EXISTS',
           message: 'Questa email è già registrata',

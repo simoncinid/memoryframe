@@ -1,8 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import type { Pool } from 'mysql2/promise';
-import mysql from 'mysql2/promise';
+import type { Pool } from 'pg';
 import { config } from './config.js';
 import type { User } from './database.js';
 import { sendVerificationEmail } from './email.js';
@@ -34,26 +33,26 @@ export async function createUserMemoryFrame(
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24); // 24 ore
 
-  await db.execute(
+  await db.query(
     `INSERT INTO users_memory_frame 
      (id, email, password_hash, email_verified, email_verification_token, email_verification_expires_at, credits_photo)
-     VALUES (?, ?, ?, FALSE, ?, ?, 0)`,
+     VALUES ($1, $2, $3, FALSE, $4, $5, 0)`,
     [userId, email, passwordHash, verificationToken, expiresAt]
   );
 
   // Crea record email verification
-  await db.execute(
+  await db.query(
     `INSERT INTO email_verifications_memory_frame (id, user_id, token, expires_at)
-     VALUES (?, ?, ?, ?)`,
+     VALUES ($1, $2, $3, $4)`,
     [uuidv4(), userId, verificationToken, expiresAt]
   );
 
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
-    `SELECT * FROM users_memory_frame WHERE id = ?`,
+  const result = await db.query(
+    `SELECT * FROM users_memory_frame WHERE id = $1`,
     [userId]
   );
 
-  const user = rows[0] as User;
+  const user = result.rows[0] as User;
 
   // Invia email di verifica
   await sendVerificationEmail(email, verificationToken);
@@ -69,16 +68,16 @@ export async function verifyUserCredentialsMemoryFrame(
   email: string,
   password: string
 ): Promise<User | null> {
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
-    `SELECT * FROM users_memory_frame WHERE email = ?`,
+  const result = await db.query(
+    `SELECT * FROM users_memory_frame WHERE email = $1`,
     [email]
   );
 
-  if (rows.length === 0) {
+  if (result.rows.length === 0) {
     return null;
   }
 
-  const user = rows[0] as User;
+  const user = result.rows[0] as User;
 
   if (!user.password_hash) {
     return null;
@@ -116,9 +115,9 @@ export async function generateRefreshTokenMemoryFrame(
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30); // 30 giorni
 
-  await db.execute(
+  await db.query(
     `INSERT INTO refresh_tokens_memory_frame (id, user_id, token, expires_at)
-     VALUES (?, ?, ?, ?)`,
+     VALUES ($1, $2, $3, $4)`,
     [tokenId, userId, token, expiresAt]
   );
 
@@ -149,27 +148,27 @@ export async function refreshAccessTokenMemoryFrame(
     const decoded = jwt.verify(refreshToken, config.jwtSecret) as { userId: string; tokenId: string };
 
     // Verifica che esista nel database
-    const [rows] = await db.execute<mysql.RowDataPacket[]>(
+    const result = await db.query(
       `SELECT * FROM refresh_tokens_memory_frame 
-       WHERE id = ? AND token = ? AND expires_at > NOW()`,
+       WHERE id = $1 AND token = $2 AND expires_at > NOW()`,
       [decoded.tokenId, refreshToken]
     );
 
-    if (rows.length === 0) {
+    if (result.rows.length === 0) {
       return null;
     }
 
     // Carica utente
-    const [userRows] = await db.execute<mysql.RowDataPacket[]>(
-      `SELECT * FROM users_memory_frame WHERE id = ?`,
+    const userResult = await db.query(
+      `SELECT * FROM users_memory_frame WHERE id = $1`,
       [decoded.userId]
     );
 
-    if (userRows.length === 0) {
+    if (userResult.rows.length === 0) {
       return null;
     }
 
-    const user = userRows[0] as User;
+    const user = userResult.rows[0] as User;
 
     // Genera nuovo access token
     const accessToken = generateAccessToken({
@@ -182,8 +181,8 @@ export async function refreshAccessTokenMemoryFrame(
     const newRefreshToken = await generateRefreshTokenMemoryFrame(db, user.id);
 
     // Elimina vecchio refresh token
-    await db.execute(
-      `DELETE FROM refresh_tokens_memory_frame WHERE id = ?`,
+    await db.query(
+      `DELETE FROM refresh_tokens_memory_frame WHERE id = $1`,
       [decoded.tokenId]
     );
 
@@ -200,35 +199,35 @@ export async function verifyEmailMemoryFrame(
   db: Pool,
   token: string
 ): Promise<boolean> {
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
+  const result = await db.query(
     `SELECT ev.*, u.id as user_id
      FROM email_verifications_memory_frame ev
      JOIN users_memory_frame u ON ev.user_id = u.id
-     WHERE ev.token = ? AND ev.expires_at > NOW() AND ev.verified_at IS NULL`,
+     WHERE ev.token = $1 AND ev.expires_at > NOW() AND ev.verified_at IS NULL`,
     [token]
   );
 
-  if (rows.length === 0) {
+  if (result.rows.length === 0) {
     return false;
   }
 
-  const verification = rows[0];
+  const verification = result.rows[0];
 
   // Aggiorna utente
-  await db.execute(
+  await db.query(
     `UPDATE users_memory_frame 
      SET email_verified = TRUE, 
          email_verification_token = NULL,
          email_verification_expires_at = NULL
-     WHERE id = ?`,
+     WHERE id = $1`,
     [verification.user_id]
   );
 
   // Marca verifica come completata
-  await db.execute(
+  await db.query(
     `UPDATE email_verifications_memory_frame 
      SET verified_at = NOW() 
-     WHERE id = ?`,
+     WHERE id = $1`,
     [verification.id]
   );
 
@@ -242,16 +241,16 @@ export async function resendVerificationEmailMemoryFrame(
   db: Pool,
   userId: string
 ): Promise<boolean> {
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
-    `SELECT * FROM users_memory_frame WHERE id = ?`,
+  const result = await db.query(
+    `SELECT * FROM users_memory_frame WHERE id = $1`,
     [userId]
   );
 
-  if (rows.length === 0 || !rows[0].email) {
+  if (result.rows.length === 0 || !result.rows[0].email) {
     return false;
   }
 
-  const user = rows[0] as User;
+  const user = result.rows[0] as User;
 
   if (user.email_verified) {
     return false; // Già verificato
@@ -262,18 +261,18 @@ export async function resendVerificationEmailMemoryFrame(
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 24);
 
-  await db.execute(
+  await db.query(
     `UPDATE users_memory_frame 
-     SET email_verification_token = ?, 
-         email_verification_expires_at = ?
-     WHERE id = ?`,
+     SET email_verification_token = $1, 
+         email_verification_expires_at = $2
+     WHERE id = $3`,
     [verificationToken, expiresAt, userId]
   );
 
   // Crea nuovo record verifica
-  await db.execute(
+  await db.query(
     `INSERT INTO email_verifications_memory_frame (id, user_id, token, expires_at)
-     VALUES (?, ?, ?, ?)`,
+     VALUES ($1, $2, $3, $4)`,
     [uuidv4(), userId, verificationToken, expiresAt]
   );
 
@@ -294,8 +293,8 @@ export async function logoutMemoryFrame(
 ): Promise<boolean> {
   try {
     const decoded = jwt.verify(refreshToken, config.jwtSecret) as { tokenId: string };
-    await db.execute(
-      `DELETE FROM refresh_tokens_memory_frame WHERE id = ?`,
+    await db.query(
+      `DELETE FROM refresh_tokens_memory_frame WHERE id = $1`,
       [decoded.tokenId]
     );
     return true;

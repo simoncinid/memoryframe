@@ -5,7 +5,6 @@ import {
 } from '../lib/credits.js';
 import { getClientIpMemoryFrame, hashIpMemoryFrame } from '../lib/ip.js';
 import { verifyAccessToken } from '../lib/auth.js';
-import mysql from 'mysql2/promise';
 
 const creditsRoutes: FastifyPluginAsync = async (fastify) => {
   const db = getDatabasePool();
@@ -55,17 +54,17 @@ const creditsRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { limit = 50, offset = 0 } = request.query as { limit?: number; offset?: number };
 
-      const [rows] = await db.execute<mysql.RowDataPacket[]>(
+      const result = await db.query(
         `SELECT id, kind, photo_delta, reason, stripe_event_id, job_id, created_at
          FROM credit_transactions_memory_frame
-         WHERE user_id = ?
+         WHERE user_id = $1
          ORDER BY created_at DESC
-         LIMIT ? OFFSET ?`,
+         LIMIT $2 OFFSET $3`,
         [payload.userId, limit, offset]
       );
 
       return reply.status(200).send({
-        transactions: rows.map((row) => ({
+        transactions: result.rows.map((row) => ({
           id: row.id,
           kind: row.kind,
           photoDelta: row.photo_delta,

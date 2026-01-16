@@ -1,26 +1,20 @@
-import mysql from 'mysql2/promise';
+import { Pool } from 'pg';
 import { config } from './config.js';
 
-let pool: mysql.Pool | null = null;
+let pool: Pool | null = null;
 
-export function getDatabasePool(): mysql.Pool {
+export function getDatabasePool(): Pool {
   if (!pool) {
-    const dbUrl = new URL(config.databaseUrl);
+    const dbUrl = config.databaseUrl;
     
-    pool = mysql.createPool({
-      host: dbUrl.hostname,
-      port: parseInt(dbUrl.port || '3306', 10),
-      user: dbUrl.username,
-      password: dbUrl.password,
-      database: dbUrl.pathname.slice(1), // Remove leading /
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-      enableKeepAlive: true,
-      keepAliveInitialDelay: 0,
+    pool = new Pool({
+      connectionString: dbUrl,
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
     });
 
-    pool.on('connection', () => {
+    pool.on('connect', () => {
       console.log('[Database] New connection established');
     });
 
@@ -35,8 +29,8 @@ export function getDatabasePool(): mysql.Pool {
 export async function testDatabaseConnection(): Promise<boolean> {
   try {
     const pool = getDatabasePool();
-    const [rows] = await pool.execute('SELECT 1 as test');
-    return Array.isArray(rows) && rows.length > 0;
+    const result = await pool.query('SELECT 1 as test');
+    return result.rows.length > 0;
   } catch (error) {
     console.error('[Database] Connection test failed:', error);
     return false;

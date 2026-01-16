@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { Pool } from 'mysql2/promise';
-import mysql from 'mysql2/promise';
+import type { Pool } from 'pg';
 import type { User, IPDailyUsage } from './database.js';
 
 /**
@@ -13,19 +12,19 @@ export async function checkFreeQuotaMemoryFrame(
 ): Promise<{ hasQuota: boolean; remaining: number }> {
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
+  const result = await db.query(
     `SELECT free_images_used 
      FROM ip_daily_usage_memory_frame 
-     WHERE ip_hash = ? AND usage_date = ?`,
+     WHERE ip_hash = $1 AND usage_date = $2`,
     [ipHash, today]
   );
 
-  if (rows.length === 0) {
+  if (result.rows.length === 0) {
     // Nessun record per oggi = quota disponibile
     return { hasQuota: true, remaining: 1 };
   }
 
-  const usage = rows[0] as IPDailyUsage;
+  const usage = result.rows[0] as IPDailyUsage;
   const remaining = Math.max(0, 1 - usage.free_images_used);
 
   return {
@@ -44,29 +43,33 @@ export async function useFreeQuotaMemoryFrame(
 ): Promise<boolean> {
   const today = new Date().toISOString().split('T')[0];
 
-  // Usa INSERT ... ON DUPLICATE KEY UPDATE per atomicità
-  await db.execute(
+  // Usa INSERT ... ON CONFLICT ... DO UPDATE per atomicità
+  await db.query(
     `INSERT INTO ip_daily_usage_memory_frame (id, ip_hash, usage_date, free_images_used)
-     VALUES (?, ?, ?, 1)
-     ON DUPLICATE KEY UPDATE
-       free_images_used = IF(free_images_used >= 1, free_images_used, free_images_used + 1),
+     VALUES ($1, $2, $3, 1)
+     ON CONFLICT (ip_hash, usage_date) DO UPDATE
+       SET free_images_used = CASE 
+         WHEN ip_daily_usage_memory_frame.free_images_used >= 1 
+         THEN ip_daily_usage_memory_frame.free_images_used 
+         ELSE ip_daily_usage_memory_frame.free_images_used + 1 
+       END,
        updated_at = CURRENT_TIMESTAMP`,
     [uuidv4(), ipHash, today]
   );
 
   // Verifica se l'update ha effettivamente incrementato
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
+  const result = await db.query(
     `SELECT free_images_used 
      FROM ip_daily_usage_memory_frame 
-     WHERE ip_hash = ? AND usage_date = ?`,
+     WHERE ip_hash = $1 AND usage_date = $2`,
     [ipHash, today]
   );
 
-  if (rows.length === 0) {
+  if (result.rows.length === 0) {
     return false;
   }
 
-  const usage = rows[0] as IPDailyUsage;
+  const usage = result.rows[0] as IPDailyUsage;
   return usage.free_images_used <= 1;
 }
 
@@ -78,16 +81,16 @@ export async function checkUserCreditsMemoryFrame(
   userId: string,
   photoNeeded: number = 0
 ): Promise<boolean> {
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
-    `SELECT credits_photo FROM users_memory_frame WHERE id = ?`,
+  const result = await db.query(
+    `SELECT credits_photo FROM users_memory_frame WHERE id = $1`,
     [userId]
   );
 
-  if (rows.length === 0) {
+  if (result.rows.length === 0) {
     return false;
   }
 
-  const user = rows[0] as User;
+  const user = result.rows[0] as User;
   return photoNeeded === 0 || user.credits_photo >= photoNeeded;
 }
 
@@ -102,51 +105,51 @@ export async function spendCreditsMemoryFrame(
   reason: string,
   jobId: string | null = null
 ): Promise<boolean> {
-  const connection = await db.getConnection();
+  const client = await db.connect();
   
   try {
-    await connection.beginTransaction();
+    await client.query('BEGIN');
 
     // Verifica crediti disponibili
-    const [userRows] = await connection.execute<mysql.RowDataPacket[]>(
-      `SELECT credits_photo FROM users_memory_frame WHERE id = ? FOR UPDATE`,
+    const userResult = await client.query(
+      `SELECT credits_photo FROM users_memory_frame WHERE id = $1 FOR UPDATE`,
       [userId]
     );
 
-    if (userRows.length === 0) {
-      await connection.rollback();
+    if (userResult.rows.length === 0) {
+      await client.query('ROLLBACK');
       return false;
     }
 
-    const user = userRows[0] as User;
+    const user = userResult.rows[0] as User;
     if (user.credits_photo < photoAmount) {
-      await connection.rollback();
+      await client.query('ROLLBACK');
       return false;
     }
 
     // Decrementa crediti
-    await connection.execute(
+    await client.query(
       `UPDATE users_memory_frame 
-       SET credits_photo = credits_photo - ?, updated_at = CURRENT_TIMESTAMP 
-       WHERE id = ?`,
+       SET credits_photo = credits_photo - $1, updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $2`,
       [photoAmount, userId]
     );
 
     // Crea transazione
-    await connection.execute(
+    await client.query(
       `INSERT INTO credit_transactions_memory_frame 
        (id, user_id, kind, photo_delta, reason, job_id)
-       VALUES (?, ?, 'spend', ?, ?, ?)`,
+       VALUES ($1, $2, 'spend', $3, $4, $5)`,
       [uuidv4(), userId, -photoAmount, reason, jobId]
     );
 
-    await connection.commit();
+    await client.query('COMMIT');
     return true;
   } catch (error) {
-    await connection.rollback();
+    await client.query('ROLLBACK');
     throw error;
   } finally {
-    connection.release();
+    client.release();
   }
 }
 
@@ -161,34 +164,34 @@ export async function grantCreditsMemoryFrame(
   reason: string,
   stripeEventId: string | null = null
 ): Promise<boolean> {
-  const connection = await db.getConnection();
+  const client = await db.connect();
   
   try {
-    await connection.beginTransaction();
+    await client.query('BEGIN');
 
     // Incrementa crediti
-    await connection.execute(
+    await client.query(
       `UPDATE users_memory_frame 
-       SET credits_photo = credits_photo + ?, updated_at = CURRENT_TIMESTAMP 
-       WHERE id = ?`,
+       SET credits_photo = credits_photo + $1, updated_at = CURRENT_TIMESTAMP 
+       WHERE id = $2`,
       [photoAmount, userId]
     );
 
     // Crea transazione
-    await connection.execute(
+    await client.query(
       `INSERT INTO credit_transactions_memory_frame 
        (id, user_id, kind, photo_delta, reason, stripe_event_id)
-       VALUES (?, ?, 'grant', ?, ?, ?)`,
+       VALUES ($1, $2, 'grant', $3, $4, $5)`,
       [uuidv4(), userId, photoAmount, reason, stripeEventId]
     );
 
-    await connection.commit();
+    await client.query('COMMIT');
     return true;
   } catch (error) {
-    await connection.rollback();
+    await client.query('ROLLBACK');
     throw error;
   } finally {
-    connection.release();
+    client.release();
   }
 }
 
@@ -199,16 +202,16 @@ export async function getUserById(
   db: Pool,
   userId: string
 ): Promise<User | null> {
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
-    `SELECT * FROM users_memory_frame WHERE id = ?`,
+  const result = await db.query(
+    `SELECT * FROM users_memory_frame WHERE id = $1`,
     [userId]
   );
 
-  if (rows.length === 0) {
+  if (result.rows.length === 0) {
     return null;
   }
 
-  return rows[0] as User;
+  return result.rows[0] as User;
 }
 
 /**
@@ -218,27 +221,27 @@ export async function getOrCreateUserByEmail(
   db: Pool,
   email: string
 ): Promise<User> {
-  const [rows] = await db.execute<mysql.RowDataPacket[]>(
-    `SELECT * FROM users_memory_frame WHERE email = ?`,
+  const result = await db.query(
+    `SELECT * FROM users_memory_frame WHERE email = $1`,
     [email]
   );
 
-  if (rows.length > 0) {
-    return rows[0] as User;
+  if (result.rows.length > 0) {
+    return result.rows[0] as User;
   }
 
   // Crea nuovo utente
   const userId = uuidv4();
-  await db.execute(
+  await db.query(
     `INSERT INTO users_memory_frame (id, email, email_verified, credits_photo)
-     VALUES (?, ?, FALSE, 0)`,
+     VALUES ($1, $2, FALSE, 0)`,
     [userId, email]
   );
 
-  const [newRows] = await db.execute<mysql.RowDataPacket[]>(
-    `SELECT * FROM users_memory_frame WHERE id = ?`,
+  const newResult = await db.query(
+    `SELECT * FROM users_memory_frame WHERE id = $1`,
     [userId]
   );
 
-  return newRows[0] as User;
+  return newResult.rows[0] as User;
 }
