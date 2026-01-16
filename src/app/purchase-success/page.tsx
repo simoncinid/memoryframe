@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 
-export default function PurchaseSuccessPage() {
+export const dynamic = 'force-dynamic';
+
+function PurchaseSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -70,5 +72,17 @@ export default function PurchaseSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PurchaseSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF5EB]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <PurchaseSuccessContent />
+    </Suspense>
   );
 }

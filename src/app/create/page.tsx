@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
 import Image from "next/image";
 import { Stepper } from "@/components/Stepper";
 import { UploadDropzone } from "@/components/UploadDropzone";
