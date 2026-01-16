@@ -53,12 +53,48 @@ export const config = {
   get isMockMode() {
     return !this.seedreamApiKey;
   },
+
+  // Database
+  databaseUrl: getEnvOrDefault('DATABASE_URL', 'mysql://user:password@localhost:3306/memoryframe_db'),
+
+  // JWT
+  jwtSecret: getEnvOrDefault('JWT_SECRET', 'change-me-in-production'),
+  jwtExpiresIn: getEnvOrDefault('JWT_EXPIRES_IN', '7d'),
+  jwtRefreshExpiresIn: getEnvOrDefault('JWT_REFRESH_EXPIRES_IN', '30d'),
+
+  // IP Hashing
+  ipSalt: getEnvOrDefault('IP_SALT', 'change-me-in-production'),
+
+  // Stripe
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+
+  // Email
+  smtpHost: getEnvOrDefault('SMTP_HOST', 'smtp.gmail.com'),
+  smtpPort: getEnvNumber('SMTP_PORT', 587),
+  smtpUser: getEnvOrDefault('SMTP_USER', ''),
+  smtpPass: getEnvOrDefault('SMTP_PASS', ''),
+  emailFrom: getEnvOrDefault('EMAIL_FROM', 'noreply@memoryframe.com'),
+  emailFromName: getEnvOrDefault('EMAIL_FROM_NAME', 'MemoryFrame'),
+
+  // Pricing
+  pricePerPhotoCredit: getEnvNumber('PRICE_PER_PHOTO_CREDIT', 19), // in centesimi
 } as const;
 
 export function validateConfig(): void {
   // Warn if Redis is not configured in production
   if (config.nodeEnv === 'production' && !config.useRedis) {
     console.warn('[Config] REDIS_URL not set - using in-memory rate limiting (not suitable for multiple instances)');
+  }
+
+  // Warn if database is not configured
+  if (config.nodeEnv === 'production' && config.databaseUrl.includes('localhost')) {
+    console.warn('[Config] DATABASE_URL appears to be using localhost - check configuration');
+  }
+
+  // Warn if JWT secret is default
+  if (config.jwtSecret === 'change-me-in-production') {
+    console.warn('[Config] JWT_SECRET is using default value - change in production!');
   }
 }
 

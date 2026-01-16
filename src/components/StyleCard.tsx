@@ -68,7 +68,7 @@ function getStyleGradient(styleId: string): string {
     vintage: "bg-gradient-to-br from-amber-600 to-amber-800",
     blackwhite: "bg-gradient-to-br from-gray-600 to-gray-900",
     watercolor: "bg-gradient-to-br from-sky-400 to-blue-600",
-    "pop-art": "bg-gradient-to-br from-pink-500 to-purple-700",
+    "pop-art": "bg-gradient-to-br from-[#A4193D] to-[#7D132E]",
     renaissance: "bg-gradient-to-br from-yellow-700 to-amber-900",
   };
   return gradients[styleId] || "bg-gradient-to-br from-stone-500 to-stone-700";

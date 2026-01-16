@@ -198,7 +198,7 @@ function MemePageContent() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero Section */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 mb-4">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-[#A4193D] to-[#C51D4D] mb-4">
           AI Face Swap Meme Generator
         </h1>
         <p className="text-lg text-stone-600 max-w-2xl mx-auto mb-4">
@@ -208,7 +208,7 @@ function MemePageContent() {
         <div className="flex flex-wrap justify-center gap-2 text-sm">
           <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-medium">🔥 Kirkification</span>
           <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full font-medium">🇻🇪 Maduro Meme</span>
-          <span className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full font-medium">✨ Free AI Face Swap</span>
+          <span className="bg-[#FFE8D1] text-[#A4193D] px-3 py-1 rounded-full font-medium">✨ Free AI Face Swap</span>
         </div>
       </div>
 
@@ -273,7 +273,7 @@ function MemePageContent() {
                   className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
                     uploadedPhoto
                       ? meme.id === "kirk"
-                        ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-lg"
+                        ? "bg-gradient-to-r from-blue-500 to-[#A4193D] text-white hover:from-blue-600 hover:to-[#7D132E] shadow-lg"
                         : "bg-gradient-to-r from-red-500 to-yellow-500 text-white hover:from-red-600 hover:to-yellow-600 shadow-lg"
                       : "bg-stone-200 text-stone-400 cursor-not-allowed"
                   }`}
