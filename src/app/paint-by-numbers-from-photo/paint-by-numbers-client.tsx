@@ -5,7 +5,7 @@ import { UploadDropzone } from "@/components/UploadDropzone";
 import { useToast } from "@/components/Toast";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
-import { getAccessToken } from "@/lib/auth";
+import { getAccessToken, refreshUserCredits } from "@/lib/auth";
 
 const generatingMessages = [
   "Analyzing your photo...",
@@ -69,6 +69,9 @@ export default function PaintByNumbersClient() {
       setResultImage(data.resultImageUrl);
       setColoredImage(data.coloredImageUrl || null);
       trackEvent("paint_by_numbers_generate_success");
+      
+      // Refresh user credits after successful generation
+      await refreshUserCredits();
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Generation failed";

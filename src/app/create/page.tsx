@@ -13,7 +13,7 @@ import { useToast } from "@/components/Toast";
 import { copy } from "@/content/copy";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
-import { getAccessToken } from "@/lib/auth";
+import { getAccessToken, refreshUserCredits } from "@/lib/auth";
 
 const steps = [
   { id: "personA", title: copy.create.steps.personA.title },
@@ -116,6 +116,9 @@ function CreatePageContent() {
 
       setResultImage(data.resultImageUrl);
       trackEvent("generate_success", { style: selectedStyle });
+      
+      // Refresh user credits after successful generation
+      await refreshUserCredits();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Generation failed";
       showToast(message, "error");

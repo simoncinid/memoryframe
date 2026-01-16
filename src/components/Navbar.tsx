@@ -72,6 +72,19 @@ export function Navbar() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  // Listener per eventi custom di aggiornamento utente (quando i crediti vengono aggiornati)
+  useEffect(() => {
+    const handleUserUpdated = (event: CustomEvent) => {
+      const updatedUser = event.detail;
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+    };
+
+    window.addEventListener('userUpdated', handleUserUpdated as EventListener);
+    return () => window.removeEventListener('userUpdated', handleUserUpdated as EventListener);
+  }, []);
+
   const handleLogout = async () => {
     await logout();
     setUser(null);

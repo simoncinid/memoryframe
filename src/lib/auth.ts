@@ -155,16 +155,32 @@ export async function getCurrentUser(): Promise<User | null> {
 
       const user = await retryResponse.json();
       localStorage.setItem(USER_KEY, JSON.stringify(user.user));
+      // Emit event to notify components that user data was updated
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('userUpdated', { detail: user.user }));
+      }
       return user.user;
     }
 
     const data = await response.json();
     localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    // Emit event to notify components that user data was updated
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('userUpdated', { detail: data.user }));
+    }
     return data.user;
   } catch (error) {
     console.error('Get user error:', error);
     return null;
   }
+}
+
+/**
+ * Refresh user credits from backend and update localStorage
+ * This should be called after operations that modify credits (e.g., after successful generation)
+ */
+export async function refreshUserCredits(): Promise<void> {
+  await getCurrentUser();
 }
 
 export async function verifyEmail(code: string): Promise<void> {
