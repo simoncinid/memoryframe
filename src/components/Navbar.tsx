@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { copy } from "@/content/copy";
 import { getUser, isAuthenticated, logout } from "@/lib/auth";
 import { useRouter } from "next/navigation";
@@ -100,21 +100,24 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-8">
             {/* Left side: Navigation links */}
             <div className="flex items-center gap-6">
-              {copy.navbar.links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
-                >
-                  {link.label}
-                </Link>
+              {copy.navbar.links.map((link, index) => (
+                <React.Fragment key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
+                  >
+                    {link.label}
+                  </Link>
+                  {index === 0 && (
+                    <Link
+                      href="/create"
+                      className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
+                    >
+                      Family Portrait
+                    </Link>
+                  )}
+                </React.Fragment>
               ))}
-              <Link
-                href="/create"
-                className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium"
-              >
-                Family Portrait
-              </Link>
             </div>
 
             {/* Right side: Credits, Buy Credits, Logout */}
@@ -202,23 +205,26 @@ export function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-[#FFDFB9]">
             <div className="flex flex-col gap-4">
-              {copy.navbar.links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
+              {copy.navbar.links.map((link, index) => (
+                <React.Fragment key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                  {index === 0 && (
+                    <Link
+                      href="/create"
+                      className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Family Portrait
+                    </Link>
+                  )}
+                </React.Fragment>
               ))}
-              <Link
-                href="/create"
-                className="text-[#A4193D] hover:text-[#7D132E] transition-colors text-sm font-medium px-2 py-1"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Family Portrait
-              </Link>
               {authChecked && (
                 <>
                   {user ? (
