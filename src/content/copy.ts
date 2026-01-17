@@ -449,7 +449,7 @@ export const copy = {
     },
     privacy: {
       title: "Privacy Policy",
-      lastUpdated: "December 27, 2024",
+      lastUpdated: "December 27, 2026",
       sections: [
         {
           title: "1. Data Controller",
@@ -499,7 +499,7 @@ export const copy = {
     },
     terms: {
       title: "Terms of Service",
-      lastUpdated: "December 27, 2024",
+      lastUpdated: "December 27, 2026",
       sections: [
         {
           title: "1. Service Provider",
@@ -574,7 +574,7 @@ export const copy = {
 
   footer: {
     tagline: "Create meaningful family portraits with AI",
-    copyright: "© 2024 MemoryFrame. All rights reserved.",
+    copyright: "© 2026 MemoryFrame. All rights reserved.",
     legalEntity: "SIMONCINI DIEGO",
     legalAddress: "Italy • reservationwebbitz@gmail.com",
     links: {
