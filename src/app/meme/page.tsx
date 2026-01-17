@@ -6,6 +6,7 @@ import { UploadDropzone } from "@/components/UploadDropzone";
 import { useToast } from "@/components/Toast";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
+import { getOrCreateDeviceId } from "@/lib/device-id";
 
 // Meme options
 const MEME_OPTIONS = [
@@ -65,12 +66,16 @@ function MemePageContent() {
     try {
       const photoBase64 = await fileToBase64(uploadedPhoto);
 
+      // Get device ID for anonymous tracking
+      const deviceId = getOrCreateDeviceId();
+
       const response = await fetch("/api/meme", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           photo: photoBase64,
           memeType: memeId,
+          deviceId,
         }),
       });
 

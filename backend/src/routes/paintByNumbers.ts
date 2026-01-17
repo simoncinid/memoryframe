@@ -7,7 +7,7 @@ import { checkAndReserveSlot, removeReservation, checkIpRateLimit } from '../lib
 import { generatePaintByNumbersTemplate } from '../lib/paintByNumbersGenerator.js';
 import { RateLimitError, AppError, formatErrorResponse } from '../lib/errors.js';
 import { getDatabasePool } from '../lib/database.js';
-import { getClientIpMemoryFrame, hashIpMemoryFrame } from '../lib/ip.js';
+import { getClientIpMemoryFrame, hashIpMemoryFrame, hashDeviceIdMemoryFrame } from '../lib/ip.js';
 import {
   checkFreeQuotaMemoryFrame,
   useFreeQuotaMemoryFrame,
@@ -61,6 +61,10 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
       requestId = fields.get('client_request_id') || generateRequestId();
       jobId = uuidv4();
 
+      // Extract device ID from form data and hash it
+      const deviceId = fields.get('device_id');
+      const deviceIdHash = deviceId ? hashDeviceIdMemoryFrame(deviceId) : undefined;
+
       const photo = files.get('photo');
       validateFile(photo, 'photo');
       validateDeletePolicy(fields.get('delete_policy'));
@@ -96,7 +100,7 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
           
           if (!userHasCredits) {
             // No credits, try free quota
-            const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+            const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
             if (hasQuota) {
               // We'll use free quota after successful generation
             } else {
@@ -109,7 +113,7 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
         }
       } else {
         // Anonymous user - check free quota
-        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
         if (!hasQuota) {
           return reply.status(402).send({
             error: 'FREE_QUOTA_EXHAUSTED',
@@ -153,17 +157,17 @@ const paintByNumbersRoutes: FastifyPluginAsync = async (fastify) => {
           creditsUsed = true;
         } else {
           // Fallback to free quota if spending failed (shouldn't happen, but handle gracefully)
-          const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+          const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
           if (hasQuota) {
-            await useFreeQuotaMemoryFrame(db, ipHash);
+            await useFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
             usedFreeQuota = true;
           }
         }
       } else {
         // Use free quota for anonymous users or users without credits
-        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
         if (hasQuota) {
-          await useFreeQuotaMemoryFrame(db, ipHash);
+          await useFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
           usedFreeQuota = true;
         }
       }

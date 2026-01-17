@@ -4,6 +4,7 @@ const BACKEND_URL = process.env.BACKEND_URL || "https://memoryframe.onrender.com
 
 interface PaintByNumbersRequest {
   photo: string; // base64 data url or raw base64
+  deviceId?: string; // Device ID for anonymous tracking
 }
 
 function base64ToBlob(base64: string, mimeType: string): Blob {
@@ -37,6 +38,11 @@ export async function POST(request: NextRequest) {
     const photoMime = getMimeType(body.photo);
     formData.append("photo", base64ToBlob(body.photo, photoMime), "photo.jpg");
     formData.append("delete_policy", "immediate");
+    
+    // Add device ID for anonymous tracking (if provided)
+    if (body.deviceId) {
+      formData.append("device_id", body.deviceId);
+    }
 
     const clientIp =
       request.headers.get("x-forwarded-for")?.split(",")[0] ||

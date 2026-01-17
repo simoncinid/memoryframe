@@ -7,6 +7,7 @@ const BACKEND_URL = process.env.BACKEND_URL || "https://memoryframe.onrender.com
 interface MemeRequest {
   photo: string; // base64
   memeType: "kirk" | "maduro";
+  deviceId?: string; // Device ID for anonymous tracking
 }
 
 function base64ToBlob(base64: string, mimeType: string): Blob {
@@ -87,6 +88,11 @@ export async function POST(request: NextRequest) {
     
     formData.append("scene", memePrompts[body.memeType]);
     formData.append("delete_policy", "immediate");
+    
+    // Add device ID for anonymous tracking (if provided)
+    if (body.deviceId) {
+      formData.append("device_id", body.deviceId);
+    }
 
     // Forward client IP for rate limiting
     const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0] || 

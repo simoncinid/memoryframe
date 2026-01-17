@@ -60,6 +60,11 @@ export async function POST(request: NextRequest) {
     formData.append("style", body.style);
     formData.append("scene", truncatedPrompt);
     formData.append("delete_policy", body.deleteImmediately ? "immediate" : "24h");
+    
+    // Add device ID for anonymous tracking (if provided)
+    if (body.deviceId) {
+      formData.append("device_id", body.deviceId);
+    }
 
     // Forward client IP for rate limiting
     const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0] || 

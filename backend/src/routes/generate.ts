@@ -16,7 +16,7 @@ import { checkAndReserveSlot, removeReservation, checkIpRateLimit } from '../lib
 import { generateImage } from '../lib/openai.js';
 import { RateLimitError, AppError, formatErrorResponse } from '../lib/errors.js';
 import { getDatabasePool } from '../lib/database.js';
-import { getClientIpMemoryFrame, hashIpMemoryFrame } from '../lib/ip.js';
+import { getClientIpMemoryFrame, hashIpMemoryFrame, hashDeviceIdMemoryFrame } from '../lib/ip.js';
 import {
   checkFreeQuotaMemoryFrame,
   useFreeQuotaMemoryFrame,
@@ -58,21 +58,25 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
   const db = getDatabasePool();
 
   fastify.post('/api/generate', async (request, reply) => {
-    const startTime = Date.now();
-    const clientIp = getClientIpMemoryFrame(request);
-    const ipHash = hashIpMemoryFrame(clientIp);
-    let requestId = '';
-    let reservationMade = false;
-    let jobId: string | null = null;
-    let creditsUsed = false;
+      const startTime = Date.now();
+      const clientIp = getClientIpMemoryFrame(request);
+      const ipHash = hashIpMemoryFrame(clientIp);
+      let requestId = '';
+      let reservationMade = false;
+      let jobId: string | null = null;
+      let creditsUsed = false;
 
-    try {
-      // Parse multipart form data
-      const { files, fields } = await parseMultipart(request);
+      try {
+        // Parse multipart form data
+        const { files, fields } = await parseMultipart(request);
 
-      // Generate or use client request ID
-      requestId = fields.get('client_request_id') || generateRequestId();
-      jobId = uuidv4();
+        // Generate or use client request ID
+        requestId = fields.get('client_request_id') || generateRequestId();
+        jobId = uuidv4();
+
+        // Extract device ID from form data and hash it
+        const deviceId = fields.get('device_id');
+        const deviceIdHash = deviceId ? hashDeviceIdMemoryFrame(deviceId) : undefined;
 
       // Extract files (only personA and personB needed now)
       const personA = files.get('personA');
@@ -124,7 +128,7 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
           
           if (!userHasCredits) {
             // No credits, try free quota
-            const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+            const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
             if (hasQuota) {
               // We'll use free quota after successful generation
             } else {
@@ -137,7 +141,7 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
         }
       } else {
         // Anonymous user - check free quota
-        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
         if (!hasQuota) {
           return reply.status(402).send({
             error: 'FREE_QUOTA_EXHAUSTED',
@@ -196,17 +200,17 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
           creditsUsed = true;
         } else {
           // Fallback to free quota if spending failed (shouldn't happen, but handle gracefully)
-          const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+          const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
           if (hasQuota) {
-            await useFreeQuotaMemoryFrame(db, ipHash);
+            await useFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
             usedFreeQuota = true;
           }
         }
       } else {
         // Use free quota for anonymous users or users without credits
-        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash);
+        const { hasQuota } = await checkFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
         if (hasQuota) {
-          await useFreeQuotaMemoryFrame(db, ipHash);
+          await useFreeQuotaMemoryFrame(db, ipHash, deviceIdHash);
           usedFreeQuota = true;
         }
       }

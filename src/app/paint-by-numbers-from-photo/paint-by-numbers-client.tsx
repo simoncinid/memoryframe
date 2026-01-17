@@ -6,6 +6,7 @@ import { useToast } from "@/components/Toast";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { getAccessToken, refreshUserCredits } from "@/lib/auth";
+import { getOrCreateDeviceId } from "@/lib/device-id";
 
 const generatingMessages = [
   "Analyzing your photo...",
@@ -56,7 +57,6 @@ export default function PaintByNumbersClient() {
       }
 
       // Get device ID for anonymous tracking
-      const { getOrCreateDeviceId } = await import("@/lib/device-id");
       const deviceId = getOrCreateDeviceId();
 
       const response = await fetch("/api/paint-by-numbers", {

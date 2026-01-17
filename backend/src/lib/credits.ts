@@ -3,19 +3,44 @@ import type { Pool } from 'pg';
 import type { User, IPDailyUsage } from './database.js';
 
 /**
- * Checks if the IP still has free quota available today
+ * Checks if the device/IP still has free quota available today
+ * Prioritizes device_id over IP for anonymous users (more robust)
  * @returns (has_quota: bool, remaining: int)
  */
 export async function checkFreeQuotaMemoryFrame(
   db: Pool,
-  ipHash: string
+  ipHash: string,
+  deviceIdHash?: string
 ): Promise<{ hasQuota: boolean; remaining: number }> {
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
+  // Se abbiamo device_id, controlla quello (più robusto)
+  if (deviceIdHash) {
+    const deviceResult = await db.query(
+      `SELECT free_images_used 
+       FROM ip_daily_usage_memory_frame 
+       WHERE device_id_hash = $1 AND usage_date = $2`,
+      [deviceIdHash, today]
+    );
+
+    if (deviceResult.rows.length > 0) {
+      const usage = deviceResult.rows[0] as IPDailyUsage;
+      const remaining = Math.max(0, 1 - usage.free_images_used);
+      return {
+        hasQuota: remaining > 0,
+        remaining,
+      };
+    }
+    
+    // Se device_id non ha record, quota disponibile
+    return { hasQuota: true, remaining: 1 };
+  }
+
+  // Fallback a IP hash (retrocompatibilità)
   const result = await db.query(
     `SELECT free_images_used 
      FROM ip_daily_usage_memory_frame 
-     WHERE ip_hash = $1 AND usage_date = $2`,
+     WHERE ip_hash = $1 AND usage_date = $2 AND device_id_hash IS NULL`,
     [ipHash, today]
   );
 
@@ -34,16 +59,49 @@ export async function checkFreeQuotaMemoryFrame(
 }
 
 /**
- * Uses free quota for the IP (1 image per day)
+ * Uses free quota for the device/IP (1 image per day)
+ * Prioritizes device_id over IP for anonymous users (more robust)
  * @returns true if successful, false if quota exhausted
  */
 export async function useFreeQuotaMemoryFrame(
   db: Pool,
-  ipHash: string
+  ipHash: string,
+  deviceIdHash?: string
 ): Promise<boolean> {
   const today = new Date().toISOString().split('T')[0];
 
-  // Use INSERT ... ON CONFLICT ... DO UPDATE for atomicity
+  // Se abbiamo device_id, usa quello (più robusto)
+  if (deviceIdHash) {
+    await db.query(
+      `INSERT INTO ip_daily_usage_memory_frame (id, ip_hash, device_id_hash, usage_date, free_images_used)
+       VALUES ($1, $2, $3, $4, 1)
+       ON CONFLICT (device_id_hash, usage_date) DO UPDATE
+         SET free_images_used = CASE 
+           WHEN ip_daily_usage_memory_frame.free_images_used >= 1 
+           THEN ip_daily_usage_memory_frame.free_images_used 
+           ELSE ip_daily_usage_memory_frame.free_images_used + 1 
+         END,
+         updated_at = CURRENT_TIMESTAMP`,
+      [uuidv4(), ipHash, deviceIdHash, today]
+    );
+
+    // Verify if the update actually incremented
+    const result = await db.query(
+      `SELECT free_images_used 
+       FROM ip_daily_usage_memory_frame 
+       WHERE device_id_hash = $1 AND usage_date = $2`,
+      [deviceIdHash, today]
+    );
+
+    if (result.rows.length === 0) {
+      return false;
+    }
+
+    const usage = result.rows[0] as IPDailyUsage;
+    return usage.free_images_used <= 1;
+  }
+
+  // Fallback a IP hash (retrocompatibilità)
   await db.query(
     `INSERT INTO ip_daily_usage_memory_frame (id, ip_hash, usage_date, free_images_used)
      VALUES ($1, $2, $3, 1)
@@ -61,7 +119,7 @@ export async function useFreeQuotaMemoryFrame(
   const result = await db.query(
     `SELECT free_images_used 
      FROM ip_daily_usage_memory_frame 
-     WHERE ip_hash = $1 AND usage_date = $2`,
+     WHERE ip_hash = $1 AND usage_date = $2 AND device_id_hash IS NULL`,
     [ipHash, today]
   );
 

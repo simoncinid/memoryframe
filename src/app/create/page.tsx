@@ -14,6 +14,7 @@ import { copy } from "@/content/copy";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { getAccessToken, refreshUserCredits } from "@/lib/auth";
+import { getOrCreateDeviceId } from "@/lib/device-id";
 
 const steps = [
   { id: "personA", title: copy.create.steps.personA.title },
@@ -98,7 +99,6 @@ function CreatePageContent() {
       }
 
       // Get device ID for anonymous tracking
-      const { getOrCreateDeviceId } = await import("@/lib/device-id");
       const deviceId = getOrCreateDeviceId();
 
       const response = await fetch("/api/generate", {

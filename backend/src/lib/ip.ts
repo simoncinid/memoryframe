@@ -30,3 +30,13 @@ export function hashIpMemoryFrame(ip: string): string {
   hash.update(ip + salt);
   return hash.digest('hex');
 }
+
+/**
+ * SHA256 hash of device ID concatenated with salt for privacy
+ */
+export function hashDeviceIdMemoryFrame(deviceId: string): string {
+  const salt = config.ipSalt; // Usa lo stesso salt per coerenza
+  const hash = crypto.createHash('sha256');
+  hash.update(deviceId + salt);
+  return hash.digest('hex');
+}
