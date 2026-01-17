@@ -44,7 +44,7 @@ const faqItems = [
   },
   {
     question: "How much does it cost?",
-    answer: "Nothing! MemoryFrame is 100% free. We're supported by optional tips from happy users who want to help keep the tool free for everyone.",
+    answer: "MemoryFrame offers 1 free image per day. No signup required, no hidden fees, no watermarks.",
   },
 ];
 

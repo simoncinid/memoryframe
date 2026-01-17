@@ -8,6 +8,7 @@ interface GenerateRequest {
   style: string;
   prompt: string;
   deleteImmediately?: boolean;
+  deviceId?: string; // Device ID for anonymous tracking
 }
 
 function base64ToBlob(base64: string, mimeType: string): Blob {

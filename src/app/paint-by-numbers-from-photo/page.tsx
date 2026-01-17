@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     canonical: "/paint-by-numbers-from-photo",
   },
   openGraph: {
-    title: "Paint by Numbers from Photo | Free AI Generator",
+    title: "Paint by Numbers from Photo | AI Generator",
     description:
-      "Upload a photo and generate a clean, printable paint-by-numbers outline. 100% free — no signup required.",
+      "Upload a photo and generate a clean, printable paint-by-numbers outline. No signup required.",
     type: "website",
   },
 };

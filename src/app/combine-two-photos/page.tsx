@@ -45,7 +45,7 @@ const faqItems = [
   },
   {
     question: "Do I need to create an account?",
-    answer: "No! Just upload your photos, choose a style, and generate. No signup, no email required. It's completely free.",
+    answer: "No! Just upload your photos, choose a style, and generate. No signup, no email required.",
   },
 ];
 

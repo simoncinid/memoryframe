@@ -71,8 +71,8 @@ export const copy = {
       title: "Frequently Asked Questions",
       items: [
         {
-          question: "Is MemoryFrame really free?",
-          answer: "Yes, 100% free! There's no catch, no hidden fees, no watermarks. Running AI costs real money, but we keep it free through optional tips from users who love their portraits and want to help others enjoy the same experience.",
+          question: "Is MemoryFrame free?",
+          answer: "MemoryFrame offers 1 free image per day. No signup required, no hidden fees, no watermarks.",
         },
         {
           question: "What photo formats are supported?",
@@ -160,21 +160,6 @@ export const copy = {
     rateLimitError: "Daily limit reached. Try again later.",
   },
 
-  tipModal: {
-    title: "Love Your Portrait? 💜",
-    subtitle: "MemoryFrame is 100% free, but each generation costs us real money",
-    costMessage: "This portrait cost us approximately",
-    empatheticMessage: "Tips from kind users like you are the only way we can keep this tool free for everyone. No pressure at all — but if you can, even a small tip helps us cover the AI costs and keep creating magic for families everywhere.",
-    amounts: [2, 5, 10, 20],
-    otherLabel: "Custom",
-    checkoutButton: "Leave a Tip 💜",
-    skipText: "No worries, enjoy your portrait!",
-    thankYou: {
-      title: "You're Amazing! 🎉",
-      message: "Your generosity helps keep MemoryFrame free for families everywhere. Thank you for being part of our community!",
-      closeButton: "Close",
-    },
-  },
 
   styles: [
     {
@@ -325,7 +310,7 @@ export const copy = {
       title: "AI Family Portrait Generator | MemoryFrame",
       metaDescription: "Create beautiful AI-generated family portraits from separate photos. Bring loved ones together in one meaningful image with our free tool.",
       h1: "AI Family Portrait Generator",
-      intro: "Transform separate photos into a unified family portrait using advanced AI technology. Whether you want to create a keepsake, a gift, or simply see your family together in a new way, our tool makes it simple and free.",
+      intro: "Transform separate photos into a unified family portrait using advanced AI technology. Whether you want to create a keepsake, a gift, or simply see your family together in a new way, our tool makes it simple.",
       useCases: [
         {
           title: "Long-Distance Families",
@@ -530,7 +515,7 @@ export const copy = {
         },
         {
           title: "3. Free Service & Voluntary Tips",
-          content: "The service is provided completely free of charge. Users may optionally leave a tip to support the ongoing costs of maintaining the service (API costs, hosting, development). Tips are entirely voluntary, non-refundable, and do not provide any additional features or guarantees.",
+          content: "The service offers 1 free image per day. Users may purchase additional credits to generate more images. Credits are non-refundable and do not provide any additional features or guarantees beyond image generation.",
         },
         {
           title: "4. Acceptable Use",

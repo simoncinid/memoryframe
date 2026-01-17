@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { FAQ, FAQJsonLd } from "@/components/FAQ";
-import { FreeServiceBanner } from "@/components/FreeServiceBanner";
 import { copy } from "@/content/copy";
 
 const pageData = copy.seoPages.aiFamilyPortrait;
@@ -44,7 +43,7 @@ const faqItems = [
   },
   {
     question: "Is this really free?",
-    answer: "Yes! MemoryFrame is 100% free. We're supported by optional tips from users who love their portraits. No signup, no hidden fees, no watermarks.",
+    answer: "MemoryFrame offers 1 free image per day. No signup required, no hidden fees, no watermarks.",
   },
   {
     question: "Do you store my family photos?",
@@ -86,10 +85,6 @@ export default function AIFamilyPortraitPage() {
           <p className="text-lg text-[#A4193D] max-w-3xl mx-auto">{pageData.intro}</p>
         </div>
 
-        {/* Free Service Banner */}
-        <div className="mb-12">
-          <FreeServiceBanner variant="hero" />
-        </div>
 
         {/* How It Works Steps - Visual Version */}
         <section className="mb-16">
@@ -217,7 +212,7 @@ export default function AIFamilyPortraitPage() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Create Your Family Portrait — It&apos;s Free
+            Create Your Family Portrait
           </Link>
         </div>
 
@@ -302,11 +297,8 @@ export default function AIFamilyPortraitPage() {
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Create Your Portrait?
           </h2>
-          <p className="text-white/70 mb-2">
-            Free to use. No signup required. No watermarks.
-          </p>
-          <p className="text-[#7D132E] text-sm mb-8">
-            Tips help us keep this tool free for everyone 💜
+          <p className="text-white/70 mb-8">
+            No signup required. No watermarks.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

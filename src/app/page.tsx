@@ -43,24 +43,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Free Service Banner */}
-      <section className="py-6 bg-gradient-to-r from-[#FFF5EB] via-[#FFE8D1] to-[#FFDFB9] border-y border-[#FFDFB9]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center md:text-left">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#A4193D] to-[#C51D4D] rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-              </div>
-              <div>
-                <p className="font-semibold text-[#A4193D]">Free forever, powered by your support</p>
-                <p className="text-sm text-[#7D132E]">Running AI costs real money — tips from kind users keep this free for everyone 💜</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* How It Works */}
       <section className="py-20 bg-white">
@@ -307,20 +289,11 @@ export default function HomePage() {
       {/* Final CTA */}
       <section className="py-20 bg-gradient-to-br from-[#A4193D] to-[#7D132E]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full mb-6">
-            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span className="text-sm font-medium text-white/90">100% Free • No Signup • No Watermarks</span>
-          </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Create Your Portrait?
           </h2>
-          <p className="text-lg text-white/90 mb-2">
+          <p className="text-lg text-white/90 mb-8">
             It only takes a minute. Upload two photos, pick a style, done.
-          </p>
-          <p className="text-sm text-white/70 mb-8">
-            Love your result? Optional tips help keep this free for families everywhere 💜
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

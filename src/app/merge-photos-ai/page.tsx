@@ -65,7 +65,7 @@ const faqItems = [
   },
   {
     question: "Is this tool really free?",
-    answer: "Yes, 100% free! We're supported by optional tips from users who love their portraits. No signup, no hidden fees, no watermarks.",
+    answer: "MemoryFrame offers 1 free image per day. No signup required, no hidden fees, no watermarks.",
   },
 ];
 

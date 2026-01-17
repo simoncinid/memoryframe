@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import { HowToPageLayout } from "@/components/HowToPageLayout";
 
 export const metadata: Metadata = {
-  title: "Portrait AI Generator | Create Stunning AI Portraits Free",
-  description: "Generate beautiful AI portraits from your photos. Transform ordinary photos into artistic portraits with various styles like classic, painterly, cinematic, and more. 100% free.",
+  title: "Portrait AI Generator | Create Stunning AI Portraits",
+  description: "Generate beautiful AI portraits from your photos. Transform ordinary photos into artistic portraits with various styles like classic, painterly, cinematic, and more.",
   keywords: [
     "portrait AI generator",
     "AI portrait maker",

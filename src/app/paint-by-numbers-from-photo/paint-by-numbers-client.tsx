@@ -55,10 +55,14 @@ export default function PaintByNumbersClient() {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
+      // Get device ID for anonymous tracking
+      const { getOrCreateDeviceId } = await import("@/lib/device-id");
+      const deviceId = getOrCreateDeviceId();
+
       const response = await fetch("/api/paint-by-numbers", {
         method: "POST",
         headers,
-        body: JSON.stringify({ photo: photoBase64 }),
+        body: JSON.stringify({ photo: photoBase64, deviceId }),
       });
 
       const data = await response.json();

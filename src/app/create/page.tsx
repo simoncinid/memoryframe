@@ -97,6 +97,10 @@ function CreatePageContent() {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
+      // Get device ID for anonymous tracking
+      const { getOrCreateDeviceId } = await import("@/lib/device-id");
+      const deviceId = getOrCreateDeviceId();
+
       const response = await fetch("/api/generate", {
         method: "POST",
         headers,
@@ -105,6 +109,7 @@ function CreatePageContent() {
           personB: personBBase64,
           style: selectedStyle,
           prompt,
+          deviceId,
         }),
       });
 

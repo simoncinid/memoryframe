@@ -303,8 +303,7 @@ function MemePageContent() {
               <span className="transform group-open:rotate-180 transition-transform">▼</span>
             </summary>
             <p className="text-[#A4193D] mt-3">
-              Yes! Our AI face swap meme generator is completely free to use. No signup required, 
-              no watermarks on your images. We&apos;re supported by optional tips from users who love their results.
+              MemoryFrame offers 1 free image per day. No signup required, no watermarks on your images.
             </p>
           </details>
           

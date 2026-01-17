@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { FAQ, FAQJsonLd } from "@/components/FAQ";
-import { FreeServiceBanner } from "@/components/FreeServiceBanner";
 import { copy } from "@/content/copy";
 
 interface UseCase {
@@ -46,7 +45,7 @@ export function HowToPageLayout({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Start Creating Your Portrait — It&apos;s Free
+            Start Creating Your Portrait
           </Link>
         </div>
 
@@ -56,8 +55,6 @@ export function HowToPageLayout({
           <p className="text-lg text-[#A4193D]">{intro}</p>
         </div>
 
-        {/* Free Service Banner */}
-        <FreeServiceBanner variant="hero" />
 
         {/* How It Works Steps */}
         <section className="mb-12">
@@ -146,11 +143,8 @@ export function HowToPageLayout({
           <h2 className="text-2xl font-bold text-white mb-4">
             Ready to Create Your Portrait?
           </h2>
-          <p className="text-white/70 mb-2">
-            Free to use. No signup required. No watermarks.
-          </p>
-          <p className="text-[#7D132E] text-sm mb-6">
-            Tips help us keep this tool free for everyone 💜
+          <p className="text-white/70 mb-6">
+            No signup required. No watermarks.
           </p>
           <Link
             href="/create"
