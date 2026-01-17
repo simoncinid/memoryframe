@@ -46,8 +46,8 @@ export const copy = {
       subtitle: "We built MemoryFrame with privacy and trust at its core",
       items: [
         {
-          title: "Photos Deleted",
-          description: "Your uploads are automatically deleted within 24 hours. You can also delete them immediately after generation.",
+          title: "Secure Storage",
+          description: "Your photos are stored securely in our database and processed with industry-standard encryption.",
         },
         {
           title: "No AI Training",
@@ -55,7 +55,7 @@ export const copy = {
         },
         {
           title: "Secure Processing",
-          description: "All data is encrypted in transit and at rest. We process and forget.",
+          description: "All data is encrypted in transit and at rest. We use industry-standard security practices.",
         },
         {
           title: "You Own the Result",
@@ -88,7 +88,7 @@ export const copy = {
         },
         {
           question: "What happens to my photos?",
-          answer: "Photos are processed securely and deleted within 24 hours by default. You can choose to delete them immediately after generation.",
+          answer: "Photos are processed securely and stored in our database. All data is encrypted in transit and at rest.",
         },
         {
           question: "Can I generate multiple portraits?",
@@ -152,10 +152,6 @@ export const copy = {
       downloadButton: "Download",
       variationsButton: "Generate Variation",
       variationLimit: "You've used your free variation. Leave a tip to unlock more.",
-    },
-    deleteOption: {
-      label: "Delete photos immediately after generation",
-      description: "Photos will be removed right after your portrait is created",
     },
     rateLimitError: "Daily limit reached. Try again later.",
   },
@@ -461,15 +457,15 @@ export const copy = {
         },
         {
           title: "2. Data We Collect",
-          content: "MemoryFrame is designed with privacy-first principles. We DO NOT store or retain any user photos or personal data. Photos you upload are transmitted directly to OpenAI's API for processing and are immediately discarded after generation. We do not have access to your photos, we do not save them on our servers, and we do not use them for any purpose other than generating your requested portrait.",
+          content: "MemoryFrame is designed with privacy-first principles. Photos you upload are stored securely in our database and transmitted to OpenAI's API for processing. We use your photos solely for generating your requested portrait. All data is encrypted in transit and at rest.",
         },
         {
           title: "3. How Your Photos Are Processed",
-          content: "When you upload photos, they are sent directly via API to OpenAI for image generation. We act as a simple intermediary - your photos pass through our service but are never stored, logged, or retained. OpenAI processes the images according to their own privacy policy and data handling practices. We recommend reviewing OpenAI's privacy policy for details on their data processing.",
+          content: "When you upload photos, they are stored securely in our database and sent via API to OpenAI for image generation. OpenAI processes the images according to their own privacy policy and data handling practices. We recommend reviewing OpenAI's privacy policy for details on their data processing.",
         },
         {
-          title: "4. No Data Retention",
-          content: "We explicitly confirm: (a) No photos are stored on our servers; (b) No user accounts or personal information are collected; (c) No cookies are used to track individual users; (d) No databases of user content exist; (e) Generated images are provided for immediate download and are not stored.",
+          title: "4. Data Storage",
+          content: "Photos you upload are stored securely in our database. We collect minimal personal information necessary for service operation. We use cookies for essential functionality and analytics. Generated images are stored and can be accessed through your account.",
         },
         {
           title: "5. Third-Party Services",
@@ -481,7 +477,7 @@ export const copy = {
         },
         {
           title: "7. Your Rights Under GDPR",
-          content: "As an EU resident, you have rights including: access to your data, rectification, erasure, restriction of processing, data portability, and objection to processing. Since we do not store personal data, most of these rights are automatically satisfied. For any privacy-related inquiries, contact reservationwebbitz@gmail.com.",
+          content: "As an EU resident, you have rights including: access to your data, rectification, erasure, restriction of processing, data portability, and objection to processing. You can exercise these rights by contacting us at reservationwebbitz@gmail.com. We will respond to your request within 30 days.",
         },
         {
           title: "8. Children's Privacy",
@@ -489,7 +485,7 @@ export const copy = {
         },
         {
           title: "9. Security Measures",
-          content: "All data transmissions are encrypted using TLS/SSL. We use industry-standard security practices. Since we don't store data, risks associated with data breaches are minimized.",
+          content: "All data transmissions are encrypted using TLS/SSL. We use industry-standard security practices to protect your data. All stored data is encrypted at rest and access is restricted to authorized personnel only.",
         },
         {
           title: "10. Changes to This Policy",
@@ -511,7 +507,7 @@ export const copy = {
         },
         {
           title: "2. Service Description",
-          content: "MemoryFrame is a free AI-powered tool that generates family portraits from uploaded photos. The service uses OpenAI's image generation technology via API calls. We do not store any photos or user data - all processing is done in real-time through API calls.",
+          content: "MemoryFrame is an AI-powered tool that generates family portraits from uploaded photos. The service uses OpenAI's image generation technology via API calls. Photos are stored securely in our database for processing and service operation.",
         },
         {
           title: "3. Free Service & Voluntary Tips",
@@ -530,8 +526,8 @@ export const copy = {
           content: "You retain all rights to the photos you upload. The generated portraits are yours to use for personal or commercial purposes without restriction. The MemoryFrame name, logo, and website design remain the property of the Provider.",
         },
         {
-          title: "7. No Data Storage",
-          content: "We explicitly do not store, retain, or archive any photos you upload. Photos are processed via real-time API calls and immediately discarded. We have no ability to recover, view, or access your photos after processing.",
+          title: "7. Data Storage",
+          content: "Photos you upload are stored securely in our database. All data is encrypted in transit and at rest. We use industry-standard security practices to protect your data. You can request deletion of your data at any time by contacting us.",
         },
         {
           title: "8. Service Limitations",
@@ -601,7 +597,7 @@ export const copy = {
         { label: "Contact", href: "/contact" },
       ],
     },
-    privacyNote: "We never store your photos. All processing happens via real-time API calls - your privacy is guaranteed.",
+    privacyNote: "Your photos are stored securely in our database. All data is encrypted in transit and at rest - your privacy is protected.",
   },
 
   navbar: {

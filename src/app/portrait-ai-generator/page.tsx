@@ -65,7 +65,7 @@ const faqItems = [
   },
   {
     question: "Do you store my photos?",
-    answer: "No. We never store your photos. All processing happens via real-time API calls — your photo is processed and immediately discarded. Your privacy is guaranteed.",
+    answer: "Photos are stored securely in our database. All data is encrypted in transit and at rest. We use industry-standard security practices to protect your privacy.",
   },
 ];
 

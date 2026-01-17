@@ -342,8 +342,7 @@ function MemePageContent() {
               <span className="transform group-open:rotate-180 transition-transform">▼</span>
             </summary>
             <p className="text-[#A4193D] mt-3">
-              No! We never store your photos. All processing happens via real-time API calls and 
-              your images are immediately discarded after generation. Your privacy is guaranteed.
+              Photos are stored securely in our database. All data is encrypted in transit and at rest. We use industry-standard security practices to protect your privacy.
             </p>
           </details>
         </div>
