@@ -4,7 +4,7 @@ import type { User, IPDailyUsage } from './database.js';
 
 /**
  * Checks if the device/IP still has free quota available today
- * Prioritizes device_id over IP for anonymous users (more robust)
+ * Checks BOTH device_id AND IP - if either has been used today, blocks the request
  * @returns (has_quota: bool, remaining: int)
  */
 export async function checkFreeQuotaMemoryFrame(
@@ -14,7 +14,7 @@ export async function checkFreeQuotaMemoryFrame(
 ): Promise<{ hasQuota: boolean; remaining: number }> {
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-  // Se abbiamo device_id, controlla quello (più robusto)
+  // Se abbiamo device_id, controlla prima quello
   if (deviceIdHash) {
     const deviceResult = await db.query(
       `SELECT free_images_used 
@@ -32,7 +32,25 @@ export async function checkFreeQuotaMemoryFrame(
       };
     }
     
-    // Se device_id non ha record, quota disponibile
+    // Se device_id non ha record, controlla anche l'IP
+    // Se l'IP è già stato usato oggi (con qualsiasi device_id o senza), blocca
+    const ipResult = await db.query(
+      `SELECT free_images_used 
+       FROM ip_daily_usage_memory_frame 
+       WHERE ip_hash = $1 AND usage_date = $2`,
+      [ipHash, today]
+    );
+
+    if (ipResult.rows.length > 0) {
+      const usage = ipResult.rows[0] as IPDailyUsage;
+      const remaining = Math.max(0, 1 - usage.free_images_used);
+      return {
+        hasQuota: remaining > 0,
+        remaining,
+      };
+    }
+
+    // Né device_id né IP sono stati usati oggi
     return { hasQuota: true, remaining: 1 };
   }
 
