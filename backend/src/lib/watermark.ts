@@ -12,10 +12,9 @@ export async function applyDiagonalWatermark(imageBase64: string, mimeType: stri
   const h = meta.height ?? 1024;
 
   // Pattern diagonale: linee semi-trasparenti a -45°
-  // SVG 2x della dimensione per coprire anche dopo rotazione
-  const size = Math.max(w, h) * 2;
+  // Overlay deve avere stesse dimensioni o minori dell'immagine (limite Sharp composite)
   const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
   <defs>
     <pattern id="lines" patternUnits="userSpaceOnUse" width="60" height="60" patternTransform="rotate(-45 30 30)">
       <line x1="0" y1="0" x2="0" y2="60" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
@@ -28,7 +27,7 @@ export async function applyDiagonalWatermark(imageBase64: string, mimeType: stri
   const overlayBuffer = Buffer.from(svg);
   const outFormat = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpeg';
   const watermarked = await img
-    .composite([{ input: overlayBuffer, blend: 'over' }])
+    .composite([{ input: overlayBuffer, blend: 'over', top: 0, left: 0 }])
     .toFormat(outFormat, { quality: outFormat === 'jpeg' ? 90 : undefined })
     .toBuffer();
 
