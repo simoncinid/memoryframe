@@ -14,9 +14,11 @@ export interface GenerateRequest {
 
 export interface GenerateResponse {
   request_id: string;
+  job_id: string;
   image_base64: string;
   mime_type: string;
   generation_time_ms: number;
+  used_free_quota: boolean;
 }
 
 export interface ErrorResponse {

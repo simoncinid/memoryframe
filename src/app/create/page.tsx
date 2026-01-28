@@ -15,6 +15,7 @@ import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { getAccessToken, refreshUserCredits } from "@/lib/auth";
 import { getOrCreateDeviceId } from "@/lib/device-id";
+import { createUnlockCheckout } from "@/lib/credits";
 
 const steps = [
   { id: "personA", title: copy.create.steps.personA.title },
@@ -40,6 +41,10 @@ function CreatePageContent() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingMessage, setGeneratingMessage] = useState("");
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [usedFreeQuota, setUsedFreeQuota] = useState(false);
+  const [showLockInModal, setShowLockInModal] = useState(false);
+  const [unlockLoading, setUnlockLoading] = useState(false);
 
 
   // Handle style from URL
@@ -120,6 +125,8 @@ function CreatePageContent() {
       }
 
       setResultImage(data.resultImageUrl);
+      setJobId(data.jobId ?? null);
+      setUsedFreeQuota(!!data.usedFreeQuota);
       trackEvent("generate_success", { style: selectedStyle });
       
       // Refresh user credits after successful generation
@@ -154,8 +161,34 @@ function CreatePageContent() {
     setSelectedStyle(null);
     setPrompt("");
     setResultImage(null);
+    setJobId(null);
+    setUsedFreeQuota(false);
+    setShowLockInModal(false);
     setCurrentStep(0);
   }, []);
+
+  const handleUnlock = useCallback(async () => {
+    if (!jobId) return;
+    setUnlockLoading(true);
+    try {
+      const { url } = await createUnlockCheckout(jobId);
+      window.location.href = url;
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : "Error starting checkout", "error");
+    } finally {
+      setUnlockLoading(false);
+    }
+  }, [jobId, showToast]);
+
+  // beforeunload: lock-in quando è free e non sbloccata
+  useEffect(() => {
+    if (!usedFreeQuota || !resultImage) return;
+    const onLeave = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", onLeave);
+    return () => window.removeEventListener("beforeunload", onLeave);
+  }, [usedFreeQuota, resultImage]);
 
   // Result View
   if (resultImage) {
@@ -168,34 +201,88 @@ function CreatePageContent() {
         </div>
 
         <div className="bg-[#FFF5EB] rounded-2xl p-4 mb-8">
-          <div className="relative aspect-square max-w-2xl mx-auto rounded-xl overflow-hidden bg-[#FFDFB9]">
+          <div
+            className="relative aspect-square max-w-2xl mx-auto rounded-xl overflow-hidden bg-[#FFDFB9] select-none"
+            onContextMenu={usedFreeQuota ? (e) => e.preventDefault() : undefined}
+            style={usedFreeQuota ? { userSelect: "none", WebkitUserSelect: "none" } : undefined}
+          >
             <Image
               src={resultImage}
               alt="Generated portrait"
               fill
-              className="object-cover"
+              className="object-cover pointer-events-none"
               priority
+              draggable={!usedFreeQuota}
             />
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <button
-            onClick={handleDownload}
-            className="px-8 py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D]"
-          >
-            {copy.create.result.downloadButton}
-          </button>
+          {usedFreeQuota ? (
+            <button
+              onClick={handleUnlock}
+              disabled={unlockLoading}
+              className="px-8 py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D] disabled:opacity-70"
+            >
+              {unlockLoading ? "Redirecting…" : "Unlock for $0.99"}
+            </button>
+          ) : (
+            <button
+              onClick={handleDownload}
+              className="px-8 py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D]"
+            >
+              {copy.create.result.downloadButton}
+            </button>
+          )}
         </div>
 
         <div className="text-center">
           <button
-            onClick={handleReset}
+            onClick={() => (usedFreeQuota ? setShowLockInModal(true) : handleReset())}
             className="text-[#A4193D] hover:text-[#A4193D] underline underline-offset-4"
           >
             Create another portrait
           </button>
         </div>
+
+        {/* Lock-in modal: "Isn't your family photo worth $0.99?" */}
+        {showLockInModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-[#FFF5EB] rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-xl relative">
+              <button
+                onClick={() => {
+                  setShowLockInModal(false);
+                  handleReset();
+                }}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-[#7D132E] hover:bg-[#FFE8D1]"
+                aria-label="Close"
+              >
+                ×
+              </button>
+              <p className="text-lg sm:text-xl text-[#A4193D] font-medium mb-6 pr-8">
+                Isn&apos;t your family photo worth $0.99?
+              </p>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleUnlock}
+                  disabled={unlockLoading}
+                  className="w-full py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] disabled:opacity-70"
+                >
+                  {unlockLoading ? "Redirecting…" : "Unlock for $0.99"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLockInModal(false);
+                    handleReset();
+                  }}
+                  className="w-full py-2 text-[#7D132E] hover:underline"
+                >
+                  No thanks, start over
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

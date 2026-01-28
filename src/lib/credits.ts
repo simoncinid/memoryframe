@@ -80,3 +80,19 @@ export async function createCheckout(photoCredits: number): Promise<CheckoutResp
 
   return response.json();
 }
+
+/** Checkout $0.99 per sbloccare una foto gratuita (auth non richiesta) */
+export async function createUnlockCheckout(jobId: string): Promise<{ url: string; sessionId: string }> {
+  const response = await fetch(`${BACKEND_URL}/v1/stripe/create-unlock-checkout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ job_id: jobId }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.message || 'Error creating unlock checkout');
+  }
+
+  return response.json();
+}

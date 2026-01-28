@@ -14,6 +14,7 @@ import {
 } from '../lib/validation.js';
 import { checkAndReserveSlot, removeReservation, checkIpRateLimit } from '../lib/globalRateLimit.js';
 import { generateImage } from '../lib/openai.js';
+import { applyDiagonalWatermark } from '../lib/watermark.js';
 import { RateLimitError, AppError, formatErrorResponse } from '../lib/errors.js';
 import { getDatabasePool } from '../lib/database.js';
 import { getClientIpMemoryFrame, hashIpMemoryFrame, hashDeviceIdMemoryFrame } from '../lib/ip.js';
@@ -215,13 +216,23 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
 
-      // Update job status
-      await db.query(
-        `UPDATE jobs_memory_frame 
-         SET status = 'completed', completed_at = NOW() 
-         WHERE id = $1`,
-        [jobId]
-      );
+      // Update job status; se free, salva immagine pulita per sblocco $0.99
+      if (usedFreeQuota) {
+        await db.query(
+          `UPDATE jobs_memory_frame 
+           SET status = 'completed', completed_at = NOW(), 
+               output_image_base64 = $2, output_mime_type = $3 
+           WHERE id = $1`,
+          [jobId, result.imageBase64, result.mimeType]
+        );
+      } else {
+        await db.query(
+          `UPDATE jobs_memory_frame 
+           SET status = 'completed', completed_at = NOW() 
+           WHERE id = $1`,
+          [jobId]
+        );
+      }
 
       // Log success
       request.log.info({
@@ -234,11 +245,22 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
         status: 'success',
       }, 'Generation completed');
 
+      // Per free: applica watermark e restituisci quella; altrimenti immagine pulita
+      let imageBase64 = result.imageBase64;
+      let mimeType = result.mimeType;
+      if (usedFreeQuota) {
+        const wm = await applyDiagonalWatermark(result.imageBase64, result.mimeType);
+        imageBase64 = wm.base64;
+        mimeType = wm.mimeType;
+      }
+
       const response: GenerateResponse = {
         request_id: requestId,
-        image_base64: result.imageBase64,
-        mime_type: result.mimeType,
+        job_id: jobId!,
+        image_base64: imageBase64,
+        mime_type: mimeType,
         generation_time_ms: generationTimeMs,
+        used_free_quota: usedFreeQuota,
       };
 
       return reply.status(200).send(response);
@@ -292,6 +314,31 @@ const generateRoutes: FastifyPluginAsync = async (fastify) => {
         message: 'An unexpected error occurred.',
       });
     }
+  });
+
+  // GET immagine pulita dopo sblocco $0.99 (solo se unlocked_at IS NOT NULL)
+  fastify.get<{ Params: { jobId: string } }>('/v1/generate/result/:jobId', async (request, reply) => {
+    const { jobId } = request.params;
+    const result = await db.query(
+      `SELECT output_image_base64, output_mime_type, unlocked_at, status 
+       FROM jobs_memory_frame 
+       WHERE id = $1`,
+      [jobId]
+    );
+    if (result.rows.length === 0) {
+      return reply.status(404).send({ error: 'NOT_FOUND', message: 'Job not found' });
+    }
+    const row = result.rows[0] as { output_image_base64: string | null; output_mime_type: string | null; unlocked_at: Date | null; status: string };
+    if (row.status !== 'completed' || !row.output_image_base64) {
+      return reply.status(404).send({ error: 'NOT_FOUND', message: 'Image not available' });
+    }
+    if (!row.unlocked_at) {
+      return reply.status(402).send({ error: 'LOCKED', message: 'Unlock this photo for $0.99 to download' });
+    }
+    return reply.status(200).send({
+      image_base64: row.output_image_base64,
+      mime_type: row.output_mime_type || 'image/png',
+    });
   });
 };
 

@@ -132,6 +132,68 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
     }
   });
 
+  // Create checkout $0.99 per sbloccare una foto gratuita (auth non richiesta)
+  fastify.post<{ Body: { job_id?: string } }>('/v1/stripe/create-unlock-checkout', async (request, reply) => {
+    try {
+      const { job_id } = (request.body as { job_id?: string }) || {};
+      if (!job_id || typeof job_id !== 'string' || job_id.length > 64) {
+        return reply.status(400).send({
+          error: 'VALIDATION_ERROR',
+          message: 'job_id is required',
+        });
+      }
+
+      const job = await db.query(
+        `SELECT id, status, output_image_base64, unlocked_at 
+         FROM jobs_memory_frame 
+         WHERE id = $1`,
+        [job_id]
+      );
+      if (job.rows.length === 0) {
+        return reply.status(404).send({ error: 'NOT_FOUND', message: 'Job not found' });
+      }
+      const row = job.rows[0] as { status: string; output_image_base64: string | null; unlocked_at: Date | null };
+      if (row.status !== 'completed' || !row.output_image_base64) {
+        return reply.status(400).send({ error: 'BAD_REQUEST', message: 'This photo cannot be unlocked' });
+      }
+      if (row.unlocked_at) {
+        return reply.status(400).send({ error: 'ALREADY_UNLOCKED', message: 'This photo is already unlocked' });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'payment',
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'Unlock your family photo',
+                description: 'Download your portrait without watermark',
+              },
+              unit_amount: 99, // $0.99
+            },
+            quantity: 1,
+          },
+        ],
+        metadata: {
+          type: 'unlock_photo',
+          job_id,
+        },
+        success_url: `${config.frontendOrigin}/unlock-success?job_id=${encodeURIComponent(job_id)}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${config.frontendOrigin}/create`,
+      });
+
+      return reply.status(200).send({ url: session.url, sessionId: session.id });
+    } catch (error) {
+      request.log.error(error);
+      return reply.status(500).send({
+        error: 'INTERNAL_ERROR',
+        message: 'Error creating checkout',
+      });
+    }
+  });
+
   // Webhook Stripe
   fastify.post('/v1/stripe/webhook', async (request, reply) => {
     const sig = request.headers['stripe-signature'];
@@ -170,23 +232,36 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
     // Handle checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
+      const metadata = session.metadata;
 
       try {
-        // Check for duplicates
-        const existingResult = await db.query(
-          `SELECT id FROM credit_transactions_memory_frame 
-           WHERE stripe_event_id = $1`,
-          [event.id]
-        );
-
-        if (existingResult.rows.length > 0) {
-          request.log.info(`Webhook already processed: ${event.id}`);
-          return reply.status(200).send({ status: 'ok', message: 'Already processed' });
+        if (metadata?.type === 'unlock_photo') {
+          const jobId = metadata.job_id;
+          if (!jobId) {
+            request.log.error({ metadata }, 'unlock_photo: missing job_id');
+            return reply.status(400).send({ error: 'INVALID_METADATA', message: 'Missing job_id' });
+          }
+          const up = await db.query(
+            `UPDATE jobs_memory_frame SET unlocked_at = NOW() 
+             WHERE id = $1 AND unlocked_at IS NULL AND output_image_base64 IS NOT NULL`,
+            [jobId]
+          );
+          request.log.info({ jobId, rows: up.rowCount, eventId: event.id }, 'Photo unlocked via Stripe');
+          return reply.status(200).send({ status: 'ok' });
         }
 
-        const metadata = session.metadata;
-
         if (metadata?.type === 'dynamic_credits') {
+          // Check for duplicates
+          const existingResult = await db.query(
+            `SELECT id FROM credit_transactions_memory_frame 
+             WHERE stripe_event_id = $1`,
+            [event.id]
+          );
+
+          if (existingResult.rows.length > 0) {
+            request.log.info(`Webhook already processed: ${event.id}`);
+            return reply.status(200).send({ status: 'ok', message: 'Already processed' });
+          }
           const photoCredits = parseInt(metadata.photo_credits || '0', 10);
           const userId = metadata.user_id;
 
@@ -234,10 +309,10 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
           }, 'Credits assigned via Stripe webhook');
 
           return reply.status(200).send({ status: 'ok' });
-        } else {
-          request.log.warn({ type: metadata?.type }, 'Unsupported webhook type');
-          return reply.status(200).send({ status: 'ok', message: 'Unsupported type' });
         }
+
+        request.log.warn({ type: metadata?.type }, 'Unsupported webhook type');
+        return reply.status(200).send({ status: 'ok', message: 'Unsupported type' });
       } catch (error) {
         request.log.error({ error }, 'Error processing webhook');
         return reply.status(500).send({

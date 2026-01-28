@@ -144,6 +144,8 @@ export async function POST(request: NextRequest) {
       success: true,
       resultImageUrl,
       generationId: data.request_id,
+      jobId: data.job_id,
+      usedFreeQuota: !!data.used_free_quota,
       style: body.style,
       prompt: body.prompt,
       createdAt: new Date().toISOString(),
