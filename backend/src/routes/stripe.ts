@@ -43,16 +43,20 @@ const stripeRoutes: FastifyPluginAsync = async (fastify) => {
         });
       }
 
-      // Minimum 4 credits (to ensure at least $0.50)
-      if (photo_credits < 4) {
-        return reply.status(400).send({
-          error: 'VALIDATION_ERROR',
-          message: 'Minimum is 4 credits ($0.76)',
-        });
+      // 1 credit = $0.99 (first portrait); 4+ credits = standard price per credit
+      let unitAmount: number;
+      if (photo_credits === 1) {
+        unitAmount = 99; // $0.99
+      } else {
+        if (photo_credits < 4) {
+          return reply.status(400).send({
+            error: 'VALIDATION_ERROR',
+            message: 'Minimum is 1 credit ($0.99) or 4+ credits',
+          });
+        }
+        unitAmount = config.pricePerPhotoCredit; // in cents
       }
 
-      // Calculate total
-      const unitAmount = config.pricePerPhotoCredit; // in cents
       const totalAmount = photo_credits * unitAmount;
 
       // Verify Stripe minimum ($0.50 = 50 cents)

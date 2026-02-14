@@ -42,8 +42,8 @@ const faqItems = [
     answer: "Currently, our tool supports combining two people into a portrait. For larger family groups, you may need to run multiple generations.",
   },
   {
-    question: "Is this really free?",
-    answer: "MemoryFrame offers 1 free image per day. No signup required, no hidden fees, no watermarks.",
+    question: "How much does it cost?",
+    answer: "One portrait is $0.99. Sign in, pay at checkout, then generate. No hidden fees.",
   },
   {
     question: "Do you store my family photos?",
@@ -298,7 +298,7 @@ export default function AIFamilyPortraitPage() {
             Ready to Create Your Portrait?
           </h2>
           <p className="text-white/70 mb-8">
-            No signup required. No watermarks.
+            One portrait = $0.99. Pay first, then generate.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

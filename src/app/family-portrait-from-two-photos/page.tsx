@@ -44,7 +44,7 @@ const faqItems = [
   },
   {
     question: "How much does it cost?",
-    answer: "MemoryFrame offers 1 free image per day. No signup required, no hidden fees, no watermarks.",
+    answer: "One portrait is $0.99. Sign in, pay at checkout, then generate. No hidden fees.",
   },
 ];
 

@@ -64,8 +64,8 @@ const faqItems = [
     answer: "Yes! Our AI is trained to create natural-looking compositions. Using photos with similar lighting and angles will give the best results.",
   },
   {
-    question: "Is this tool really free?",
-    answer: "MemoryFrame offers 1 free image per day. No signup required, no hidden fees, no watermarks.",
+    question: "How much does it cost?",
+    answer: "One portrait is $0.99. Sign in, pay at checkout, then generate. No hidden fees.",
   },
 ];
 

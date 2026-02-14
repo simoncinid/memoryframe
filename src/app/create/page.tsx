@@ -13,9 +13,10 @@ import { useToast } from "@/components/Toast";
 import { copy } from "@/content/copy";
 import { fileToBase64 } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
-import { getAccessToken, refreshUserCredits } from "@/lib/auth";
+import { getAccessToken, getUser, refreshUserCredits } from "@/lib/auth";
 import { getOrCreateDeviceId } from "@/lib/device-id";
-import { createUnlockCheckout } from "@/lib/credits";
+import { createCheckout } from "@/lib/credits";
+import Link from "next/link";
 
 const steps = [
   { id: "personA", title: copy.create.steps.personA.title },
@@ -42,9 +43,7 @@ function CreatePageContent() {
   const [generatingMessage, setGeneratingMessage] = useState("");
   const [resultImage, setResultImage] = useState<string | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
-  const [usedFreeQuota, setUsedFreeQuota] = useState(false);
-  const [showLockInModal, setShowLockInModal] = useState(false);
-  const [unlockLoading, setUnlockLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
 
   // Handle style from URL
@@ -72,74 +71,10 @@ function CreatePageContent() {
     if (selectedStyle && currentStep === 2) setCurrentStep(3);
   }, [selectedStyle, currentStep]);
 
-
-  const handleGenerate = useCallback(async () => {
-    if (!personA || !personB || !selectedStyle || !prompt) {
-      showToast("Please complete all steps before generating", "error");
-      return;
-    }
-
-    setIsGenerating(true);
-    trackEvent("generate_started", { style: selectedStyle });
-
-    // Cycle through generating messages
-    const messages = copy.create.generating.messages;
-    let messageIndex = 0;
-    setGeneratingMessage(messages[0]);
-    const messageInterval = setInterval(() => {
-      messageIndex = (messageIndex + 1) % messages.length;
-      setGeneratingMessage(messages[messageIndex]);
-    }, 1500);
-
-    try {
-      const [personABase64, personBBase64] = await Promise.all([
-        fileToBase64(personA),
-        fileToBase64(personB),
-      ]);
-
-      const token = getAccessToken();
-      const headers: HeadersInit = { "Content-Type": "application/json" };
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      // Get device ID for anonymous tracking
-      const deviceId = getOrCreateDeviceId();
-
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          personA: personABase64,
-          personB: personBBase64,
-          style: selectedStyle,
-          prompt,
-          deviceId,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Generation failed");
-      }
-
-      setResultImage(data.resultImageUrl);
-      setJobId(data.jobId ?? null);
-      setUsedFreeQuota(!!data.usedFreeQuota);
-      trackEvent("generate_success", { style: selectedStyle });
-      
-      // Refresh user credits after successful generation
-      await refreshUserCredits();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Generation failed";
-      showToast(message, "error");
-      trackEvent("generate_error", { error: message });
-    } finally {
-      clearInterval(messageInterval);
-      setIsGenerating(false);
-    }
-  }, [personA, personB, selectedStyle, prompt, showToast]);
+  // Refresh credits on mount (e.g. after returning from checkout)
+  useEffect(() => {
+    if (getUser()) refreshUserCredits();
+  }, []);
 
   const handleDownload = useCallback(() => {
     if (!resultImage) return;
@@ -162,33 +97,97 @@ function CreatePageContent() {
     setPrompt("");
     setResultImage(null);
     setJobId(null);
-    setUsedFreeQuota(false);
-    setShowLockInModal(false);
     setCurrentStep(0);
   }, []);
 
-  const handleUnlock = useCallback(async () => {
-    if (!jobId) return;
-    setUnlockLoading(true);
-    try {
-      const { url } = await createUnlockCheckout(jobId);
-      window.location.href = url;
-    } catch (e) {
-      showToast(e instanceof Error ? e.message : "Error starting checkout", "error");
-    } finally {
-      setUnlockLoading(false);
+  const handleGenerate = useCallback(async () => {
+    if (!personA || !personB || !selectedStyle || !prompt) {
+      showToast("Please complete all steps before generating", "error");
+      return;
     }
-  }, [jobId, showToast]);
 
-  // beforeunload: lock-in quando è free e non sbloccata
-  useEffect(() => {
-    if (!usedFreeQuota || !resultImage) return;
-    const onLeave = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-    };
-    window.addEventListener("beforeunload", onLeave);
-    return () => window.removeEventListener("beforeunload", onLeave);
-  }, [usedFreeQuota, resultImage]);
+    setIsGenerating(true);
+    trackEvent("generate_started", { style: selectedStyle });
+
+    const messages = copy.create.generating.messages;
+    let messageIndex = 0;
+    setGeneratingMessage(messages[0]);
+    const messageInterval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % messages.length;
+      setGeneratingMessage(messages[messageIndex]);
+    }, 1500);
+
+    try {
+      const [personABase64, personBBase64] = await Promise.all([
+        fileToBase64(personA),
+        fileToBase64(personB),
+      ]);
+
+      const token = getAccessToken();
+      const headers: HeadersInit = { "Content-Type": "application/json" };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const deviceId = getOrCreateDeviceId();
+
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          personA: personABase64,
+          personB: personBBase64,
+          style: selectedStyle,
+          prompt,
+          deviceId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || "Generation failed");
+      }
+
+      setResultImage(data.resultImageUrl);
+      setJobId(data.jobId ?? null);
+      trackEvent("generate_success", { style: selectedStyle });
+
+      await refreshUserCredits();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Generation failed";
+      showToast(message, "error");
+      trackEvent("generate_error", { error: message });
+    } finally {
+      clearInterval(messageInterval);
+      setIsGenerating(false);
+    }
+  }, [personA, personB, selectedStyle, prompt, showToast]);
+
+  // Step A: pay $0.99 then generate. If no credits, go to checkout first.
+  const handleGenerateOrPay = useCallback(async () => {
+    if (!personA || !personB || !selectedStyle || !prompt) {
+      showToast("Please complete all steps before generating", "error");
+      return;
+    }
+    const user = getUser();
+    if (!user) {
+      showToast("Sign in to create. One portrait = $0.99.", "error");
+      return;
+    }
+    if (user.creditsPhoto < 1) {
+      setCheckoutLoading(true);
+      try {
+        const checkout = await createCheckout(1);
+        window.location.href = checkout.url;
+      } catch (e) {
+        showToast(e instanceof Error ? e.message : "Error starting checkout", "error");
+        setCheckoutLoading(false);
+      }
+      return;
+    }
+    handleGenerate();
+  }, [personA, personB, selectedStyle, prompt, showToast, handleGenerate]);
 
   // Result View
   if (resultImage) {
@@ -201,88 +200,34 @@ function CreatePageContent() {
         </div>
 
         <div className="bg-[#FFF5EB] rounded-2xl p-4 mb-8">
-          <div
-            className="relative aspect-square max-w-2xl mx-auto rounded-xl overflow-hidden bg-[#FFDFB9] select-none"
-            onContextMenu={usedFreeQuota ? (e) => e.preventDefault() : undefined}
-            style={usedFreeQuota ? { userSelect: "none", WebkitUserSelect: "none" } : undefined}
-          >
+          <div className="relative aspect-square max-w-2xl mx-auto rounded-xl overflow-hidden bg-[#FFDFB9]">
             <Image
               src={resultImage}
               alt="Generated portrait"
               fill
-              className="object-cover pointer-events-none"
+              className="object-cover"
               priority
-              draggable={!usedFreeQuota}
             />
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          {usedFreeQuota ? (
-            <button
-              onClick={handleUnlock}
-              disabled={unlockLoading}
-              className="px-8 py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D] disabled:opacity-70"
-            >
-              {unlockLoading ? "Redirecting…" : "Unlock for $0.99"}
-            </button>
-          ) : (
-            <button
-              onClick={handleDownload}
-              className="px-8 py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D]"
-            >
-              {copy.create.result.downloadButton}
-            </button>
-          )}
+          <button
+            onClick={handleDownload}
+            className="px-8 py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D]"
+          >
+            {copy.create.result.downloadButton}
+          </button>
         </div>
 
         <div className="text-center">
           <button
-            onClick={() => (usedFreeQuota ? setShowLockInModal(true) : handleReset())}
+            onClick={handleReset}
             className="text-[#A4193D] hover:text-[#A4193D] underline underline-offset-4"
           >
             Create another portrait
           </button>
         </div>
-
-        {/* Lock-in modal: "Isn't your family photo worth $0.99?" */}
-        {showLockInModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-[#FFF5EB] rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-xl relative">
-              <button
-                onClick={() => {
-                  setShowLockInModal(false);
-                  handleReset();
-                }}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-[#7D132E] hover:bg-[#FFE8D1]"
-                aria-label="Close"
-              >
-                ×
-              </button>
-              <p className="text-lg sm:text-xl text-[#A4193D] font-medium mb-6 pr-8">
-                Isn&apos;t your family photo worth $0.99?
-              </p>
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={handleUnlock}
-                  disabled={unlockLoading}
-                  className="w-full py-3 bg-[#A4193D] text-white rounded-xl font-medium hover:bg-[#7D132E] disabled:opacity-70"
-                >
-                  {unlockLoading ? "Redirecting…" : "Unlock for $0.99"}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowLockInModal(false);
-                    handleReset();
-                  }}
-                  className="w-full py-2 text-[#7D132E] hover:underline"
-                >
-                  No thanks, start over
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
@@ -443,14 +388,32 @@ function CreatePageContent() {
               />
             </div>
 
-            {/* Generate Button */}
-            <button
-              onClick={handleGenerate}
-              disabled={!prompt}
-              className="w-full py-4 bg-[#A4193D] text-white rounded-xl font-medium text-lg hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {copy.create.generateButton}
-            </button>
+            {/* Step A: Pay $0.99 then generate. Must be signed in. */}
+            {!getUser() ? (
+              <div className="space-y-3">
+                <p className="text-[#7D132E] text-sm">
+                  Sign in to create. One portrait = $0.99.
+                </p>
+                <Link
+                  href="/login?redirect=/create"
+                  className="w-full py-4 bg-[#A4193D] text-white rounded-xl font-medium text-lg hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D] block text-center"
+                >
+                  Sign in to continue
+                </Link>
+              </div>
+            ) : (
+              <button
+                onClick={handleGenerateOrPay}
+                disabled={!prompt || checkoutLoading}
+                className="w-full py-4 bg-[#A4193D] text-white rounded-xl font-medium text-lg hover:bg-[#7D132E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C51D4D] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {checkoutLoading
+                  ? "Redirecting to checkout…"
+                  : getUser()!.creditsPhoto < 1
+                    ? "Pay $0.99 & Generate"
+                    : copy.create.generateButton}
+              </button>
+            )}
           </div>
         )}
       </div>

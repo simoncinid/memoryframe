@@ -308,7 +308,7 @@ function MemePageContent() {
               <span className="transform group-open:rotate-180 transition-transform">▼</span>
             </summary>
             <p className="text-[#A4193D] mt-3">
-              MemoryFrame offers 1 free image per day. No signup required, no watermarks on your images.
+              Portrait generation is $0.99 per image. Sign in and pay at checkout before generating.
             </p>
           </details>
           

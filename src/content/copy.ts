@@ -71,8 +71,8 @@ export const copy = {
       title: "Frequently Asked Questions",
       items: [
         {
-          question: "Is MemoryFrame free?",
-          answer: "MemoryFrame offers 1 free image per day. No signup required, no hidden fees, no watermarks.",
+          question: "How much does a portrait cost?",
+          answer: "One portrait costs $0.99. Sign in, pay at checkout, then generate. No hidden fees.",
         },
         {
           question: "What photo formats are supported?",
@@ -151,7 +151,7 @@ export const copy = {
       title: "Your Portrait is Ready",
       downloadButton: "Download",
       variationsButton: "Generate Variation",
-      variationLimit: "You've used your free variation. Leave a tip to unlock more.",
+      variationLimit: "Buy more credits to generate another variation.",
     },
     rateLimitError: "Daily limit reached. Try again later.",
   },
@@ -304,7 +304,7 @@ export const copy = {
   seoPages: {
     aiFamilyPortrait: {
       title: "AI Family Portrait Generator | MemoryFrame",
-      metaDescription: "Create beautiful AI-generated family portraits from separate photos. Bring loved ones together in one meaningful image with our free tool.",
+      metaDescription: "Create beautiful AI-generated family portraits from separate photos. Bring loved ones together in one meaningful image. $0.99 per portrait.",
       h1: "AI Family Portrait Generator",
       intro: "Transform separate photos into a unified family portrait using advanced AI technology. Whether you want to create a keepsake, a gift, or simply see your family together in a new way, our tool makes it simple.",
       useCases: [
@@ -511,7 +511,7 @@ export const copy = {
         },
         {
           title: "3. Free Service & Voluntary Tips",
-          content: "The service offers 1 free image per day. Users may purchase additional credits to generate more images. Credits are non-refundable and do not provide any additional features or guarantees beyond image generation.",
+          content: "Each portrait costs one credit ($0.99 for the first). Users purchase credits before generating. Credits are non-refundable and do not provide any additional features or guarantees beyond image generation.",
         },
         {
           title: "4. Acceptable Use",

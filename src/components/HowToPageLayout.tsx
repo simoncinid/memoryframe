@@ -144,7 +144,7 @@ export function HowToPageLayout({
             Ready to Create Your Portrait?
           </h2>
           <p className="text-white/70 mb-6">
-            No signup required. No watermarks.
+            One portrait = $0.99. Pay first, then generate.
           </p>
           <Link
             href="/create"
